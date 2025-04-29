@@ -3,25 +3,33 @@ import "package:flutter/material.dart";
 
 class CustomTextField extends StatelessWidget{
   final String label;
+  final String? value;
   final TextEditingController? controller;
   final TextInputType? keyboardtype;
+  final Color themeColor;
+  final Color fontColor;
 
 
   const CustomTextField({
     super.key,
     required this.label,
+    this.value,
     this.controller,
-    this.keyboardtype
+    this.keyboardtype,
+    this.themeColor=Colors.orange,
+    this.fontColor=Colors.black
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+          
           controller: controller,
-          cursorColor: Colors.orange,
+          cursorColor: themeColor,
           keyboardType: keyboardtype,
           style: TextStyle(
             fontWeight: FontWeight.w600,
+            color: fontColor,
             fontSize: 14
           ),
           decoration: InputDecoration(
@@ -29,15 +37,16 @@ class CustomTextField extends StatelessWidget{
             labelText: label,
             labelStyle: TextStyle(
               fontWeight: FontWeight.w600,
+              color: fontColor,
               fontSize: 13
             ),
-            focusColor: Colors.orange,
-            fillColor: Colors.orange,
-            hoverColor: Colors.orange,
-            floatingLabelStyle: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),
+            focusColor: themeColor,
+            fillColor: themeColor,
+            hoverColor: themeColor,
+            floatingLabelStyle: TextStyle(color: fontColor,fontWeight: FontWeight.w600),
             
             focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.orange)
+              borderSide: BorderSide(color: themeColor)
               
             )
           ),

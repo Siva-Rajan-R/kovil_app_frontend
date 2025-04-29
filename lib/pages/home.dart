@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/features_container.dart';
-import 'package:sampleflutter/pages/events.dart';
+import 'package:sampleflutter/pages/add_event_name.dart';
+import 'package:sampleflutter/pages/add_events.dart';
+import 'package:sampleflutter/pages/all_events.dart';
+import 'package:sampleflutter/pages/login.dart';
 import 'package:sampleflutter/pages/tamil_calendar.dart';
+import 'package:sampleflutter/pages/today_events.dart';
+import 'package:sampleflutter/pages/user.dart';
+import 'package:sampleflutter/utils/enums.dart';
+import 'package:sampleflutter/utils/secure_storage_init.dart';
 // void main(){
 //   runApp(HomePage());
 // }
@@ -78,63 +85,81 @@ List<Widget> rowBuilder(List<Map<String,dynamic>> items){
 
 
 class HomePage extends StatelessWidget{
+  
   HomePage({super.key});
 
   final List<Map<String,dynamic>> featuresSvg=[
     {"label":"Tamil Calendar","svg":"assets/svg/calendar-svgrepo-com.svg","cc":Colors.yellow.shade50,"sc":Colors.yellow.shade300,"route":TamilCalendarPage()},
-    {"label":"All Events","svg":"assets/svg/event svy.svg","cc":Colors.purple.shade50,"sc":Colors.purple.shade100,"route":EventsPage()},
-    {"label":"Today Events","svg":"assets/svg/news-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade100,"route":TamilCalendarPage()},
-    {"label":"Add Events","svg":"assets/svg/calendar-add-event-svgrepo-com.svg","cc":Colors.green.shade50,"sc":Colors.green.shade100,"route":TamilCalendarPage()},
-    {"label":"Users","svg":"assets/svg/users-young-svgrepo-com.svg","cc":Colors.cyan.shade50,"sc":Colors.cyan.shade100,"route":TamilCalendarPage()},
+    {"label":"All Events","svg":"assets/svg/event svy.svg","cc":Colors.purple.shade50,"sc":Colors.purple.shade100,"route":AllEventsPage()},
+    {"label":"Today Events","svg":"assets/svg/news-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade100,"route":TodayEventsPage()},
+    {"label":"Add Events Name","svg":"assets/svg/calendar-add-event-svgrepo-com.svg","cc":Colors.green.shade50,"sc":Colors.green.shade100,"route":AddEventName()},
+    {"label":"Add Events","svg":"assets/svg/calendar-add-event-svgrepo-com.svg","cc":Colors.green.shade50,"sc":Colors.green.shade100,"route":AddEventsPage()},
+    {"label":"Users","svg":"assets/svg/users-young-svgrepo-com.svg","cc":Colors.cyan.shade50,"sc":Colors.cyan.shade100,"route":UserPage()},
     {"label":"Dashboard","svg":"assets/svg/analytics-clipboard-svgrepo-com.svg","cc":Colors.grey.shade300,"sc":Colors.grey.shade300,"route":TamilCalendarPage()},
-    {"label":"Logout","svg":"assets/svg/logout-svgrepo-com.svg","cc":Colors.red.shade50,"sc":Colors.red.shade100,"route":TamilCalendarPage()},
+    {"label":"Logout","svg":"assets/svg/logout-svgrepo-com.svg","cc":Colors.red.shade50,"sc":Colors.red.shade100,"route":LoginPage()},
     
   ];
-    final String user="admin";
   
+  Future getCurrentUserRole() async {
+    return await secureStorage.read(key: 'role');
+  }
+
   @override
   Widget build(BuildContext context) {
   List<Map<String,dynamic>> visibleFeatures=[];
-    if (user=="admin"){
-      visibleFeatures=featuresSvg;
-    }
-    else{
-      visibleFeatures=[
-        ...featuresSvg.sublist(0,3),
-        featuresSvg.last
-        
-      ];
-      print(visibleFeatures);
-    }
-    
-    return Scaffold(
-      appBar: KovilAppBar(),
-        body: Column(
-          children: [
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
+    return FutureBuilder(
+      future: getCurrentUserRole(),
+      builder: (context, snapshot){
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));
+        }
+        else{
+          final String curUserRole=snapshot.data ?? "";
+          print("cur role ${curUserRole} ${UserRoleEnum.ADMIN.name}");
+          if (curUserRole==UserRoleEnum.ADMIN.name){
+            visibleFeatures=featuresSvg;
+          }
+          else{
+            visibleFeatures=[
+              ...featuresSvg.sublist(0,3),
+              featuresSvg.last
+              
+            ];
+            print(visibleFeatures);
+          }
+          
+          return Scaffold(
+            appBar: KovilAppBar(withIcon: true,),
+              body: Column(
+                children: [
+                  Column(
                     children: [
-                      Text(
-                        "Features",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange.shade800
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Features",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange.shade800
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                      SizedBox(height: 10,),
+                    ...rowBuilder(visibleFeatures)
+                      
                     ],
-                  ),
-                ),
-                SizedBox(height: 10,),
-               ...rowBuilder(visibleFeatures)
-                
-              ],
-            )
-          ],
-        )
-      );
+                  )
+                ],
+              )
+            );
+        }
+      }
+    );
+    
   }
 } 

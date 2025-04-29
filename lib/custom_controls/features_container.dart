@@ -1,6 +1,8 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sampleflutter/utils/secure_storage_init.dart';
 
 
 
@@ -27,10 +29,21 @@ class FeaturesContainer extends StatelessWidget{
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: (){
+        onTap: () async{
           // Navigator.of(context).pushNamed(route);
-          Navigator.push(context,CupertinoPageRoute(builder: (context)=>route));
-          print("clicked container ${label}");
+          if (label=='Logout'){
+            print("logout ulla");
+            await secureStorage.delete(key: 'accessToken');
+            await secureStorage.delete(key: 'refreshToken');
+            await secureStorage.delete(key: 'role');
+            await secureStorage.delete(key: 'refreshTokenExpDate');
+            await secureStorage.write(key: 'isLoggedIn', value: 'false');
+            Navigator.pushReplacementNamed(context, '/login');
+          }
+          else{
+            Navigator.push(context,CupertinoPageRoute(builder: (context)=>route));
+          }
+          print("clicked container $label");
         },
         child: Container(
             width: 80,

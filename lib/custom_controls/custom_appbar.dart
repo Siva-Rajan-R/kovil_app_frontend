@@ -5,19 +5,52 @@ class KovilAppBar extends StatelessWidget implements PreferredSizeWidget{
   final String title;
   final double height;
   final double titleSize;
+  final List<Widget>? actions;
+  final bool withIcon;
 
-  KovilAppBar(
+  const KovilAppBar(
     {
       this.title="Nanmai Tharuvar Kovil",
-      this.height=100,
+      this.height=120,
       this.titleSize=25,
+      this.withIcon=false,
+      this.actions,
       super.key
     }
   );
   @override
   Size get preferredSize => Size.fromHeight(height);
+  
   @override
+  
   Widget build(BuildContext context) {
+    final List<Widget> titleWidget=[
+      SvgPicture.asset(
+          "assets/svg/temple-india-svgrepo-com.svg",
+          width: 40,
+          height: 40,
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: titleSize,
+            color: Colors.white,
+            overflow: TextOverflow.ellipsis
+          ),
+        )
+    ];
+    final List<Widget> appBarTitle;
+    if(withIcon){
+      appBarTitle=titleWidget;
+    }
+    else{
+      appBarTitle=[titleWidget.last];
+    }
+
     return PreferredSize(
         preferredSize: Size.fromHeight(100),
         child: Container(
@@ -37,31 +70,14 @@ class KovilAppBar extends StatelessWidget implements PreferredSizeWidget{
             borderRadius: BorderRadius.only(bottomLeft: Radius.elliptical(20, 20),bottomRight: Radius.elliptical(20, 20))
           ),
           child: AppBar(
+              actions: actions,
               backgroundColor: Colors.transparent,
               iconTheme: IconThemeData(color: Colors.white),
               centerTitle: true,
               toolbarHeight: height,
-              title: Row(
+              title: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  "assets/svg/temple-india-svgrepo-com.svg",
-                  width: 40,
-                  height: 40,
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: titleSize,
-                    color: Colors.white
-                    
-                  ),
-                )
-              ],
+              children: List.from(appBarTitle),
             )
           ),
         ),

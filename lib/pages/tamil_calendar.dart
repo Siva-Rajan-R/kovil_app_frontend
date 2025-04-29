@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
+import 'package:sampleflutter/utils/network_request.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 class TamilCalendarPage extends StatefulWidget {
   const TamilCalendarPage({super.key});
@@ -10,14 +12,15 @@ class TamilCalendarPage extends StatefulWidget {
 }
 
 class _TamilCalendarPageState extends State<TamilCalendarPage> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-
+  DateTime _selectedDay= DateTime.now();
+  
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      appBar: KovilAppBar(titleSize: 20,),
+      appBar: KovilAppBar(withIcon: true,titleSize: 20,),
       body: Column(
         children: [
           TableCalendar(
@@ -39,7 +42,7 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
               ),
             ),
             onDaySelected: (selectedDay, focusedDay) {
-              print(selectedDay);
+              print(DateFormat("yyyy-MM-dd").format(selectedDay));
               setState(() {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
@@ -52,7 +55,7 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
               });
             },
             onPageChanged: (focusedDay) {
-              print("${focusedDay},${_focusedDay}");
+              print("$focusedDay,$_focusedDay");
               _focusedDay = focusedDay;
             },
           ),
@@ -68,8 +71,9 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
                         minScale: 0.5,
                         maxScale: 4.0,
                         panEnabled: true,
-                        child: Image.asset(
-                          "assets/image/Screenshot 2025-04-13 170837.png"
+                        child: Image.network(
+                          "$BASEURL/panchagam/calendar?date=${DateFormat("yyyy-MM-dd").format(_selectedDay)}"
+                        
                         ),
                       ),
                   ),

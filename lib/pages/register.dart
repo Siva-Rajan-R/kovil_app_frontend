@@ -1,6 +1,11 @@
+import 'dart:convert';
+
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sampleflutter/utils/network_request.dart';
 
 // void main(){
 //   runApp(RegisterPage());
@@ -37,24 +42,26 @@ class RegisterPage extends StatelessWidget{
                   padding: EdgeInsets.all(8.0),
                   child:SizedBox(
                     height:100,
+                    width: double.infinity,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                         Row(
+                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SvgPicture.asset(
                               "assets/svg/hindu-temple-svgrepo-com.svg",
-                              width: 40,
-                              height: 40,
+                              width: 50,
+                              
                             ),
                             Text(
                             "Nanmai Tharuvar Kovil",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 22,
+                              fontSize: 26,
                               fontWeight: FontWeight.bold
                             ),
                                                   ),
@@ -139,16 +146,41 @@ class RegisterPage extends StatelessWidget{
                               label: Text("Role"),
                               controller: role,
                               menuStyle: MenuStyle(
-                                backgroundColor: MaterialStatePropertyAll<Color>(Colors.orange.shade100)
+                                backgroundColor: WidgetStatePropertyAll<Color>(Colors.orange.shade100)
                               ),
                               dropdownMenuEntries: [
-                                DropdownMenuEntry(value: "admin", label: "Admin"),
-                                DropdownMenuEntry(value: "user", label: "User")
+                                DropdownMenuEntry(value: "admin", label: "admin"),
+                                DropdownMenuEntry(value: "user", label: "user")
                               ],
                             ),
                             SizedBox(height: 20),
                             ElevatedButton(
-                              onPressed: () => print("${name.text},${email.text},${mobileNumber.text},${role.text},${password.text}"),
+                              onPressed: () async {
+                                print("name ${name.text},${email.text},${mobileNumber.text},${role.text},${password.text}");
+                                final res=await NetworkService.sendRequest(
+                                  path: '/register',
+                                  context: context,
+                                  method: 'POST',
+                                  body: {
+                                    "name": name.text,
+                                    "mobile_number": mobileNumber.text,
+                                    "email": email.text,
+                                    "role": role.text,
+                                    "password": password.text
+                                  }
+                                );
+                                final decodedRes=jsonDecode(res.body);
+                                print(decodedRes);
+                                if (res.statusCode==201){
+                                  customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.success).show(context);
+                                }
+                                else if(res.statusCode==422){
+                                  customSnackBar(content: "input fields couldn't be empty", contentType: AnimatedSnackBarType.info).show(context);
+                                }
+                                else{
+                                  customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
+                                }
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange,
                                 
