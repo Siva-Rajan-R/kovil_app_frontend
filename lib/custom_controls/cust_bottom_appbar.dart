@@ -5,7 +5,7 @@ class CustomBottomAppbar extends StatelessWidget{
   final Widget bottomAppbarChild;
   final double height;
 
-  CustomBottomAppbar({
+  const CustomBottomAppbar({
     required this.bottomAppbarChild,
     this.color=Colors.white,
     this.height=50,

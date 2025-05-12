@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:sampleflutter/pages/forgot.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/pages/login.dart';
 import 'package:sampleflutter/pages/register.dart';
@@ -38,6 +39,7 @@ class MyKovilApp extends StatelessWidget {
             routes: {
               "/login": (context) =>  LoginPage(),
               "/register": (context) =>  RegisterPage(),
+              "/forgot":(context)=>ForgotPage(),
               "/home": (context) =>  HomePage(),
               "/tamil-calendar": (context) =>  TamilCalendarPage(),
             },

@@ -1,4 +1,5 @@
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -33,12 +34,26 @@ class FeaturesContainer extends StatelessWidget{
           // Navigator.of(context).pushNamed(route);
           if (label=='Logout'){
             print("logout ulla");
+            AwesomeDialog(
+            context: context,
+            btnOkText: "Yes",
+            dismissOnTouchOutside: false,
+            dismissOnBackKeyPress: false,
+            dialogType: DialogType.question,
+            animType: AnimType.topSlide,
+            title: 'Log out',
+            desc: 'Are you sure , Do you Want to Logout ?',
+            btnCancelOnPress: () {},
+            btnOkOnPress: () async{
             await secureStorage.delete(key: 'accessToken');
             await secureStorage.delete(key: 'refreshToken');
             await secureStorage.delete(key: 'role');
             await secureStorage.delete(key: 'refreshTokenExpDate');
             await secureStorage.write(key: 'isLoggedIn', value: 'false');
             Navigator.pushReplacementNamed(context, '/login');
+            },
+            ).show();
+
           }
           else{
             Navigator.push(context,CupertinoPageRoute(builder: (context)=>route));

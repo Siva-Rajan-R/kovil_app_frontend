@@ -10,84 +10,105 @@ import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
-class AddEventsNextPage extends StatelessWidget{
-
+class AddEventsNextPage extends StatefulWidget {
   final Map previousPageData;
-  
+  final Map? existingEventDetails;
 
-  AddEventsNextPage(
-    {
-      required this.previousPageData,
-      super.key
+  const AddEventsNextPage({
+    required this.previousPageData,
+    this.existingEventDetails,
+    super.key,
+  });
+
+  @override
+  State<AddEventsNextPage> createState() => _AddEventsNextPageState();
+}
+
+class _AddEventsNextPageState extends State<AddEventsNextPage> {
+  bool isLoading = false;
+
+  late TextEditingController clientName;
+  late TextEditingController clientCity;
+  late TextEditingController clientNumber;
+  late TextEditingController totalAmount;
+  late TextEditingController paidAmount;
+  late TextEditingController paymentStatus;
+  late TextEditingController paymentMode;
+  late TextEditingController neivethiyamAmount;
+  String buttonLabel = "Submit";
+  String method = "POST";
+
+  @override
+  void initState() {
+    super.initState();
+
+    final data = widget.existingEventDetails;
+
+    clientName = TextEditingController(text: data?['client_name'] ?? "");
+    clientCity = TextEditingController(text: data?['client_city'] ?? "");
+    clientNumber = TextEditingController(text: data?['client_mobile_number'] ?? "");
+    totalAmount = TextEditingController(text: (widget.previousPageData['eventAmount']+widget.previousPageData["neivethiyamAmount"]).toString());
+    paidAmount = TextEditingController(text: data?['paid_amount'].toString() ?? "0");
+    paymentStatus = TextEditingController(text: data?['payment_status'] ?? "");
+    paymentMode = TextEditingController(text: data?['payment_mode'] ?? "");
+
+    if (data != null) {
+      buttonLabel = "Update";
+      method = "PUT";
     }
-  );
-  
+  }
+
+  Future<void> _handleSubmit(BuildContext context) async {
+    setState(() => isLoading = true);
+
+    Map reqBody = {
+      "event_name": widget.previousPageData['eventName'],
+      "event_description": widget.previousPageData['eventDes'],
+      "event_date": widget.previousPageData['eventDate'],
+      "event_start_at": widget.previousPageData['startTime'],
+      "event_end_at": widget.previousPageData['endTime'],
+      "client_name": clientName.text,
+      "client_mobile_number": clientNumber.text,
+      "client_city": clientCity.text,
+      "total_amount": totalAmount.text.isNotEmpty ? int.parse(totalAmount.text) : 0,
+      "paid_amount": paidAmount.text.isNotEmpty ? int.parse(paidAmount.text) : 0,
+      "payment_status": paymentStatus.text,
+      "payment_mode": paymentMode.text,
+      "neivethiyam_id":widget.previousPageData["neivethiyamId"]
+    };
+
+    if (method == "PUT") {
+      reqBody["event_id"] = widget.existingEventDetails!["event_id"];
+    }
+
+    final res = await NetworkService.sendRequest(
+      path: "/event",
+      context: context,
+      method: method,
+      body: reqBody,
+    );
+
+    final decodedRes = jsonDecode(utf8.decode(res.bodyBytes));
+    setState(() => isLoading = false);
+    print(res.body);
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+      Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(builder: (context) => HomePage()),
+        (route) => false,
+      );
+    } else if (res.statusCode == 422) {
+      customSnackBar(content: "Input Fields Couldn't Be Empty", contentType: AnimatedSnackBarType.info).show(context);
+    } else {
+      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final TextEditingController clientName=TextEditingController();
-    final TextEditingController clientCity=TextEditingController();
-    final TextEditingController clientNumber=TextEditingController();
-    final TextEditingController totalAmount=TextEditingController(text: previousPageData['eventAmount']);
-    final TextEditingController paidAmount=TextEditingController();
-    final TextEditingController paymentStatus=TextEditingController();
-    final TextEditingController paymentMode=TextEditingController();
-    
-    print("${previousPageData['startTime']} ${previousPageData['endTime']}");
     return Scaffold(
-      bottomNavigationBar: CustomBottomAppbar(
-        bottomAppbarChild: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                    onPressed: ()async{
-                      final res=await NetworkService.sendRequest(
-                        path: "/event",
-                        context: context,
-                        method: 'POST',
-                        body: {
-                          "event_name": previousPageData['eventName'],
-                          "event_description": previousPageData['eventDes'],
-                          "event_date": previousPageData['eventDate'],
-                          "event_start_at": previousPageData['startTime'],
-                          "event_end_at": previousPageData['endTime'],
-                          "client_name": clientName.text,
-                          "client_mobile_number": clientNumber.text,
-                          "client_city": clientCity.text,
-                          "total_amount": totalAmount.text.isNotEmpty? int.parse(totalAmount.text) : 0,
-                          "paid_amount": paidAmount.text.isNotEmpty? int.parse(paidAmount.text) : 0,
-                          "payment_status": paymentStatus.text,
-                          "payment_mode": paymentMode.text
-                        }
-                      );
-                      final decodedRes=jsonDecode(res.body);
-                      print(decodedRes);
-                      if(res.statusCode==201){
-                        customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
-                        
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          CupertinoPageRoute(builder: (context) => HomePage()),
-                          (route) => false,
-                        );
-                      }
-                      else if(res.statusCode==422){
-                        customSnackBar(content: "Input Fields Couldn't Be Empty", contentType: AnimatedSnackBarType.info).show(context);
-                      }
-                      else{
-                        customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
-                      }
-                      
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      
-                    ),
-                    child: Text("Submit",style: TextStyle(color: Colors.white),)
-                  ),
-              ],
-            ),
-      ),
-      appBar: KovilAppBar(height: 100,),
+      appBar: KovilAppBar(height: 100),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -142,7 +163,7 @@ class AddEventsNextPage extends StatelessWidget{
             Container(
               width: double.infinity,
               margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
                   Colors.orange.shade400,
@@ -181,33 +202,50 @@ class AddEventsNextPage extends StatelessWidget{
                     CustomTextField(label: "Paid amount",themeColor: Colors.white,fontColor: Colors.white,keyboardtype: TextInputType.number,controller: paidAmount,),
                     SizedBox(height: 20,),
                     SingleChildScrollView(
+                      padding: EdgeInsets.only(top: 10),
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
                           DropdownMenu(
-                              width: 280,
+                              width: 250,
                               controller: paymentMode,
-                              label: Text("Payment mode"),
+                              label: Text(
+                                "Payment mode",
+                                style: TextStyle(
+                                  color: Colors.white,fontWeight: FontWeight.w600
+                                ),
+                              ),
+                              textStyle: TextStyle(
+                                color: Colors.white,fontWeight: FontWeight.w600
+                              ),
                               menuStyle: MenuStyle(
                                 backgroundColor: WidgetStatePropertyAll<Color>(Colors.orange.shade100)
                               ),
                               dropdownMenuEntries: [
-                                DropdownMenuEntry(value: "online", label: "online"),
-                                DropdownMenuEntry(value: "offline", label: "offline")
+                                for(String i in List.from(widget.previousPageData['paymentModes']).toList())
+                                  DropdownMenuEntry(value: i, label: i),
                               ],
                             ),
                             SizedBox(width: 10,),
                             DropdownMenu(
                               width: 280,
                               controller: paymentStatus,
-                              label: Text("Payment status"),
+                              label: Text(
+                                "Payment status",
+                                style: TextStyle(
+                                  color: Colors.white,fontWeight: FontWeight.w600
+                                ),
+                              ),
+                              textStyle: TextStyle(
+                                color: Colors.white,fontWeight: FontWeight.w600
+                              ),
+                                          
                               menuStyle: MenuStyle(
                                 backgroundColor: WidgetStatePropertyAll<Color>(Colors.orange.shade100)
                               ),
                               dropdownMenuEntries: [
-                                DropdownMenuEntry(value: "fully paid", label: "fully paid"),
-                                DropdownMenuEntry(value: "partially paid", label: "partially paid"),
-                                DropdownMenuEntry(value: "not paid", label: "not paid")
+                                for(String i in widget.previousPageData['paymentStatus'])
+                                DropdownMenuEntry(value: i, label: i),
                               ],
                             ),
                         ],
@@ -218,7 +256,26 @@ class AddEventsNextPage extends StatelessWidget{
                 ),
               ),
             ),
-            
+          ],
+        ),
+      ),
+      bottomNavigationBar: CustomBottomAppbar(
+        bottomAppbarChild: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: isLoading ? null : () => _handleSubmit(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+              ),
+              child: isLoading
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : Text(buttonLabel, style: TextStyle(color: Colors.white)),
+            ),
           ],
         ),
       ),

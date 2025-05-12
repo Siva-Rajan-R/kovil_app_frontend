@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget{
   final TextInputType? keyboardtype;
   final Color themeColor;
   final Color fontColor;
+  final Function(String)? onChanged;
 
 
   const CustomTextField({
@@ -17,13 +18,13 @@ class CustomTextField extends StatelessWidget{
     this.controller,
     this.keyboardtype,
     this.themeColor=Colors.orange,
-    this.fontColor=Colors.black
+    this.fontColor=Colors.black,
+    this.onChanged
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-          
           controller: controller,
           cursorColor: themeColor,
           keyboardType: keyboardtype,
@@ -32,6 +33,7 @@ class CustomTextField extends StatelessWidget{
             color: fontColor,
             fontSize: 14
           ),
+          
           decoration: InputDecoration(
             border: UnderlineInputBorder(),
             labelText: label,
@@ -47,7 +49,9 @@ class CustomTextField extends StatelessWidget{
             
             focusedBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: themeColor)
-              
+            ),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: themeColor)
             )
           ),
         );

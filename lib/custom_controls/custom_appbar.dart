@@ -10,7 +10,7 @@ class KovilAppBar extends StatelessWidget implements PreferredSizeWidget{
 
   const KovilAppBar(
     {
-      this.title="Nanmai Tharuvar Kovil",
+      this.title="Guruvudhasan",
       this.height=120,
       this.titleSize=25,
       this.withIcon=false,

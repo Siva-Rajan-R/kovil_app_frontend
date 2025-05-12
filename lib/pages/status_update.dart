@@ -6,24 +6,41 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
-import 'package:sampleflutter/pages/status_update_next.dart';
+import 'dart:convert';
+import 'package:animated_snack_bar/animated_snack_bar.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
+import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
+import 'package:sampleflutter/pages/home.dart';
+import 'package:sampleflutter/utils/network_request.dart';
 
 class StatusUpdatePage extends StatefulWidget {
   final String eventStatus;
   final String eventId;
-  const StatusUpdatePage({required this.eventStatus,required this.eventId, super.key});
+  final Map? existingEventDetails;
+  const StatusUpdatePage({required this.eventStatus,required this.eventId, this.existingEventDetails, super.key});
 
   @override
   State<StatusUpdatePage> createState() => _StatusUpdatePageState();
 }
 
 class _StatusUpdatePageState extends State<StatusUpdatePage> {
+
+  bool _isSubmitting = false;
+
+  bool isLoading=false;
+
   File? _selectedImage;
   String? _selectedImagePath;
-  final TextEditingController feedback=TextEditingController();
-  final TextEditingController tips=TextEditingController();
-  final TextEditingController poojai=TextEditingController();
-  
+  late TextEditingController feedback;
+  late TextEditingController archagar;
+  late TextEditingController abisegam ;
+  late TextEditingController helper;
+  late TextEditingController poo;
+  late TextEditingController read;
+  late TextEditingController prepare;
+
+
+  List<Map> workersName=[];
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -38,46 +55,160 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     }
   }
 
+  void handleSubmit() async {
+    setState(() => _isSubmitting = true);
+    final formData = {
+      "event_id": widget.eventId,
+      "event_status": widget.eventStatus,
+      "feedback": feedback.text,
+      "archagar": archagar.text,
+      "abisegam": abisegam.text,
+      "helper": helper.text,
+      "poo": poo.text,
+      "read": read.text,
+      "prepare": prepare.text,
+    };
+
+    final res = await NetworkService.sendRequest(
+      path: "/event/status",
+      context: context,
+      method: "PUT",
+      isJson: false,
+      isMultipart: true,
+      imageFile: _selectedImage,
+      body: formData,
+    );
+    setState(() => _isSubmitting = false);
+    print(res.body);
+    final decodedRes = jsonDecode(utf8.decode(res.bodyBytes));
+    
+    if (res.statusCode == 200) {
+      customSnackBar(
+        content: decodedRes,
+        contentType: AnimatedSnackBarType.success,
+      ).show(context);
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(builder: (_) => HomePage()),
+        (_) => false,
+      );
+    } else if (res.statusCode == 422) {
+      customSnackBar(
+        content: "Input Fields Couldn't be Empty",
+        contentType: AnimatedSnackBarType.info,
+      ).show(context);
+    } else {
+      customSnackBar(
+        content: decodedRes['detail'],
+        contentType: AnimatedSnackBarType.error,
+      ).show(context);
+    }
+
+    
+  }
+
+  void getWorkersName()async {
+    setState(() {
+      isLoading=true;
+    });
+    final res=await NetworkService.sendRequest(path: "/workers", context: context);
+
+    final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
+    setState(() {
+      isLoading=false;
+    });
+    print("qwertyuiopasdfghjk $decodedRes");
+    if (res.statusCode==200){
+      workersName=List.from(decodedRes['workers']);
+    }
+    else{
+      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
+    }
+  }
+
+  @override
+  void dispose() {
+    abisegam.dispose();
+    helper.dispose();
+    poo.dispose();
+    read.dispose();
+    prepare.dispose();
+    feedback.dispose();
+    archagar.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState(){
+    super.initState();
+
+    getWorkersName();
+
+    final existsDetails=widget.existingEventDetails;
+    String efeedback="";
+    String earchagar="";
+    String eabisegam="";
+    String ehelper="";
+    String epoo="";
+    String eread="";
+    String eprepare="";
+
+    if (existsDetails!=null){
+
+      print("existsss $existsDetails");
+      efeedback=existsDetails['feedback'] ?? "";
+      earchagar=existsDetails['archagar'] ?? "";
+      eabisegam=existsDetails['abisegam'] ?? "";
+      ehelper=existsDetails['helper'] ?? "";
+      epoo=existsDetails['poo'] ?? "";
+      eread=existsDetails['read'] ?? "";
+      eprepare=existsDetails['prepare'] ?? "";
+    }
+    feedback=TextEditingController(text: efeedback);
+    archagar=TextEditingController(text: earchagar);
+    abisegam = TextEditingController(text: eabisegam);
+    helper = TextEditingController(text: ehelper);
+    poo = TextEditingController(text: epoo);
+    read = TextEditingController(text: eread);
+    prepare = TextEditingController(text: eprepare);
+  }
+
   @override
   Widget build(BuildContext context) {
     print('Event status: ${widget.eventStatus}');
     bool canPickImage = !(widget.eventStatus.toLowerCase() == "pending" || widget.eventStatus.toLowerCase() == "canceled");
-    
-    return Scaffold(
-      bottomNavigationBar: CustomBottomAppbar(
-        bottomAppbarChild: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            ElevatedButton(
-              onPressed: () { 
-                Map data={
-                  'imagePath':_selectedImagePath,
-                  "imageFile":_selectedImage,
-                  'feedback':feedback.text,
-                  "tips":tips.text,
-                  "poojai":poojai.text,
-                  "eventId":widget.eventId,
-                  "eventStatus":widget.eventStatus
+    print("workers name is the worls------------$workersName");
 
-                };
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(builder: (context) => StatusUpdatePageNext(previousPageData: data,)));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-              ),
-              child: Row(
-                children: [
-                  const Text("Next", style: TextStyle(color: Colors.white)),
-                  const SizedBox(width: 10),
-                  const Icon(Icons.arrow_forward, color: Colors.white),
-                ],
-              ),
+    final List<Map> ddLabels=[
+      {"label":"ஸ்தல அர்ச்சகர்","controller":archagar},
+      {"label":"அபிஷேகம்","controller":abisegam},
+      {"label":"அபிஷேகம் உதவி","controller":helper},
+      {"label":"பூ அர்ச்சனை","controller":poo},
+      {"label":"நாமா வழி சொல்பவர்","controller":read},
+      {"label":"பொருட்கள் சேகரித்தவர்","controller":prepare}
+    ];
+    return isLoading? Scaffold(
+      appBar: const KovilAppBar(withIcon: true),
+      body: Center(child: CircularProgressIndicator(color: Colors.orange,),) ,
+    )
+    : Scaffold(
+      bottomNavigationBar: CustomBottomAppbar(
+        bottomAppbarChild: Center(
+          child: ElevatedButton(
+            onPressed: _isSubmitting ? null : handleSubmit,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              
             ),
-          ],
+            child: Text(
+              _isSubmitting ? "Submitting..." : "Submit",
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
         ),
       ),
+
       appBar: const KovilAppBar(withIcon: true),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -109,22 +240,35 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
                   ),
                 ],
               ),
+            
             SizedBox(height: 10),
             Padding(
-              padding: EdgeInsets.all(10),
-              child: CustomTextField(label: "Feedback",controller: feedback,),
+              padding: const EdgeInsets.all(10),
+              child: CustomTextField(label:"நிகழ்வு கருத்து",controller:feedback,),
             ),
-            SizedBox(height: 10),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: CustomTextField(label: "Tips",controller: tips,),
-            ),
-            SizedBox(height: 10),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: CustomTextField(label: "Poojai",controller: poojai,),
-            ),
-            SizedBox(height: 20),
+
+            for (int i = 0; i < ddLabels.length; i++) 
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: CustomDropdown(
+                    Width: 400,
+                    label: ddLabels[i]['label'],
+                    ddController: ddLabels[i]['controller'],
+                    ddEntries: [
+                      for (int j = 0; j < workersName.length; j++)
+                        DropdownMenuEntry(
+                          value: workersName[j]['name'],
+                          label: workersName[j]['name'],
+                        )
+                    ],
+                    onSelected: (value) {
+                      print("Selected worker ID: $value");
+                    },
+                  ),
+                ),
+
+            
+
           ],
         ),
       ),

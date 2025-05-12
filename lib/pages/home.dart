@@ -3,56 +3,16 @@ import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/features_container.dart';
 import 'package:sampleflutter/pages/add_event_name.dart';
 import 'package:sampleflutter/pages/add_events.dart';
+import 'package:sampleflutter/pages/add_worker.dart';
 import 'package:sampleflutter/pages/all_events.dart';
+import 'package:sampleflutter/pages/dashboard.dart';
+import 'package:sampleflutter/pages/event_download.dart';
 import 'package:sampleflutter/pages/login.dart';
 import 'package:sampleflutter/pages/tamil_calendar.dart';
 import 'package:sampleflutter/pages/today_events.dart';
 import 'package:sampleflutter/pages/user.dart';
 import 'package:sampleflutter/utils/enums.dart';
 import 'package:sampleflutter/utils/secure_storage_init.dart';
-// void main(){
-//   runApp(HomePage());
-// }
-
-// Container(
-//                 alignment: Alignment.center,
-//                 width: double.infinity,
-//                 height: 150,
-//                 decoration: BoxDecoration(
-//                   gradient: LinearGradient(
-//                     colors: [
-//                       Colors.orange.shade400,
-//                       Colors.orange.shade700,
-//                       Colors.orange.shade800
-//                     ],
-//                     begin: Alignment.topLeft,
-//                     end: Alignment.topRight
-//                   ),
-//                   borderRadius: BorderRadius.only(bottomLeft: Radius.elliptical(20, 20),bottomRight: Radius.elliptical(20, 20))
-//                 ),
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     SvgPicture.asset(
-//                       "assets/svg/temple-india-svgrepo-com.svg",
-//                       width: 40,
-//                       height: 40,
-//                     ),
-//                     SizedBox(
-//                       width: 10,
-//                     ),
-//                     Text(
-//                       "Nanmai Tharuvar Kovil",
-//                       style: TextStyle(
-//                         fontWeight: FontWeight.bold,
-//                         fontSize: 20,
-//                         color: Colors.white
-                        
-//                       ),
-//                     )
-//                   ],
-//                 ),
-//               ),
 
 List<Widget> rowBuilder(List<Map<String,dynamic>> items){
   print("items ${items.length}");
@@ -86,19 +46,9 @@ List<Widget> rowBuilder(List<Map<String,dynamic>> items){
 
 class HomePage extends StatelessWidget{
   
-  HomePage({super.key});
+  const HomePage({super.key});
 
-  final List<Map<String,dynamic>> featuresSvg=[
-    {"label":"Tamil Calendar","svg":"assets/svg/calendar-svgrepo-com.svg","cc":Colors.yellow.shade50,"sc":Colors.yellow.shade300,"route":TamilCalendarPage()},
-    {"label":"All Events","svg":"assets/svg/event svy.svg","cc":Colors.purple.shade50,"sc":Colors.purple.shade100,"route":AllEventsPage()},
-    {"label":"Today Events","svg":"assets/svg/news-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade100,"route":TodayEventsPage()},
-    {"label":"Add Events Name","svg":"assets/svg/calendar-add-event-svgrepo-com.svg","cc":Colors.green.shade50,"sc":Colors.green.shade100,"route":AddEventName()},
-    {"label":"Add Events","svg":"assets/svg/calendar-add-event-svgrepo-com.svg","cc":Colors.green.shade50,"sc":Colors.green.shade100,"route":AddEventsPage()},
-    {"label":"Users","svg":"assets/svg/users-young-svgrepo-com.svg","cc":Colors.cyan.shade50,"sc":Colors.cyan.shade100,"route":UserPage()},
-    {"label":"Dashboard","svg":"assets/svg/analytics-clipboard-svgrepo-com.svg","cc":Colors.grey.shade300,"sc":Colors.grey.shade300,"route":TamilCalendarPage()},
-    {"label":"Logout","svg":"assets/svg/logout-svgrepo-com.svg","cc":Colors.red.shade50,"sc":Colors.red.shade100,"route":LoginPage()},
-    
-  ];
+  
   
   Future getCurrentUserRole() async {
     return await secureStorage.read(key: 'role');
@@ -115,7 +65,20 @@ class HomePage extends StatelessWidget{
         }
         else{
           final String curUserRole=snapshot.data ?? "";
-          print("cur role ${curUserRole} ${UserRoleEnum.ADMIN.name}");
+          print("cur role $curUserRole ${UserRoleEnum.ADMIN.name}");
+          final List<Map<String,dynamic>> featuresSvg=[
+            {"label":"Tamil Calendar","svg":"assets/svg/calendar-svgrepo-com.svg","cc":Colors.yellow.shade50,"sc":Colors.yellow.shade300,"route":TamilCalendarPage()},
+            {"label":"All Events","svg":"assets/svg/event svy.svg","cc":Colors.purple.shade50,"sc":Colors.purple.shade100,"route":AllEventsPage(curUser: curUserRole,)},
+            {"label":"Today Events","svg":"assets/svg/news-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade100,"route":TodayEventsPage(curUser: curUserRole,)},
+            {"label":"Add Workers","svg":"assets/svg/service-workers-svgrepo-com.svg","cc":Colors.brown.shade50,"sc":Colors.brown.shade100,"route":AddWorkerPage()},
+            {"label":"Add Events Name","svg":"assets/svg/writing-svgrepo-com.svg","cc":Colors.teal.shade50,"sc":Colors.teal.shade100,"route":AddEventName()},
+            {"label":"Add Events","svg":"assets/svg/calendar-add-event-svgrepo-com.svg","cc":Colors.green.shade50,"sc":Colors.green.shade100,"route":AddEventsPage()},
+            {"label":"Users","svg":"assets/svg/users-young-svgrepo-com.svg","cc":Colors.cyan.shade50,"sc":Colors.cyan.shade100,"route":UserPage(curUser: curUserRole,)},
+            {"label":"Download&Delete","svg":"assets/svg/download-svgrepo-com.svg","cc":Colors.grey.shade300,"sc":Colors.grey.shade300,"route":EventDownloadPage()},
+            {"label":"Dashboard","svg":"assets/svg/analytics-clipboard-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade300,"route":DashboardPage()},
+            {"label":"Logout","svg":"assets/svg/logout-svgrepo-com.svg","cc":Colors.red.shade50,"sc":Colors.red.shade100,"route":LoginPage()},
+            
+          ];
           if (curUserRole==UserRoleEnum.ADMIN.name){
             visibleFeatures=featuresSvg;
           }

@@ -6,7 +6,7 @@ import 'package:sampleflutter/utils/secure_storage_init.dart';
 import 'package:http_parser/http_parser.dart';  // For MediaType
 
 // https://kovil-app-backend.vercel.app
-String BASEURL = "http://127.0.0.1:8000";
+String BASEURL = "https://kovil-app-backend.vercel.app";
 
 class NetworkService {
   static Future<http.Response> sendRequest({

@@ -61,7 +61,7 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
           ),
           SizedBox(height: 20,),
           Expanded(
-            child: SingleChildScrollView(
+            child:SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Column(
                 children: [
@@ -72,8 +72,30 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
                         maxScale: 4.0,
                         panEnabled: true,
                         child: Image.network(
-                          "$BASEURL/panchagam/calendar?date=${DateFormat("yyyy-MM-dd").format(_selectedDay)}"
-                        
+                          "$BASEURL/panchagam/calendar?date=${DateFormat("yyyy-MM-dd").format(_selectedDay)}",
+                            loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return SizedBox(
+                                  height: 100,
+                                  child: Center(
+                                    child: CircularProgressIndicator(color: Colors.orange,),
+                                  ),
+                                );
+                              },
+                            errorBuilder: (context, error, stackTrace) {
+                              print("Image load error: $error"); // 👈 debug print
+                              return const Center(
+                                child: SizedBox(
+                                  height: 100,
+                                  child: Text(
+                                    '⚠️ Unable to load image. Check your internet connection.',
+                                    style: TextStyle(color: Colors.red,fontWeight: FontWeight.w600),
+                                    textAlign: TextAlign.center,
+
+                                  ),
+                                ),
+                              );
+                            },
                         ),
                       ),
                   ),
