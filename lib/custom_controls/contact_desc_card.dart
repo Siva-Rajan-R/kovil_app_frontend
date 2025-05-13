@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
-import 'dart:convert';
 
 // ignore: must_be_immutable
 class ContactDescCard extends StatefulWidget {
@@ -76,21 +73,16 @@ class _ContactDescCard extends State<ContactDescCard>{
                                     isLoading = true;
                                   });
                                   final res=await NetworkService.sendRequest(path: "/event/contact-description", context: context,method: "DELETE",body: {"contact_desc_id":eventDetails['contact_description_id']});
-                                  final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
                                   setState(() {
                                       isLoading=false;
                                     });
             
-                                  if(res.statusCode==200){
-                                    customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+                                  if(res!=null){
                                     Navigator.pushAndRemoveUntil(
                                       context,
                                       CupertinoPageRoute(builder: (context) => HomePage()),
                                       (route) => false,
                                     );
-                                  }
-                                  else{
-                                    customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
                                   }
                                 },
                               ).show();

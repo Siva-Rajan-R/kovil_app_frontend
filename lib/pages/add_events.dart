@@ -1,9 +1,8 @@
-import 'dart:convert';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
+import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
 import 'package:sampleflutter/pages/add_events_next.dart';
@@ -31,6 +30,7 @@ class AddEventsPage extends StatefulWidget {
 
 class _AddEventsPageState extends State<AddEventsPage> {
   bool isloading=true;
+  bool isSpecial=false;
   late TextEditingController eventName;
   late TextEditingController neivethiyam;
   late TextEditingController eventDes;
@@ -50,23 +50,16 @@ class _AddEventsPageState extends State<AddEventsPage> {
   void initState(){
     super.initState();
     NetworkService.sendRequest(path: '/event/dropdown-values', context: context).then((res){
-      final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
-
-      print("from res $decodedRes");
-      
-        if(res.statusCode==200){
+        if(res!=null){
           setState(() {
-            eventNamesAmount=List.from(decodedRes['event_names']);
-            neivethiyamNamesAmount=List.from(decodedRes['neivethiyam_names']);
-            paymentModes=decodedRes['payment_modes'];
-            paymentStatus=decodedRes['payment_status'];
+            eventNamesAmount=List.from(res['event_names']);
+            neivethiyamNamesAmount=List.from(res['neivethiyam_names']);
+            paymentModes=res['payment_modes'];
+            paymentStatus=res['payment_status'];
             neivethiyamNamesAmount.add({"name":null,"amount":0});
             isloading=false;
           });
           
-        }
-        else{
-          customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
         }
         
     });
@@ -131,7 +124,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("hii bye $eventNamesAmount");
+    print("hii bye $isSpecial hoooo $eventNamesAmount ");
       return Scaffold(
         bottomNavigationBar: isloading? null 
         : CustomBottomAppbar(
@@ -241,30 +234,38 @@ class _AddEventsPageState extends State<AddEventsPage> {
                         setState(() {
                           eventNameValue=eventNamesAmount[value!]['name'];
                           eventAmount=eventNamesAmount[value]['amount'];
+                          isSpecial=eventNamesAmount[value]['is_special'];
                         })
                       },
                     ),
                     const SizedBox(height: 20),
-                    CustomDropdown(
-                      textColor: Colors.white,
-                      themeColor: Colors.white,
-                      label: "Neivethiyam Name", 
-                      ddController: neivethiyam, 
-                      ddEntries:[
-                        for(int i=0;i<neivethiyamNamesAmount.length;i++)
-                          DropdownMenuEntry(
-                            value: i, 
-                            label: "${neivethiyamNamesAmount[i]["name"]} - ₹ ${neivethiyamNamesAmount[i]['amount']}",
-                          )
+                    
+                    Row(
+                      children: [
+                        CustomDropdown(
+                          Width: 270,
+                          textColor: Colors.white,
+                          themeColor: Colors.white,
+                          label: "Neivethiyam Name", 
+                          ddController: neivethiyam, 
+                          ddEntries:[
+                            for(int i=0;i<neivethiyamNamesAmount.length;i++)
+                              DropdownMenuEntry(
+                                value: i, 
+                                label: "${neivethiyamNamesAmount[i]["name"]} - ₹ ${neivethiyamNamesAmount[i]['amount']}",
+                              )
+                          ],
+                          onSelected: (value) => {
+                            print("selected value $value"),
+                            setState(() {
+                              neivethiyamAmount=neivethiyamNamesAmount[value!]["amount"];
+                              neivethiyamId=neivethiyamNamesAmount[value]["id"];
+                              print(neivethiyamId);
+                            })
+                          },
+                        ),
+                        Expanded(child: CustomTextField(label: "Padi/Kg",themeColor: Colors.white,fontColor: Colors.white,))
                       ],
-                      onSelected: (value) => {
-                        print("selected value $value"),
-                        setState(() {
-                          neivethiyamAmount=neivethiyamNamesAmount[value!]["amount"];
-                          neivethiyamId=neivethiyamNamesAmount[value]["id"];
-                          print(neivethiyamId);
-                        })
-                      },
                     ),
                     
                     const SizedBox(height: 20),

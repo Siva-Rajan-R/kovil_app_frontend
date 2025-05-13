@@ -1,10 +1,7 @@
-import 'dart:convert';
 
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
@@ -71,20 +68,11 @@ class _EventDownloadPage extends State<EventDownloadPage>{
 
     print(body);
     final res=await NetworkService.sendRequest(path: '/event/report/email',method: "POST", context: context,body:body);
-    final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
     setState(() {
       _isSubmitting=false;
     });
-    print(decodedRes);
-    if(res.statusCode==200){
-      customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
-    }
-    else if(res.statusCode==422){
-      customSnackBar(content: "invalid Inputs", contentType: AnimatedSnackBarType.info).show(context);
-    }
-    else{
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
-    }
+    print(res);
+    
   }
 
   void handleDelete()async {
@@ -103,20 +91,11 @@ class _EventDownloadPage extends State<EventDownloadPage>{
             _isDeleting=true;
           });
           final res=await NetworkService.sendRequest(path: '/event/all',method: "DELETE", context: context,body: {"from_date":fromDate.toString(),"to_date":toDate.toString()});
-          final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
-          print(decodedRes);
+          print(res);
           setState(() {
             _isDeleting=false;
           });
-          if(res.statusCode==200){
-            customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
-          }
-          else if(res.statusCode==422){
-            customSnackBar(content: "invalid Inputs", contentType: AnimatedSnackBarType.info).show(context);
-          }
-          else{
-            customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
-          }
+  
        }
       ).show();
   }

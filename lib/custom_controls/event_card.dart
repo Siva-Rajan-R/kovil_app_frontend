@@ -1,11 +1,8 @@
-import 'dart:convert';
 
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/pages/add_events.dart';
 import 'package:sampleflutter/pages/detailed_event.dart';
 import 'package:sampleflutter/pages/home.dart';
@@ -57,17 +54,12 @@ class _EventCardState extends State<EventCard> {
       isEventloading=true;
     });
     final res=await NetworkService.sendRequest(path: "/event/contact-description?event_id=$event_id", context: context);
-    final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
-    print("heloooooooooooooooooooooooooooooooooooooygggg${res.body}");
     setState(() {
       isEventloading=false;
     });
-    if(res.statusCode==200){
-      final List des=decodedRes;
+    if(res!=null){
+      final List des=res;
       contactDescription.text=des.isNotEmpty? des[0]['description'] : "";
-    }
-    else{
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
     }
   }
 
@@ -77,22 +69,12 @@ class _EventCardState extends State<EventCard> {
     });
      print("biiii $isContactAddLoading");
     final res=await NetworkService.sendRequest(path: "/event/contact-description", context: context,method: 'POST',body: {"event_id":event_id,"contact_description":contactDescription.text.trim()});
-    final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
-    print(decodedRes);
+    print(res);
 
     setState(() {
       isContactAddLoading=false;
     });
 
-    if (res.statusCode==201 || res.statusCode==200){
-      customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
-    }
-    else if(res.statusCode==422){
-      customSnackBar(content: "Invalid Inputs", contentType: AnimatedSnackBarType.info).show(context);
-    }
-    else {
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
-    }
     Navigator.pop(context);
   }
 
@@ -196,20 +178,15 @@ class _EventCardState extends State<EventCard> {
                                   isEventloading=true;
                                 });
                                 final res=await NetworkService.sendRequest(path: "/event", context: context,method: "DELETE",body: {"event_id":eventDetails['event_id']});
-                                final decodedRes=jsonDecode(res.body);
                                 setState(() {
                                   isEventloading=false;
                                 });
-                                if(res.statusCode==200){
-                                  customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+                                if(res!=null){
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     CupertinoPageRoute(builder: (context) => HomePage()),
                                     (route) => false,
                                   );
-                                }
-                                else{
-                                  customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
                                 }
                               }
                             ).show();

@@ -1,13 +1,10 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/enums.dart';
 import 'package:sampleflutter/utils/network_request.dart';
-import 'dart:convert';
 
 import 'package:sampleflutter/utils/open_phone.dart';
 
@@ -80,21 +77,17 @@ class _UserCardState extends State<UserCard> {
                                 isloading = true;
                               });
                               final res=await NetworkService.sendRequest(path: "/user", context: context,method: "DELETE",body: {"del_user_id":widget.user['id']});
-                              final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
+                              print(res);
                               setState(() {
                                   isloading=false;
                                 });
         
-                              if(res.statusCode==200){
-                                customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+                              if(res!=null){
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   CupertinoPageRoute(builder: (context) => HomePage()),
                                   (route) => false,
                                 );
-                              }
-                              else{
-                                customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
                               }
                             },
                           ).show();
@@ -115,21 +108,17 @@ class _UserCardState extends State<UserCard> {
                                 isloading = true;
                               });
                               final res=await NetworkService.sendRequest(path: "/user/role", context: context,method: "PUT",body: {"user_id":widget.user['id'],"role":value});
-                              final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
+                              print(res);
                               setState(() {
                                   isloading=false;
                                 });
         
-                              if(res.statusCode==200){
-                                customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+                              if(res!=null){
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   CupertinoPageRoute(builder: (context) => HomePage()),
                                   (route) => false,
                                 );
-                              }
-                              else{
-                                customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
                               }
                             },
                           ).show();

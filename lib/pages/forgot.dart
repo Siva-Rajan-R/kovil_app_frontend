@@ -1,9 +1,6 @@
-import 'dart:convert';
 
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/utils/network_request.dart';
@@ -131,31 +128,10 @@ class _ForgotPageState extends State<ForgotPage> {
                                             'new_password': password.text
                                           });
 
-                                      final decodedRes =
-                                          jsonDecode(res.body);
-                                      if (res.statusCode == 200) {
-                                        customSnackBar(
-                                                content: decodedRes,
-                                                contentType:
-                                                    AnimatedSnackBarType
-                                                        .success)
-                                            .show(context);
+                                      if (res!=null) {
                                         Navigator.pushReplacementNamed(
                                             context, "/login");
-                                      } else if (res.statusCode == 422) {
-                                        customSnackBar(
-                                                content:
-                                                    "input fields couldn't be empty",
-                                                contentType:
-                                                    AnimatedSnackBarType.info)
-                                            .show(context);
-                                      } else {
-                                        customSnackBar(
-                                                content: decodedRes['detail'],
-                                                contentType:
-                                                    AnimatedSnackBarType.error)
-                                            .show(context);
-                                      }
+                                      } 
 
                                       setState(() {
                                         isLoading = false;

@@ -6,9 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
-import 'dart:convert';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
@@ -79,31 +76,15 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       body: formData,
     );
     setState(() => _isSubmitting = false);
-    print(res.body);
-    final decodedRes = jsonDecode(utf8.decode(res.bodyBytes));
-    
-    if (res.statusCode == 200) {
-      customSnackBar(
-        content: decodedRes,
-        contentType: AnimatedSnackBarType.success,
-      ).show(context);
+    print(res);
 
+    if (res!=null) {
       Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(builder: (_) => HomePage()),
         (_) => false,
       );
-    } else if (res.statusCode == 422) {
-      customSnackBar(
-        content: "Input Fields Couldn't be Empty",
-        contentType: AnimatedSnackBarType.info,
-      ).show(context);
-    } else {
-      customSnackBar(
-        content: decodedRes['detail'],
-        contentType: AnimatedSnackBarType.error,
-      ).show(context);
-    }
+    } 
 
     
   }
@@ -114,17 +95,14 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     });
     final res=await NetworkService.sendRequest(path: "/workers", context: context);
 
-    final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
     setState(() {
       isLoading=false;
     });
-    print("qwertyuiopasdfghjk $decodedRes");
-    if (res.statusCode==200){
-      workersName=List.from(decodedRes['workers']);
+    print("qwertyuiopasdfghjk $res");
+    if (res!=null){
+      workersName=List.from(res['workers']);
     }
-    else{
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
-    }
+
   }
 
   @override

@@ -1,10 +1,8 @@
-import 'dart:convert';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/custom_ad.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/event_card.dart';
@@ -45,13 +43,10 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
       path: "/event/calendar/?month=$month&year=$year",
       context: context,
     );
-    final decodedRes = jsonDecode(utf8.decode(res.bodyBytes));
-    if (res.statusCode == 200) {
+    if (res!=null) {
       setState(() {
-        eventDates = List<String>.from(decodedRes['events']);
+        eventDates = List<String>.from(res['events']);
       });
-    } else {
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
     }
   }
 
@@ -60,10 +55,9 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
       path: "/event/specific?date=${DateFormat("yyyy-MM-dd").format(_selectedDay)}",
       context: context,
     );
-    final decodedRes = jsonDecode(utf8.decode(res.bodyBytes));
 
-    if (res.statusCode == 200) {
-      final List<Map> eventsList = List.from(decodedRes['events']);
+    if (res!=null) {
+      final List<Map> eventsList = List.from(res['events']);
       final List<Map> pending = eventsList.where((e) => e["event_status"] == "pending").toList();
       final List<Map> canceled = eventsList.where((e) => e["event_status"] == "canceled").toList();
       final List<Map> finished = eventsList.where((e) => e["event_status"] == "completed").toList();
@@ -80,7 +74,6 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
         "finished": finished,
       };
     } else {
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
       return {
         "pending": [],
         "canceled": [],

@@ -1,12 +1,9 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
-import 'dart:convert';
 
 import 'package:sampleflutter/utils/open_phone.dart';
 
@@ -82,69 +79,27 @@ class _WorkersNameCard extends State<WorkersNameCard>{
                             });
                             
                             final res=await NetworkService.sendRequest(path: "/worker", context: context,method: "DELETE",body: {"worker_name":workerName});
-                              print("hello ${res.body}");
-                              final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
+                              print("hello ${res}");
                               
                               setState(() {
                               isLoading=false;
                             });
-                              if(res.statusCode==200){
-                                customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+                              if(res!=null){
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   CupertinoPageRoute(builder: (context) => HomePage()),
                                   (route) => false,
                                 );
                               }
-                              else{
-                                customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.success).show(context);
-                              }
                             }
                         ).show();
                       }
-                      else if(value=="reset"){
-                        AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.info,
-                          btnOkText: "Yes",
-                          animType: AnimType.topSlide,
-                          dismissOnBackKeyPress: false,
-                          dismissOnTouchOutside: false,
-                          title: 'Reset Worker Participated Events',
-                          desc: 'Are you sure , Do you Want to Reset $workerName Participated Events ?',
-                          btnCancelOnPress: () {},
-                          btnOkOnPress: () async{
-                            setState(() {
-                              isLoading=true;
-                            });
-                            
-                            final res=await NetworkService.sendRequest(path: "/worker/reset", context: context,method: "PUT",body: {"worker_name":workerName});
-                              print("hello ${res.body}");
-                              final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
-                              
-                              setState(() {
-                              isLoading=false;
-                            });
-                              if(res.statusCode==200){
-                                customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  CupertinoPageRoute(builder: (context) => HomePage()),
-                                  (route) => false,
-                                );
-                              }
-                              else{
-                                customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.success).show(context);
-                              }
-                            }
-                        ).show();
-                      }
+                      
                     
                     },
                     itemBuilder: (context){
                       return [
                         PopupMenuItem(value: "delete",child: Text("Delete",style: TextStyle(color: Colors.orange.shade800))),
-                        PopupMenuItem(value: "reset",child: Text("Reset",style: TextStyle(color: Colors.orange.shade800)))
                       ];
                     }
                   )

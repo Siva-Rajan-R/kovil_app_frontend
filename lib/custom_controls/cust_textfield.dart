@@ -19,7 +19,8 @@ class CustomTextField extends StatelessWidget{
     this.keyboardtype,
     this.themeColor=Colors.orange,
     this.fontColor=Colors.black,
-    this.onChanged
+    this.onChanged,
+
   });
 
   @override

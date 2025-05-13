@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/event_card.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/custom_ad.dart';
@@ -54,10 +51,8 @@ class _TodayEventsPageState extends State<TodayEventsPage> {
       context: context,
     );
 
-    final decodedRes = jsonDecode(utf8.decode(res.bodyBytes));
-
-    if (res.statusCode == 200) {
-      final eventsList = List<Map>.from(decodedRes['events']);
+    if (res!=null) {
+      final eventsList = List<Map>.from(res['events']);
 
       final pending = eventsList.where((e) => e["event_status"] == "pending").toList();
       final canceled = eventsList.where((e) => e["event_status"] == "canceled").toList();
@@ -75,7 +70,6 @@ class _TodayEventsPageState extends State<TodayEventsPage> {
         'finished': finished,
       };
     } else {
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
       return {
         'pending': [],
         'canceled': [],

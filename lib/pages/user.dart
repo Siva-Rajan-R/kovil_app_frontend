@@ -1,8 +1,5 @@
-import 'dart:convert';
 
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/user_card.dart';
 import 'package:sampleflutter/utils/network_request.dart';
@@ -35,17 +32,15 @@ class UserPage extends StatelessWidget{
     final List<Map> users;
     final List<Map> admins;
     final res=await NetworkService.sendRequest(path: '/users',context: context);
-    final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
-    print("res $decodedRes");
-    if (res.statusCode!=200){
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
+    print("res $res");
+    if (res==null){
       return {
         'admins':[],
         'users':[]
       };
     }
     else{
-      final usersList=List<Map>.from(decodedRes['users']);
+      final usersList=List<Map>.from(res['users']);
       users=usersList.where((u)=>u['role']=='user').toList();
       admins=usersList.where((u)=>u['role']=="admin").toList();
         return {

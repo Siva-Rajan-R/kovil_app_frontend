@@ -1,12 +1,10 @@
-import 'dart:convert';
 
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
+import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
@@ -88,20 +86,14 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
       body: reqBody,
     );
 
-    final decodedRes = jsonDecode(utf8.decode(res.bodyBytes));
     setState(() => isLoading = false);
-    print(res.body);
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+
+    if (res!=null) {
       Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(builder: (context) => HomePage()),
         (route) => false,
       );
-    } else if (res.statusCode == 422) {
-      customSnackBar(content: "Input Fields Couldn't Be Empty", contentType: AnimatedSnackBarType.info).show(context);
-    } else {
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
     }
   }
 
@@ -206,48 +198,35 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          DropdownMenu(
-                              width: 250,
-                              controller: paymentMode,
-                              label: Text(
-                                "Payment mode",
-                                style: TextStyle(
-                                  color: Colors.white,fontWeight: FontWeight.w600
-                                ),
-                              ),
-                              textStyle: TextStyle(
-                                color: Colors.white,fontWeight: FontWeight.w600
-                              ),
-                              menuStyle: MenuStyle(
-                                backgroundColor: WidgetStatePropertyAll<Color>(Colors.orange.shade100)
-                              ),
-                              dropdownMenuEntries: [
-                                for(String i in List.from(widget.previousPageData['paymentModes']).toList())
-                                  DropdownMenuEntry(value: i, label: i),
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-                            DropdownMenu(
-                              width: 280,
-                              controller: paymentStatus,
-                              label: Text(
-                                "Payment status",
-                                style: TextStyle(
-                                  color: Colors.white,fontWeight: FontWeight.w600
-                                ),
-                              ),
-                              textStyle: TextStyle(
-                                color: Colors.white,fontWeight: FontWeight.w600
-                              ),
-                                          
-                              menuStyle: MenuStyle(
-                                backgroundColor: WidgetStatePropertyAll<Color>(Colors.orange.shade100)
-                              ),
-                              dropdownMenuEntries: [
+
+                          CustomDropdown(
+                            themeColor: Colors.white,
+                            textColor: Colors.white,
+                            Width: 250,
+                            label: "Payment mode", 
+                            ddController: paymentMode, 
+                            ddEntries: [
+                              for(String i in List.from(widget.previousPageData['paymentModes']).toList())
+                                DropdownMenuEntry(value: i, label: i),
+                            ], 
+                            onSelected: (value)=>print(value)
+                          ),
+                          
+                          SizedBox(width: 10,),
+                          
+                          CustomDropdown(
+                            themeColor: Colors.white,
+                            textColor: Colors.white,
+                            Width: 250,
+                            label: "Payment status", 
+                            ddController: paymentStatus, 
+                            ddEntries: [
                                 for(String i in widget.previousPageData['paymentStatus'])
                                 DropdownMenuEntry(value: i, label: i),
-                              ],
-                            ),
+                              ], 
+                            onSelected: (value)=>print(value)
+                          ),
+                            
                         ],
                       ),
                     ),

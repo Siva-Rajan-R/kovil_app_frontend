@@ -1,5 +1,7 @@
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:sampleflutter/utils/secure_storage_init.dart';
@@ -9,7 +11,7 @@ import 'package:http_parser/http_parser.dart';  // For MediaType
 String BASEURL = "https://kovil-app-backend.vercel.app";
 
 class NetworkService {
-  static Future<http.Response> sendRequest({
+  static Future sendRequest({
     required String path,
     required BuildContext context,
     String method = 'GET',
@@ -93,6 +95,7 @@ class NetworkService {
     }
 
     // Check if the response is unauthorized (401)
+    print(response.statusCode);
     if (response.statusCode == 401 && !isRetry) {
       final String? refreshToken = await secureStorage.read(key: 'refreshToken');
       final String? accessToken = await secureStorage.read(key: 'accessToken');
@@ -126,12 +129,12 @@ class NetworkService {
           },
           isRetry: true,
         );
-        print("hello ${res.body}");
-        if (res.statusCode == 200) {
+        print("hello ${res}");
+        if (res!=null) {
           // Save the new access token
           
           await secureStorage.write(
-              key: "accessToken", value: jsonDecode(res.body)['access_token']
+              key: "accessToken", value: res['access_token']
           );
 
           // Retry the original request with the new access token
@@ -151,6 +154,25 @@ class NetworkService {
     }
 
     // Return the response
-    return response;
+    print("body soda ${response.body}");
+    final decodedRes=jsonDecode(utf8.decode(response.bodyBytes));
+    if(response.statusCode==200 || response.statusCode==201){
+      if(decodedRes is String){
+        customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+      }
+      print(decodedRes);
+      return decodedRes;
+    }
+    else if(response.statusCode==422){
+      customSnackBar(content: "invalid Inputs", contentType: AnimatedSnackBarType.info).show(context);
+      return null;
+    }
+    else{
+      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
+      return null;
+    }
+
+    
+    
   }
 }

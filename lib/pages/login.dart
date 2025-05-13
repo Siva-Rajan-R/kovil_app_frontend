@@ -1,8 +1,6 @@
-import 'dart:convert';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/secure_storage_init.dart';
@@ -34,22 +32,16 @@ class _LoginPageState extends State<LoginPage> {
       },
     );
 
-    final decodedRes = jsonDecode(res.body);
-
-    if (res.statusCode == 200) {
-      await secureStorage.write(key: "accessToken", value: decodedRes['access_token']);
-      await secureStorage.write(key: "refreshToken", value: decodedRes['refresh_token']);
-      await secureStorage.write(key: 'role', value: decodedRes['role']);
-      await secureStorage.write(key: 'refreshTokenExpDate', value: decodedRes['refresh_token_exp_date']);
+    if (res!=null) {
+      await secureStorage.write(key: "accessToken", value: res['access_token']);
+      await secureStorage.write(key: "refreshToken", value: res['refresh_token']);
+      await secureStorage.write(key: 'role', value: res['role']);
+      await secureStorage.write(key: 'refreshTokenExpDate', value: res['refresh_token_exp_date']);
       await secureStorage.write(key: 'isLoggedIn', value: 'true');
 
       if (context.mounted) {
         Navigator.pushReplacementNamed(context, "/home");
       }
-    } else if (res.statusCode == 422) {
-      customSnackBar(content: "Invalid Credentials", contentType: AnimatedSnackBarType.info).show(context);
-    } else {
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
     }
 
     setState(() {

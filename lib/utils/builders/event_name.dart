@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,11 +36,11 @@ class _AddEventNewNameState extends State<AddEventNewName> {
     Map body={
           "event_name": name.text,
           "event_amount": price.text.isNotEmpty ? int.parse(price.text) : 0,
-          "is_special":true
+          "is_special":false
     };
     
     if (selectedDdValues==1){
-      body["is_special"]=false;
+      body["is_special"]=true;
     }
     else if (selectedDdValues==2){
       path="/neivethiyam/name";
@@ -59,24 +59,16 @@ class _AddEventNewNameState extends State<AddEventNewName> {
         body: body
       );
 
-      final decodedRes = jsonDecode(utf8.decode(res.bodyBytes));
-      print(decodedRes);
-
-      if (res.statusCode == 201) {
-        customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+      if (res!=null) {
         Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(builder: (context) => HomePage()),
           (route) => false,
         );
-      } else if (res.statusCode == 422) {
-        customSnackBar(content: "Input Fields Couldn't be Empty", contentType: AnimatedSnackBarType.info).show(context);
-      } else {
-        customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.error).show(context);
-      }
+      } 
     } catch (e) {
       print("rfuyghliuhihiu  uguyguyguk $e");
-      customSnackBar(content: "hii", contentType: AnimatedSnackBarType.error).show(context);
+      customSnackBar(content: "something went wrong", contentType: AnimatedSnackBarType.error).show(context);
     } finally {
       setState(() {
         isEventLoading = false; // Reset loading state after request is completed

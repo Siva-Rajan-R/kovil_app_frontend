@@ -93,31 +93,33 @@ class HomePage extends StatelessWidget{
           
           return Scaffold(
             appBar: KovilAppBar(withIcon: true,),
-              body: Column(
-                children: [
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              "Features",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange.shade800
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                "Features",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange.shade800
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10,),
-                    ...rowBuilder(visibleFeatures)
-                      
-                    ],
-                  )
-                ],
+                        SizedBox(height: 10,),
+                      ...rowBuilder(visibleFeatures)
+                        
+                      ],
+                    )
+                  ],
+                ),
               )
             );
         }

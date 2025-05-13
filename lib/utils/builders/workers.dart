@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
@@ -41,20 +38,14 @@ class _AddWorkersState extends State<AddWorkers> {
       setState(() {
         isLoading = false; // Reset loading state after request is completed
       });
-      final decodedRes = jsonDecode(utf8.decode(res.bodyBytes));
-      print(decodedRes);
 
-      if (res.statusCode == 201) {
-        customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+
+      if (res!=null) {
         Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(builder: (context) => HomePage()),
           (route) => false,
         );
-      } else if (res.statusCode == 422) {
-        customSnackBar(content: "Input Fields Couldn't be Empty", contentType: AnimatedSnackBarType.info).show(context);
-      } else {
-        customSnackBar(content: decodedRes["detail"], contentType: AnimatedSnackBarType.error).show(context);
       }
     
       

@@ -1,12 +1,9 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
-import 'dart:convert';
 
 // ignore: must_be_immutable
 class EventNameAmountCard extends StatefulWidget {
@@ -88,23 +85,19 @@ class _EventNameAmountCard extends State<EventNameAmountCard>{
                               body={"neivethiyam_name_id":eventNameId};
                             }
                             final res=await NetworkService.sendRequest(path: path, context: context,method: "DELETE",body: body);
-                              print("hello ${res.body}");
-                              final decodedRes=jsonDecode(utf8.decode(res.bodyBytes));
-                              
+                              print("hello ${res}");
+
                               setState(() {
                               isLoading=false;
                             });
-                              if(res.statusCode==200){
-                                customSnackBar(content: decodedRes, contentType: AnimatedSnackBarType.success).show(context);
+                              if(res!=null){
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   CupertinoPageRoute(builder: (context) => HomePage()),
                                   (route) => false,
                                 );
                               }
-                              else{
-                                customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.success).show(context);
-                              }
+                              
                             }
                         ).show();
                       }
