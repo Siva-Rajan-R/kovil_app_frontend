@@ -1,7 +1,8 @@
-
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
@@ -41,12 +42,40 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
     super.initState();
 
     final data = widget.existingEventDetails;
-
+    print(widget.previousPageData["padiKg"]);
     clientName = TextEditingController(text: data?['client_name'] ?? "");
     clientCity = TextEditingController(text: data?['client_city'] ?? "");
-    clientNumber = TextEditingController(text: data?['client_mobile_number'] ?? "");
-    totalAmount = TextEditingController(text: (widget.previousPageData['eventAmount']+widget.previousPageData["neivethiyamAmount"]).toString());
-    paidAmount = TextEditingController(text: data?['paid_amount'].toString() ?? "0");
+    clientNumber = TextEditingController(
+      text: data?['client_mobile_number'] ?? "",
+    );
+
+    double totAmnt = widget.previousPageData['eventAmount'];
+
+    if (widget.previousPageData['neivethiyamName'].isNotEmpty) {
+      if (widget.previousPageData['padiKg'].isNotEmpty &&
+          double.tryParse(widget.previousPageData['padiKg']) != null) {
+        widget.previousPageData['padiKg'] = double.parse(
+          widget.previousPageData['padiKg'],
+        );
+        print(
+          "${widget.previousPageData['padiKg']} ${widget.previousPageData['neivethiyamAmount']}",
+        );
+        double neivethiyamTotAmount =
+            widget.previousPageData["neivethiyamAmount"] *
+            widget.previousPageData['padiKg'];
+        print(neivethiyamTotAmount);
+        totAmnt = totAmnt + neivethiyamTotAmount;
+      } else {
+        customSnackBar(
+          content: "Enter a valid number",
+          contentType: AnimatedSnackBarType.info,
+        ).show(context);
+      }
+    }
+    totalAmount = TextEditingController(text: totAmnt.toString());
+    paidAmount = TextEditingController(
+      text: data?['paid_amount'].toString() ?? "0",
+    );
     paymentStatus = TextEditingController(text: data?['payment_status'] ?? "");
     paymentMode = TextEditingController(text: data?['payment_mode'] ?? "");
 
@@ -57,43 +86,66 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
   }
 
   Future<void> _handleSubmit(BuildContext context) async {
-    setState(() => isLoading = true);
+    String eventName = widget.previousPageData['eventName'];
+    bool? isSpecialEvent=widget.previousPageData["isSpecialEvent"];
+    if (eventName.isEmpty &&
+        widget.previousPageData['neivethiyamName'].isEmpty) {
+      customSnackBar(
+        content: "choose any one of the event name",
+        contentType: AnimatedSnackBarType.info,
+      ).show(context);
+    } else {
+      if (eventName.isEmpty) {
+        print(
+          "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg",
+        );
 
-    Map reqBody = {
-      "event_name": widget.previousPageData['eventName'],
-      "event_description": widget.previousPageData['eventDes'],
-      "event_date": widget.previousPageData['eventDate'],
-      "event_start_at": widget.previousPageData['startTime'],
-      "event_end_at": widget.previousPageData['endTime'],
-      "client_name": clientName.text,
-      "client_mobile_number": clientNumber.text,
-      "client_city": clientCity.text,
-      "total_amount": totalAmount.text.isNotEmpty ? int.parse(totalAmount.text) : 0,
-      "paid_amount": paidAmount.text.isNotEmpty ? int.parse(paidAmount.text) : 0,
-      "payment_status": paymentStatus.text,
-      "payment_mode": paymentMode.text,
-      "neivethiyam_id":widget.previousPageData["neivethiyamId"]
-    };
+        eventName =
+            "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg";
+        isSpecialEvent=null;
+      }
 
-    if (method == "PUT") {
-      reqBody["event_id"] = widget.existingEventDetails!["event_id"];
-    }
+      setState(() => isLoading = true);
 
-    final res = await NetworkService.sendRequest(
-      path: "/event",
-      context: context,
-      method: method,
-      body: reqBody,
-    );
+      Map reqBody = {
+        "event_name": eventName,
+        "event_description": widget.previousPageData['eventDes'],
+        "event_date": widget.previousPageData['eventDate'],
+        "event_start_at": widget.previousPageData['startTime'],
+        "event_end_at": widget.previousPageData['endTime'],
+        "client_name": clientName.text,
+        "client_mobile_number": clientNumber.text,
+        "client_city": clientCity.text,
+        "total_amount":
+            totalAmount.text.isNotEmpty ? double.parse(totalAmount.text) : 0,
+        "paid_amount":
+            paidAmount.text.isNotEmpty ? double.parse(paidAmount.text) : 0,
+        "payment_status": paymentStatus.text,
+        "payment_mode": paymentMode.text,
+        "neivethiyam_id": widget.previousPageData["neivethiyamId"],
+        "is_special": isSpecialEvent,
+      };
 
-    setState(() => isLoading = false);
+      if (method == "PUT") {
+        reqBody["event_id"] = widget.existingEventDetails!["event_id"];
+      }
 
-    if (res!=null) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        CupertinoPageRoute(builder: (context) => HomePage()),
-        (route) => false,
+      final res = await NetworkService.sendRequest(
+        path: "/event",
+        context: context,
+        method: method,
+        body: reqBody,
       );
+
+      setState(() => isLoading = false);
+
+      if (res != null) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          CupertinoPageRoute(builder: (context) => HomePage()),
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -109,20 +161,22 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
               margin: EdgeInsets.all(10),
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  Colors.orange.shade400,
-                  Colors.orange.shade600,
-                  Colors.orange.shade800
-                ]),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.orange.shade400,
+                    Colors.orange.shade600,
+                    Colors.orange.shade800,
+                  ],
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.orange.shade800,
                     blurRadius: 5,
                     spreadRadius: 2,
-                    blurStyle: BlurStyle.outer
-                  )
-                ]
+                    blurStyle: BlurStyle.outer,
+                  ),
+                ],
               ),
               child: SingleChildScrollView(
                 child: Column(
@@ -135,42 +189,61 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
-                            fontSize: 20
+                            fontSize: 20,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 20,),
-                    CustomTextField(label:"Client name" ,themeColor: Colors.white,fontColor: Colors.white,controller: clientName,),
-                    SizedBox(height: 20,),
-                    CustomTextField(label: "Client Number",themeColor: Colors.white,fontColor: Colors.white,keyboardtype: TextInputType.number,controller: clientNumber,),
-                    SizedBox(height: 20,),
-                    CustomTextField(label: "Client place",themeColor: Colors.white,fontColor: Colors.white,keyboardtype: TextInputType.streetAddress,controller: clientCity,),
-                    SizedBox(height: 20,),
+                    SizedBox(height: 20),
+                    CustomTextField(
+                      label: "Client name",
+                      themeColor: Colors.white,
+                      fontColor: Colors.white,
+                      controller: clientName,
+                    ),
+                    SizedBox(height: 20),
+                    CustomTextField(
+                      label: "Client Number",
+                      themeColor: Colors.white,
+                      fontColor: Colors.white,
+                      keyboardtype: TextInputType.number,
+                      controller: clientNumber,
+                    ),
+                    SizedBox(height: 20),
+                    CustomTextField(
+                      label: "Client place",
+                      themeColor: Colors.white,
+                      fontColor: Colors.white,
+                      keyboardtype: TextInputType.streetAddress,
+                      controller: clientCity,
+                    ),
+                    SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
-            SizedBox(height: 10,),
+            SizedBox(height: 10),
             Container(
               width: double.infinity,
               margin: EdgeInsets.all(10),
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  Colors.orange.shade400,
-                  Colors.orange.shade600,
-                  Colors.orange.shade800
-                ]),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.orange.shade400,
+                    Colors.orange.shade600,
+                    Colors.orange.shade800,
+                  ],
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.orange.shade800,
                     blurRadius: 5,
                     spreadRadius: 2,
-                    blurStyle: BlurStyle.outer
-                  )
-                ]
+                    blurStyle: BlurStyle.outer,
+                  ),
+                ],
               ),
               child: SingleChildScrollView(
                 child: Column(
@@ -183,54 +256,67 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
-                            fontSize: 20
+                            fontSize: 20,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 10,),
-                    CustomTextField(label:"Total amount" ,themeColor: Colors.white,fontColor: Colors.white,keyboardtype: TextInputType.number,controller: totalAmount,),
-                    SizedBox(height: 20,),
-                    CustomTextField(label: "Paid amount",themeColor: Colors.white,fontColor: Colors.white,keyboardtype: TextInputType.number,controller: paidAmount,),
-                    SizedBox(height: 20,),
+                    SizedBox(height: 10),
+                    CustomTextField(
+                      label: "Total amount",
+                      themeColor: Colors.white,
+                      fontColor: Colors.white,
+                      keyboardtype: TextInputType.number,
+                      controller: totalAmount,
+                    ),
+                    SizedBox(height: 20),
+                    CustomTextField(
+                      label: "Paid amount",
+                      themeColor: Colors.white,
+                      fontColor: Colors.white,
+                      keyboardtype: TextInputType.number,
+                      controller: paidAmount,
+                    ),
+                    SizedBox(height: 20),
                     SingleChildScrollView(
                       padding: EdgeInsets.only(top: 10),
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
+                          CustomDropdown(
+                            themeColor: Colors.white,
+                            textColor: Colors.white,
+                            Width: 250,
+                            label: "Payment mode",
+                            ddController: paymentMode,
+                            ddEntries: [
+                              for (String i
+                                  in List.from(
+                                    widget.previousPageData['paymentModes'],
+                                  ).toList())
+                                DropdownMenuEntry(value: i, label: i),
+                            ],
+                            onSelected: (value) => print(value),
+                          ),
+
+                          SizedBox(width: 10),
 
                           CustomDropdown(
                             themeColor: Colors.white,
                             textColor: Colors.white,
                             Width: 250,
-                            label: "Payment mode", 
-                            ddController: paymentMode, 
+                            label: "Payment status",
+                            ddController: paymentStatus,
                             ddEntries: [
-                              for(String i in List.from(widget.previousPageData['paymentModes']).toList())
+                              for (String i
+                                  in widget.previousPageData['paymentStatus'])
                                 DropdownMenuEntry(value: i, label: i),
-                            ], 
-                            onSelected: (value)=>print(value)
+                            ],
+                            onSelected: (value) => print(value),
                           ),
-                          
-                          SizedBox(width: 10,),
-                          
-                          CustomDropdown(
-                            themeColor: Colors.white,
-                            textColor: Colors.white,
-                            Width: 250,
-                            label: "Payment status", 
-                            ddController: paymentStatus, 
-                            ddEntries: [
-                                for(String i in widget.previousPageData['paymentStatus'])
-                                DropdownMenuEntry(value: i, label: i),
-                              ], 
-                            onSelected: (value)=>print(value)
-                          ),
-                            
                         ],
                       ),
                     ),
-                    
                   ],
                 ),
               ),
@@ -244,16 +330,21 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
           children: [
             ElevatedButton(
               onPressed: isLoading ? null : () => _handleSubmit(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-              ),
-              child: isLoading
-                  ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                    )
-                  : Text(buttonLabel, style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+              child:
+                  isLoading
+                      ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                      : Text(
+                        buttonLabel,
+                        style: TextStyle(color: Colors.white),
+                      ),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/features_container.dart';
+import 'package:sampleflutter/pages/event_dashboard.dart';
 import 'package:sampleflutter/pages/worker_dashboard.dart';
 
 List<Widget> rowBuilder(List<Map<String,dynamic>> items){
@@ -42,7 +43,7 @@ class DashboardPage extends StatelessWidget{
 
   List<Map<String,dynamic>> featuresSvg=[
             {"label":"Worker DashBoard","svg":"assets/svg/service-workers-svgrepo-com.svg","cc":Colors.yellow.shade50,"sc":Colors.yellow.shade300,"route":WorkerDashboardPage()},
-            // {"label":"Event DashBoard","svg":"assets/svg/checklist-svgrepo-com.svg","cc":Colors.red.shade50,"sc":Colors.red.shade100,"route":WorkerDashboardPage()}
+            {"label":"Event DashBoard","svg":"assets/svg/checklist-svgrepo-com.svg","cc":Colors.red.shade50,"sc":Colors.red.shade100,"route":EventDashboardPage()}
             
           ];
           

@@ -2,6 +2,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sampleflutter/pages/add_events.dart';
 import 'package:sampleflutter/pages/detailed_event.dart';
@@ -146,6 +147,27 @@ class _EventCardState extends State<EventCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(2.0),
+                      
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(6))
+                      ),
+                      child: Text(
+                        eventDetails['is_special_event'] == null
+                        ? "Neivethiyam"
+                        : eventDetails['is_special_event'] == true
+                            ? "Special"
+                            : "Normal",
+
+                        style: TextStyle(color: Colors.orange,fontWeight: FontWeight.w600),
+                      ),
+                    )
+                  ],
+                ),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     curUser==UserRoleEnum.ADMIN.name?
@@ -191,7 +213,7 @@ class _EventCardState extends State<EventCard> {
                               }
                             ).show();
                           }
-
+            
                           else if (value == "contact") {
                               await getContactDescription(eventDetails['event_id']);
                               showModalBottomSheet(
@@ -303,7 +325,7 @@ class _EventCardState extends State<EventCard> {
                                 ),
                               );
                             }
-
+            
                         },
                         itemBuilder: (context){
                           return [
