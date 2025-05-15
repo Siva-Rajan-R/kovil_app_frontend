@@ -42,7 +42,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
     super.initState();
 
     final data = widget.existingEventDetails;
-    print(widget.previousPageData["padiKg"]);
+    print(widget.previousPageData["isSpecialEvent"]);
     clientName = TextEditingController(text: data?['client_name'] ?? "");
     clientCity = TextEditingController(text: data?['client_city'] ?? "");
     clientNumber = TextEditingController(
@@ -50,7 +50,10 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
     );
 
     double totAmnt = widget.previousPageData['eventAmount'];
-
+    print("huuunjmmmijij ${widget.previousPageData['eventAmount']}");
+    print(
+      "ghjkjkll ${widget.previousPageData['padiKg']} ${widget.previousPageData['neivethiyamName']}",
+    );
     if (widget.previousPageData['neivethiyamName'].isNotEmpty) {
       if (widget.previousPageData['padiKg'].isNotEmpty &&
           double.tryParse(widget.previousPageData['padiKg']) != null) {
@@ -58,13 +61,18 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
           widget.previousPageData['padiKg'],
         );
         print(
-          "${widget.previousPageData['padiKg']} ${widget.previousPageData['neivethiyamAmount']}",
+          "ghjkjkll ${widget.previousPageData['padiKg']} ${widget.previousPageData['neivethiyamAmount']}",
         );
         double neivethiyamTotAmount =
             widget.previousPageData["neivethiyamAmount"] *
             widget.previousPageData['padiKg'];
-        print(neivethiyamTotAmount);
-        totAmnt = totAmnt + neivethiyamTotAmount;
+        print(widget.previousPageData["isSpecialEvent"]);
+
+        totAmnt =
+            widget.previousPageData["isSpecialEvent"] != null
+                ? totAmnt + neivethiyamTotAmount
+                : neivethiyamTotAmount;
+        print(totAmnt);        
       } else {
         customSnackBar(
           content: "Enter a valid number",
@@ -87,7 +95,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
 
   Future<void> _handleSubmit(BuildContext context) async {
     String eventName = widget.previousPageData['eventName'];
-    bool? isSpecialEvent=widget.previousPageData["isSpecialEvent"];
+    bool? isSpecialEvent = widget.previousPageData["isSpecialEvent"];
     if (eventName.isEmpty &&
         widget.previousPageData['neivethiyamName'].isEmpty) {
       customSnackBar(
@@ -102,7 +110,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
 
         eventName =
             "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg";
-        isSpecialEvent=null;
+        isSpecialEvent = null;
       }
 
       setState(() => isLoading = true);

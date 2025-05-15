@@ -22,6 +22,7 @@ Map<String, dynamic>? extractNameAndNumberFromNeivethiyam(String input) {
   if (match != null) {
     String name = match.group(1)!;
     double number = double.parse(match.group(2)!);
+    print(" esrwaerauiokmnzbd $name $number");
     return {'name': name, 'number': number};
   }
 
@@ -38,7 +39,7 @@ class AddEventsPage extends StatefulWidget {
 
 class _AddEventsPageState extends State<AddEventsPage> {
   bool isloading = true;
-  bool isSpecial = false;
+  bool? isSpecial = false;
   late TextEditingController eventName;
   late TextEditingController neivethiyam;
   late TextEditingController eventDes;
@@ -49,6 +50,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
   List paymentStatus = [];
   String eventNameValue = "";
   double eventAmount = 0;
+  String neivethiyamName = "";
   double neivethiyamAmount = 0;
   int? neivethiyamId;
   DateTime? selectedDate;
@@ -80,25 +82,40 @@ class _AddEventsPageState extends State<AddEventsPage> {
 
     if (widget.existingEventDetails != null) {
       print(
-        "exists 1 ------------------------ ${widget.existingEventDetails!["neivethiyam_name"]}",
+        "exists 1 ------------------------ ${widget.existingEventDetails!['neivethiyam_amount']} ${widget.existingEventDetails}",
       );
       final nvExtracted = extractNameAndNumberFromNeivethiyam(
-        widget.existingEventDetails!["is_special_event"]==null?  widget.existingEventDetails!["event_name"] : widget.existingEventDetails!["neivethiyam_name"] ?? "",
+        widget.existingEventDetails!["is_special_event"] == null
+            ? widget.existingEventDetails!["event_name"]
+            : widget.existingEventDetails!["neivethiyam_name"] ?? "",
       );
-      en = widget.existingEventDetails!["is_special_event"]==null? "" : widget.existingEventDetails!['event_name'] ?? "";
+      print(" werdcfasreafrev bfwafewf $nvExtracted");
+      en =
+          widget.existingEventDetails!["is_special_event"] == null
+              ? ""
+              : widget.existingEventDetails!['event_name'] ?? "";
       ed = widget.existingEventDetails!["event_description"] ?? "";
       nv = nvExtracted!["name"] ?? "";
-      nvKg = nvExtracted['amount'] ?? "1";
+      nvKg = nvExtracted['number'].toString();
       print("qwetyuiipdtftfyyc $nvKg");
       selectedDate = DateTime.parse(widget.existingEventDetails!['event_date']);
       startTime =
           widget.existingEventDetails!['event_start_at'] ?? "start time";
       endTime = widget.existingEventDetails!['event_end_at'] ?? "end time";
       eventNameValue = widget.existingEventDetails!['event_name'];
+      neivethiyamName = nv;
       neivethiyamAmount =
           (widget.existingEventDetails!['neivethiyam_amount'] ?? 0).toDouble();
 
-      eventAmount = (widget.existingEventDetails!['total_amount'] ?? 0).toDouble()-neivethiyamAmount;
+      eventAmount =
+          widget.existingEventDetails!["is_special_event"] != null
+              ? (widget.existingEventDetails!['total_amount'] ?? 0).toDouble() -
+                  neivethiyamAmount
+              : widget.existingEventDetails!['total_amount'].toDouble();
+
+      neivethiyamId = widget.existingEventDetails!['neivethiyam_id'];
+      isSpecial=widget.existingEventDetails!['is_special_event'];
+      print("qwetyuiipdtftfyyc $isSpecial");
     }
 
     eventName = TextEditingController(text: en);
@@ -188,7 +205,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
                           "eventAmount": eventAmount,
                           "paymentModes": paymentModes,
                           "paymentStatus": paymentStatus,
-                          "neivethiyamName": neivethiyam.text,
+                          "neivethiyamName": neivethiyamName,
                           "neivethiyamId": neivethiyamId,
                           "neivethiyamAmount": neivethiyamAmount,
                           "isSpecialEvent": isSpecial,
@@ -324,6 +341,8 @@ class _AddEventsPageState extends State<AddEventsPage> {
                                         "selected value $value ${neivethiyamNamesAmount[value!]["amount"].runtimeType}",
                                       ),
                                       setState(() {
+                                        neivethiyamName =
+                                            neivethiyamNamesAmount[value]["name"];
                                         neivethiyamAmount =
                                             neivethiyamNamesAmount[value!]["amount"]
                                                 .toDouble();
