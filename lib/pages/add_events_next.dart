@@ -98,8 +98,8 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
     bool? isSpecialEvent = widget.previousPageData["isSpecialEvent"];
     print(eventName.isEmpty);
     print(
-          "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg",
-        );
+      "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg",
+    );
     if (eventName.isEmpty &&
         widget.previousPageData['neivethiyamName'].isEmpty) {
       customSnackBar(
@@ -118,7 +118,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
       }
 
       setState(() => isLoading = true);
-
+      print(widget.previousPageData['padiKg']);
       Map reqBody = {
         "event_name": eventName,
         "event_description": widget.previousPageData['eventDes'],
@@ -136,7 +136,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
         "payment_mode": paymentMode.text,
         "neivethiyam_id": widget.previousPageData["neivethiyamId"],
         "is_special": isSpecialEvent,
-        "neivethiyam_kg":widget.previousPageData['padiKg']
+        "neivethiyam_kg": widget.previousPageData['padiKg'],
       };
 
       if (method == "PUT") {
