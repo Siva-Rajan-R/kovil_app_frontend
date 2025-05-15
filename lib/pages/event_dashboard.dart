@@ -86,7 +86,7 @@ class _EventDashboardPageState extends State<EventDashboardPage> {
   @override
   void initState() {
     super.initState();
-    getEventDashboard(context);
+    // getEventDashboard(context);
   }
 
   Future<void> pickFromDate(BuildContext context) async {

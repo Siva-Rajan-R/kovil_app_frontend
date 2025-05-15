@@ -102,7 +102,10 @@ class _AddEventsPageState extends State<AddEventsPage> {
       startTime =
           widget.existingEventDetails!['event_start_at'] ?? "start time";
       endTime = widget.existingEventDetails!['event_end_at'] ?? "end time";
-      eventNameValue = widget.existingEventDetails!['event_name'];
+      eventNameValue =
+          widget.existingEventDetails!["is_special_event"] != null
+              ? widget.existingEventDetails!['event_name']
+              : "";
       neivethiyamName = nv;
       neivethiyamAmount =
           (widget.existingEventDetails!['neivethiyam_amount'] ?? 0).toDouble();
@@ -114,7 +117,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
               : widget.existingEventDetails!['total_amount'].toDouble();
 
       neivethiyamId = widget.existingEventDetails!['neivethiyam_id'];
-      isSpecial=widget.existingEventDetails!['is_special_event'];
+      isSpecial = widget.existingEventDetails!['is_special_event'];
       print("qwetyuiipdtftfyyc $isSpecial");
     }
 
