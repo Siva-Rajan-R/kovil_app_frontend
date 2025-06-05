@@ -3,10 +3,125 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sampleflutter/custom_controls/custom_ad.dart';
 
+Widget buildRows(String title){
+  return Row(
+      children: [
+        
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+            fontSize: 18
+          ),
+        ),
+      ]
+    );
+}
 
 Widget buildEventReport(Map eventDetails,BuildContext context){
   print(eventDetails["updated_at"]);
-  final List<String> eventStatusUpdatedAt=eventDetails["updated_at"].split(":") ?? "Not Updated";
+  
+  String updatedAt=eventDetails["completed_updated_at"] ?? "Not Updated";
+  String updatedDate=eventDetails["completed_updated_date"] ?? "Not Updated";
+  List containerRows=[
+    "Added By : ${eventDetails['event_added_by']}",
+    "Updated By : ${eventDetails["updated_by"]}",
+    "நிகழ்வு கருத்து : ${eventDetails["feedback"]}",
+    "ஸ்தல அர்ச்சகர் : ${eventDetails["archagar"]}",
+    "அபிஷேகம் : ${eventDetails["abisegam"]}",
+    "அபிஷேகம் உதவி : ${eventDetails["helper"]}",
+    "பூ அர்ச்சனை : ${eventDetails["poo"]}",
+    "நாமா வழி சொல்பவர் : ${eventDetails["read"]}",
+    "பொருட்கள் சேகரித்தவர் : ${eventDetails["prepare"]}"
+  ];
+
+
+  
+  if (eventDetails["event_status"].toLowerCase() == "pending" || eventDetails["event_status"].toLowerCase() == "canceled"){
+    updatedAt=eventDetails["pending_canceled_updated_at"] ?? "Not Updated";
+    updatedDate=eventDetails["pending_canceled_updated_date"] ?? "Not Updated";
+    print("hello world please $updatedAt");
+    
+  }
+
+  List<Widget> status=[
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            SvgPicture.asset(
+              "assets/svg/date-svgrepo-com.svg",
+              width: 20,
+            ),
+            SizedBox(width: 10),
+            Text(
+              updatedDate,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                fontSize: 14
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10,),
+        Row(
+          children: [
+            SvgPicture.asset(
+              "assets/svg/alarm-clock-svgrepo-com.svg",
+              width: 20,
+            ),
+            SizedBox(width: 10),
+            Text(
+              updatedAt,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                fontSize: 14
+              ),
+            ),
+          ],
+        ),
+          
+      ],
+    ),
+    SizedBox(height: 20,),
+              
+  ];
+  
+  for (String i in containerRows){
+    status.addAll(
+      [
+        buildRows(i),
+        SizedBox(height: 10,)
+      ]
+    );
+  }
+
+  if (eventDetails["event_status"].toLowerCase() == "pending" || eventDetails["event_status"].toLowerCase() == "canceled"){
+    status=[
+      ...status.sublist(0,5),
+      SizedBox(height: 10,),
+      Row(
+        children: [
+          Expanded(
+            child: Text(
+              "${eventDetails['event_status']} Reason : ${eventDetails["event_pending_canceled_description"]}",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                fontSize: 18
+              ),
+              softWrap: true,
+            ),
+          ),
+        ],
+      )
+    ];
+  }
+
   return SizedBox(
     height: 100,
     child: SingleChildScrollView(
@@ -53,198 +168,7 @@ Widget buildEventReport(Map eventDetails,BuildContext context){
             ),
             child: Column(
               children: [
-                Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        "assets/svg/date-svgrepo-com.svg",
-                        width: 20,
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        eventDetails["updated_date"] ?? "Not Updated",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: 14
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10,),
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        "assets/svg/alarm-clock-svgrepo-com.svg",
-                        width: 20,
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        "${eventStatusUpdatedAt[0]}:${eventStatusUpdatedAt[1]}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: 14
-                        ),
-                      ),
-                    ],
-                  ),
-                    
-                ],
-              ),
-              SizedBox(height: 20,),
-              Row(
-                    children: [
-                      
-                      Text(
-                        "Added By : ${eventDetails['event_added_by']}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: 18
-                        ),
-                      ),
-                    ]
-                  ),
-              SizedBox(height: 10,),
-              Row(
-                children: [
-                
-                  Expanded(
-                    child: Text(
-                      "Updated By : ${eventDetails["updated_by"]}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 18
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10,),
-              Row(
-                children: [
-                  
-                  Expanded(
-                    child: Text(
-                      "நிகழ்வு கருத்து : ${eventDetails["feedback"]}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 18
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10,),
-
-              Row(
-                children: [
-                  
-                  Expanded(
-                    child: Text(
-                      "ஸ்தல அர்ச்சகர் : ${eventDetails["archagar"]}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 18
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10,),
-              Row(
-                children: [
-                  
-                  Expanded(
-                    child: Text(
-                      "அபிஷேகம் : ${eventDetails["abisegam"]}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 18
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10,),
-              Row(
-                children: [
-                  
-                  Expanded(
-                    child: Text(
-                      "அபிஷேகம் உதவி : ${eventDetails["helper"]}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 18
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10,),
-              Row(
-                children: [
-
-                  Expanded(
-                    child: Text(
-                      "பூ அர்ச்சனை : ${eventDetails["poo"]}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 18
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10,),
-              Row(
-                children: [
-                  
-                  Expanded(
-                    child: Text(
-                      "நாமா வழி சொல்பவர் : ${eventDetails["read"]}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 18
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10,),
-              Row(
-                children: [
-                 
-                  Expanded(
-                    child: Text(
-                      "பொருட்கள் சேகரித்தவர் : ${eventDetails["prepare"]}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 18
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                ],
-              ),
+                ...status
               ],
             ),
           )

@@ -35,6 +35,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
   late TextEditingController poo;
   late TextEditingController read;
   late TextEditingController prepare;
+  late TextEditingController statusDesc;
 
 
   List<Map> workersName=[];
@@ -54,7 +55,8 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
 
   void handleSubmit() async {
     setState(() => _isSubmitting = true);
-    final formData = {
+
+    Map body = {
       "event_id": widget.eventId,
       "event_status": widget.eventStatus,
       "feedback": feedback.text,
@@ -66,14 +68,31 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       "prepare": prepare.text,
     };
 
+    bool isJson=false;
+    String path="/event/status/completed";
+    File? imageFile=_selectedImage;
+    bool isMultipart= true;
+
+    if (widget.eventStatus.toLowerCase() == "pending" || widget.eventStatus.toLowerCase() == "canceled"){
+      body={
+        "event_id":widget.eventId,
+        "event_status": widget.eventStatus,
+        "status_description": statusDesc.text.trim()
+      };
+      isJson=true;
+      path="/event/status/pending-canceled";
+      imageFile=null;
+      isMultipart= false;
+    }
+
     final res = await NetworkService.sendRequest(
-      path: "/event/status",
+      path: path,
       context: context,
       method: "PUT",
-      isJson: false,
-      isMultipart: true,
-      imageFile: _selectedImage,
-      body: formData,
+      isJson: isJson,
+      isMultipart: isMultipart,
+      imageFile: imageFile,
+      body: body,
     );
     setState(() => _isSubmitting = false);
     print(res);
@@ -114,6 +133,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     prepare.dispose();
     feedback.dispose();
     archagar.dispose();
+    statusDesc.dispose();
     super.dispose();
   }
 
@@ -131,6 +151,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     String epoo="";
     String eread="";
     String eprepare="";
+    String stsdesc="";
 
     if (existsDetails!=null){
 
@@ -142,6 +163,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       epoo=existsDetails['poo'] ?? "";
       eread=existsDetails['read'] ?? "";
       eprepare=existsDetails['prepare'] ?? "";
+      stsdesc=existsDetails['event_pending_canceled_description'] ?? "";
     }
     feedback=TextEditingController(text: efeedback);
     archagar=TextEditingController(text: earchagar);
@@ -150,6 +172,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     poo = TextEditingController(text: epoo);
     read = TextEditingController(text: eread);
     prepare = TextEditingController(text: eprepare);
+    statusDesc=TextEditingController(text: stsdesc);
   }
 
   @override
@@ -188,7 +211,32 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       ),
 
       appBar: const KovilAppBar(withIcon: true),
-      body: SingleChildScrollView(
+      body: (widget.eventStatus.toLowerCase() == "pending" || widget.eventStatus.toLowerCase() == "canceled")? 
+      Padding(
+        padding: const EdgeInsets.all(10),
+        child: TextField(
+          controller: statusDesc,
+          style: const TextStyle(
+              color: Colors.black, fontWeight: FontWeight.w600),
+          cursorColor: Colors.orange,
+          minLines: 5,
+          decoration: InputDecoration(
+            hintText: 'Write a reason for ${widget.eventStatus}...',
+            hintStyle: const TextStyle(
+                color: Colors.grey, fontWeight: FontWeight.w500),
+            enabledBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black38),
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.orange),
+            ),
+            alignLabelWithHint: true,
+          ),
+          keyboardType: TextInputType.multiline,
+          maxLines: 6,
+        ),
+      )
+      : SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

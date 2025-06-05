@@ -40,7 +40,7 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
 
   Future<void> fetchEventDates(int month, int year) async {
     final res = await NetworkService.sendRequest(
-      path: "/event/calendar/?month=$month&year=$year",
+      path: "/event/calendar?month=$month&year=$year",
       context: context,
     );
     if (res!=null) {

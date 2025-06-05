@@ -158,37 +158,42 @@ class _EventDownloadPage extends State<EventDownloadPage>{
         child: SingleChildScrollView(
           child: Column(
             children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                ),
-                onPressed: () => pickFromDate(context),
-                child: Text(
-                  fromDate == null
-                      ? "Pick Start Date"
-                      : "${fromDate!.toLocal()}".split(' ')[0],
-                ),
-              ),
-              Text(
-                "To",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600
-                ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                ),
-                onPressed: () => pickToDate(context),
-                child: Text(
-                  toDate == null
-                      ? "Pick End Date"
-                      : "${toDate!.toLocal()}".split(' ')[0],
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                    ),
+                    onPressed: () => pickFromDate(context),
+                    child: Text(
+                      fromDate == null
+                          ? "Pick Start Date"
+                          : "${fromDate!.toLocal()}".split(' ')[0],
+                    ),
+                  ),
+                  Text(
+                    "To",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                    ),
+                    onPressed: () => pickToDate(context),
+                    child: Text(
+                      toDate == null
+                          ? "Pick End Date"
+                          : "${toDate!.toLocal()}".split(' ')[0],
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 30,),
 

@@ -23,6 +23,7 @@ class WorkerDashboardPage extends StatefulWidget {
 
 class _DashboardState extends State<WorkerDashboardPage>{
   TextEditingController amountToCalculate = TextEditingController(text: "50");
+  TextEditingController sendTo = TextEditingController();
   DateTime? fromDate;
   DateTime? toDate;
   bool _isDeleting=false;
@@ -32,12 +33,20 @@ class _DashboardState extends State<WorkerDashboardPage>{
   int totNofEvents=0;
   int amount=50;
 
+
   List<Map<String, dynamic>> workersData = [];
 
   @override
   void initState(){
     super.initState();
     getWorkersInfo();
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
+    sendTo.dispose();
+    amountToCalculate.dispose();
   }
 
   Future getWorkersInfo()async{
@@ -91,17 +100,44 @@ class _DashboardState extends State<WorkerDashboardPage>{
   }
 
   handleDownload() async {
-    setState(() {
-      _isSubmitting=true;
-    });
 
-  
-    final res=await NetworkService.sendRequest(path: '/worker/report/email',method: "POST", context: context,body: {"from_date":fromDate.toString(),"to_date":toDate.toString(),"amount":amount});
+    AwesomeDialog(
+        context: context,
+        btnOkText: "Download",
+        dismissOnTouchOutside: false,
+        dismissOnBackKeyPress: false,
+        dialogType: DialogType.noHeader,
+        animType: AnimType.topSlide,
+        body: Column(
+          children: [
+            Text(
+              "Download Participated Events",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 30,),
+            CustomTextField(label: "Forward to (Optional)",controller: sendTo,)
+          ],
+        ),
+        btnCancelOnPress: () {},
+        btnOkOnPress: () async {
+          setState(() {
+            _isSubmitting=true;
+          });
 
-    setState(() {
-      _isSubmitting=false;
-    });
-    print(res);
+          Map body={"from_date":fromDate.toString(),"to_date":toDate.toString(),"amount":amount};
+          if(sendTo.text.trim()!=""){
+            body['send_to']=sendTo.text.trim();
+          }
+          print(body);
+          final res=await NetworkService.sendRequest(path: '/worker/report/email',method: "POST", context: context,body: body);
+
+          setState(() {
+            _isSubmitting=false;
+          });
+          print(res);
+       }
+      ).show();
+    
 
     
   }
@@ -112,7 +148,6 @@ class _DashboardState extends State<WorkerDashboardPage>{
     });
 
     final res=await NetworkService.sendRequest(path: "/workers/date?from_date=$fromDate&to_date=$toDate", context: context);
-    ;
 
     setState(() {
       _isFullLoading=false;
@@ -124,22 +159,36 @@ class _DashboardState extends State<WorkerDashboardPage>{
 
   }
 
-  void handleDelete()async {
+  void handleDelete() async {
     AwesomeDialog(
         context: context,
         btnOkText: "Yes",
         dismissOnTouchOutside: false,
         dismissOnBackKeyPress: false,
-        dialogType: DialogType.info,
+        dialogType: DialogType.question,
         animType: AnimType.topSlide,
-        title: 'Reset Participated Events',
-        desc: 'Are you sure , Do you Want to Reset Participated Events ?',
+        body: Column(
+          children: [
+            Text(
+              "Reset Participated Events",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 30,),
+            CustomTextField(label: "Forward to (Optional)",controller: sendTo,)
+          ],
+        ),
         btnCancelOnPress: () {},
         btnOkOnPress: () async {
           setState(() {
             _isDeleting=true;
           });
-          final res=await NetworkService.sendRequest(path: '/worker/reset/all',method: "PUT", context: context,body: {"from_date":fromDate.toString(),"to_date":toDate.toString(),"amount":amount});
+          Map body={"from_date":fromDate.toString(),"to_date":toDate.toString(),"amount":amount};
+          
+          if (sendTo.text.trim()!=""){
+            body["send_to"]=sendTo.text.trim();
+          }
+
+          final res=await NetworkService.sendRequest(path: '/worker/reset/all',method: "PUT", context: context,body: body);
           print(res);
           setState(() {
             _isDeleting=false;
@@ -255,8 +304,8 @@ class _DashboardState extends State<WorkerDashboardPage>{
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: DataTable(
-                              headingRowColor: MaterialStateColor.resolveWith((states) => Colors.blueGrey.shade300),
-                              dataRowColor: MaterialStateColor.resolveWith((states) => Colors.grey.shade100),
+                              headingRowColor: WidgetStateColor.resolveWith((states) => Colors.blueGrey.shade300),
+                              dataRowColor: WidgetStateColor.resolveWith((states) => Colors.grey.shade100),
                               columnSpacing: 24,
                               columns: const [
                                 DataColumn(

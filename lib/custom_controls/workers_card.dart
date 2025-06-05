@@ -31,7 +31,7 @@ class _WorkersNameCard extends State<WorkersNameCard>{
     final String workerName=widget.workerName;
     final String workerNo=widget.workerNo;
     final int workerParticipatedEvents=widget.workerParticipatedEvents;
-    print("$workerName");
+    print(workerName);
     return Stack(
       children: [
         Container(
@@ -71,7 +71,7 @@ class _WorkersNameCard extends State<WorkersNameCard>{
                           dismissOnBackKeyPress: false,
                           dismissOnTouchOutside: false,
                           title: 'Delete Worker Name',
-                          desc: 'Are you sure , Do you Want to Delete ${workerName} ?',
+                          desc: 'Are you sure , Do you Want to Delete $workerName ?',
                           btnCancelOnPress: () {},
                           btnOkOnPress: () async{
                             setState(() {
@@ -79,7 +79,7 @@ class _WorkersNameCard extends State<WorkersNameCard>{
                             });
                             
                             final res=await NetworkService.sendRequest(path: "/worker", context: context,method: "DELETE",body: {"worker_name":workerName});
-                              print("hello ${res}");
+                              print("hello $res");
                               
                               setState(() {
                               isLoading=false;
@@ -137,7 +137,7 @@ class _WorkersNameCard extends State<WorkersNameCard>{
                     child: GestureDetector(
                       onTap:()=> makePhoneCall(workerNo,context),
                       child: Text(
-                        "$workerNo",
+                        workerNo,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.white,

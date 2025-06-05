@@ -6,9 +6,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:sampleflutter/utils/secure_storage_init.dart';
 import 'package:http_parser/http_parser.dart';  // For MediaType
+import 'package:connectivity_plus/connectivity_plus.dart';
+
+
+
+
 
 // https://kovil-app-backend.vercel.app
-String BASEURL = "https://kovil-app-backend.vercel.app";
+String BASEURL = "https://feminist-andria-sivarajan-40ab83c8.koyeb.app";
 
 class NetworkService {
   static Future sendRequest({
@@ -22,6 +27,19 @@ class NetworkService {
     bool isMultipart = false, // Flag to check if it's a multipart request
     File? imageFile, // Optional image file for multipart
   }) async {
+
+    // 🔌 Check network before hitting the backend
+      var connectivityResult = await Connectivity().checkConnectivity();
+      print(connectivityResult);
+      if (connectivityResult == ConnectivityResult.none) {
+        print("helopo");
+        customSnackBar(
+          content: "No internet connection. Please turn on your data or Wi-Fi.",
+          contentType: AnimatedSnackBarType.info,
+        ).show(context);
+        return null; // Skip API call if there's no internet
+      }
+
     final url = "$BASEURL$path";
     final uri = Uri.parse(url);
     final accessToken = await secureStorage.read(key: 'accessToken');
@@ -129,7 +147,7 @@ class NetworkService {
           },
           isRetry: true,
         );
-        print("hello ${res}");
+        print("hello $res");
         if (res!=null) {
           // Save the new access token
           
@@ -168,7 +186,9 @@ class NetworkService {
       return null;
     }
     else{
-      customSnackBar(content: decodedRes['detail'], contentType: AnimatedSnackBarType.error).show(context);
+      final errorText = decodedRes['detail'] ?? (decodedRes.toString().isNotEmpty ? decodedRes.toString() : "Something went wrong");
+
+      customSnackBar(content: errorText, contentType: AnimatedSnackBarType.error).show(context);
       return null;
     }
 

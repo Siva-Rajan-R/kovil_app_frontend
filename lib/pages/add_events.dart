@@ -50,7 +50,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
   List paymentStatus = [];
   String eventNameValue = "";
   double eventAmount = 0;
-  String neivethiyamName = "";
+  String? neivethiyamName;
   double neivethiyamAmount = 0;
   int? neivethiyamId;
   DateTime? selectedDate;
@@ -78,25 +78,19 @@ class _AddEventsPageState extends State<AddEventsPage> {
     String en = "";
     String ed = "";
     String nv = "";
-    String nvKg = "1";
+    double nvKg = 1.0;
 
     if (widget.existingEventDetails != null) {
       print(
         "exists 1 ------------------------ ${widget.existingEventDetails!['neivethiyam_amount']} ${widget.existingEventDetails}",
       );
-      final nvExtracted = extractNameAndNumberFromNeivethiyam(
-        widget.existingEventDetails!["is_special_event"] == null
-            ? widget.existingEventDetails!["event_name"]
-            : widget.existingEventDetails!["neivethiyam_name"] ?? "",
-      );
-      print(" werdcfasreafrev bfwafewf $nvExtracted");
       en =
           widget.existingEventDetails!["is_special_event"] == null
               ? ""
               : widget.existingEventDetails!['event_name'] ?? "";
       ed = widget.existingEventDetails!["event_description"] ?? "";
-      nv = nvExtracted!["name"] ?? "";
-      nvKg = nvExtracted['number'].toString();
+      nv = widget.existingEventDetails!["neivethiyam_name"] ?? "";
+      nvKg = (widget.existingEventDetails!['padi_kg'] ?? 0).toDouble();
       print("qwetyuiipdtftfyyc $nvKg");
       selectedDate = DateTime.parse(widget.existingEventDetails!['event_date']);
       startTime =
@@ -113,7 +107,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
       eventAmount =
           widget.existingEventDetails!["is_special_event"] != null
               ? (widget.existingEventDetails!['total_amount'] ?? 0).toDouble() -
-                  neivethiyamAmount
+                  (neivethiyamAmount*nvKg)
               : widget.existingEventDetails!['total_amount'].toDouble();
 
       neivethiyamId = widget.existingEventDetails!['neivethiyam_id'];
@@ -124,7 +118,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
     eventName = TextEditingController(text: en);
     eventDes = TextEditingController(text: ed);
     neivethiyam = TextEditingController(text: nv);
-    padiKg = TextEditingController(text: nvKg);
+    padiKg = TextEditingController(text: nvKg.toString());
   }
 
   Future<void> pickDate(BuildContext context) async {
@@ -364,6 +358,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
                                     themeColor: Colors.white,
                                     fontColor: Colors.white,
                                     controller: padiKg,
+                                    keyboardtype: TextInputType.number,
                                   ),
                                 ),
                               ),

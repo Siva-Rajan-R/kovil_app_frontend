@@ -12,7 +12,7 @@ class CustomDropdown extends StatelessWidget {
 
 
   const CustomDropdown({
-    Key? key,
+    super.key,
     required this.label,
     required this.ddController,
     required this.ddEntries,
@@ -20,7 +20,7 @@ class CustomDropdown extends StatelessWidget {
     this.themeColor=Colors.orange,
     this.textColor=Colors.black,
     this.Width=300,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

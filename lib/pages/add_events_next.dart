@@ -54,7 +54,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
     print(
       "ghjkjkll ${widget.previousPageData['padiKg']} ${widget.previousPageData['neivethiyamName']}",
     );
-    if (widget.previousPageData['neivethiyamName'].isNotEmpty) {
+    if (widget.previousPageData['neivethiyamName']!=null) {
       if (widget.previousPageData['padiKg'].isNotEmpty &&
           double.tryParse(widget.previousPageData['padiKg']) != null) {
         widget.previousPageData['padiKg'] = double.parse(
@@ -75,7 +75,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
         print(totAmnt);
       } else {
         customSnackBar(
-          content: "Enter a valid number",
+          content: "Enter a valid number on padi/kg",
           contentType: AnimatedSnackBarType.info,
         ).show(context);
       }
@@ -101,9 +101,9 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
       "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg",
     );
     if (eventName.isEmpty &&
-        widget.previousPageData['neivethiyamName'].isEmpty) {
+        widget.previousPageData['neivethiyamName']==null) {
       customSnackBar(
-        content: "choose any one of the event name",
+        content: "Choose any one of the event name",
         contentType: AnimatedSnackBarType.info,
       ).show(context);
     } else {
@@ -112,13 +112,12 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
           "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg",
         );
 
-        eventName =
-            "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg";
+        eventName = "${widget.previousPageData['neivethiyamName']}";
         isSpecialEvent = null;
       }
 
       setState(() => isLoading = true);
-      print(widget.previousPageData['padiKg']);
+      print("hello pooo ${widget.previousPageData['neivethiyamName']}");
       Map reqBody = {
         "event_name": eventName,
         "event_description": widget.previousPageData['eventDes'],
@@ -134,10 +133,15 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
             paidAmount.text.isNotEmpty ? double.parse(paidAmount.text) : 0,
         "payment_status": paymentStatus.text,
         "payment_mode": paymentMode.text,
-        "neivethiyam_id": widget.previousPageData["neivethiyamId"],
         "is_special": isSpecialEvent,
         "neivethiyam_kg": widget.previousPageData['padiKg'],
       };
+
+      print(widget.previousPageData["neivethiyamName"]);
+      if (widget.previousPageData["neivethiyamName"]!=null){
+        reqBody["neivethiyam_id"]=widget.previousPageData["neivethiyamId"];
+        print("vaangana vanakam na my song enna kelunga na");
+      }
 
       if (method == "PUT") {
         reqBody["event_id"] = widget.existingEventDetails!["event_id"];

@@ -80,8 +80,12 @@ class UserPage extends StatelessWidget{
                   }
                   else{
                     print("anap shhort $snapshot.data");
-                    final List admins=snapshot.data['admins'];
-                    final List users=snapshot.data['users'];
+                    List admins=[];
+                    List users=[];
+                    if (snapshot.data!=null){
+                      admins=snapshot.data!['admins'];
+                      users=snapshot.data!['users'];
+                    }
                     return TabBarView(
                           children: [
                             admins.isNotEmpty? _buildUsers(users: admins,context: context,curuser: curUser) : Center(child: Text("No Data Found"),),

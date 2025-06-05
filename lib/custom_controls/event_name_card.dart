@@ -71,7 +71,7 @@ class _EventNameAmountCard extends State<EventNameAmountCard>{
                           dismissOnBackKeyPress: false,
                           dismissOnTouchOutside: false,
                           title: 'Delete Event Name',
-                          desc: 'Are you sure , Do you Want to Delete ${eventName} ?',
+                          desc: 'Are you sure , Do you Want to Delete $eventName ?',
                           btnCancelOnPress: () {},
                           btnOkOnPress: () async{
                             setState(() {
@@ -85,7 +85,7 @@ class _EventNameAmountCard extends State<EventNameAmountCard>{
                               body={"neivethiyam_name_id":eventNameId};
                             }
                             final res=await NetworkService.sendRequest(path: path, context: context,method: "DELETE",body: body);
-                              print("hello ${res}");
+                              print("hello $res");
 
                               setState(() {
                               isLoading=false;

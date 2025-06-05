@@ -2,7 +2,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sampleflutter/pages/add_events.dart';
 import 'package:sampleflutter/pages/detailed_event.dart';
@@ -50,11 +49,11 @@ class _EventCardState extends State<EventCard> {
   bool isContactAddLoading=false;
   TextEditingController contactDescription=TextEditingController();
 
-  getContactDescription(String event_id)async {
+  getContactDescription(String eventId)async {
     setState(() {
       isEventloading=true;
     });
-    final res=await NetworkService.sendRequest(path: "/event/contact-description?event_id=$event_id", context: context);
+    final res=await NetworkService.sendRequest(path: "/event/contact-description?event_id=$eventId", context: context);
     setState(() {
       isEventloading=false;
     });
@@ -64,12 +63,12 @@ class _EventCardState extends State<EventCard> {
     }
   }
 
-  Future saveContactDescription(String event_id) async {
+  Future saveContactDescription(String eventId) async {
     setState(() {
       isContactAddLoading=true;
     });
      print("biiii $isContactAddLoading");
-    final res=await NetworkService.sendRequest(path: "/event/contact-description", context: context,method: 'POST',body: {"event_id":event_id,"contact_description":contactDescription.text.trim()});
+    final res=await NetworkService.sendRequest(path: "/event/contact-description", context: context,method: 'POST',body: {"event_id":eventId,"contact_description":contactDescription.text.trim()});
     print(res);
 
     setState(() {
@@ -149,7 +148,7 @@ class _EventCardState extends State<EventCard> {
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.all(2.0),
+                      padding: EdgeInsets.only(top: 2.0,bottom: 2.0,left: 4,right: 4),
                       
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -264,7 +263,7 @@ class _EventCardState extends State<EventCard> {
                                                   cursorColor: Colors.orange,
                                                   minLines: 4,
                                                   decoration: InputDecoration(
-                                                    hintText: 'Write something...',
+                                                    hintText: 'Write a contact description...',
                                                     hintStyle: const TextStyle(
                                                         color: Colors.grey, fontWeight: FontWeight.w500),
                                                     enabledBorder: const OutlineInputBorder(

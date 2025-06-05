@@ -3,7 +3,7 @@ import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/event_dashboard_container.dart';
 
-List<Widget> rowBuilder(List items) {
+List<Widget> rowBuilder(List items,eventTotCount) {
   print("items ${items.length}");
   List<Widget> rows = [];
   List<Widget> temp = [];
@@ -15,7 +15,7 @@ List<Widget> rowBuilder(List items) {
       temp.add(
         EventDashboardContainer(
           eventCount: items[i]['count'],
-          totCount: 10,
+          totCount: eventTotCount,
           eventStatus: items[i]['status'],
           eventAmnt: items[i]['total_amount'],
           themeColor:
@@ -61,12 +61,16 @@ class EventDashboardPage extends StatefulWidget {
 }
 
 class _EventDashboardPageState extends State<EventDashboardPage> {
-  DateTime? fromDate=DateTime.now();
-  DateTime? toDate=DateTime.now();
+  final DateTime tdyDate=DateTime.now();
+  DateTime? fromDate;
+  DateTime? toDate;
   List eventsDashboard = [];
   bool isLoading = false;
+  int eventTotCount=0;
+  int eventTotAmnt=0;
 
   Future getEventDashboard(BuildContext context) async {
+    print(fromDate);
     setState(() {
       isLoading = true;
     });
@@ -78,15 +82,26 @@ class _EventDashboardPageState extends State<EventDashboardPage> {
     setState(() {
       isLoading = false;
     });
+
     if (res != null) {
+
+      eventTotAmnt=0;
+      eventTotCount=0;
+
       eventsDashboard = List<Map>.from(res['events_dashboard']);
+      for(int index=0;index<eventsDashboard.length;index++){
+        eventTotAmnt+=(eventsDashboard[index]['total_amount'] as num).toInt();
+        eventTotCount+=(eventsDashboard[index]['count'] as num).toInt();
+      }
     }
   }
 
   @override
   void initState() {
     super.initState();
-    // getEventDashboard(context);
+    fromDate=DateTime(tdyDate.year, tdyDate.month, tdyDate.day);
+    toDate=DateTime(tdyDate.year, tdyDate.month, tdyDate.day);
+    getEventDashboard(context);
   }
 
   Future<void> pickFromDate(BuildContext context) async {
@@ -166,7 +181,7 @@ class _EventDashboardPageState extends State<EventDashboardPage> {
                       ),
                     ],
                   ),
-                  ...rowBuilder(eventsDashboard),
+                  ...rowBuilder(eventsDashboard,eventTotCount),
                 ],
               ),
     );
