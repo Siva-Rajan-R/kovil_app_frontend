@@ -7,12 +7,15 @@ Widget buildRows(String title){
   return Row(
       children: [
         
-        Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-            fontSize: 18
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontSize: 18
+            ),
+            softWrap: true,
           ),
         ),
       ]

@@ -102,122 +102,125 @@ class _EventDownloadPage extends State<EventDownloadPage>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: KovilAppBar(
-        withIcon: true,
-      ),
-      bottomNavigationBar: CustomBottomAppbar(
-        bottomAppbarChild: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: _isDeleting ? null : handleDelete,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                
-              ),
-              child: Text(
-                _isDeleting ? "Deleting..." : "Delete All",
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: _isSubmitting ? null :handleDownload,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                
-              ),
-              child: Text(
-                _isSubmitting ? "Downloading..." : "Download",
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
+    return PopScope(
+      canPop: (_isDeleting || _isSubmitting)? false : true,
+      child: Scaffold(
+        appBar: KovilAppBar(
+          withIcon: true,
         ),
-      ),
-      body: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [
-            Colors.orange.shade400,
-            Colors.orange.shade600,
-            Colors.orange.shade800,
-          ]),
-          borderRadius: const BorderRadius.all(Radius.circular(20)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.orange.shade800,
-              blurRadius: 5,
-              spreadRadius: 2,
-              blurStyle: BlurStyle.outer,
-            ),
-          ],
-        ),
-        child: SingleChildScrollView(
-          child: Column(
+        bottomNavigationBar: CustomBottomAppbar(
+          bottomAppbarChild: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () => pickFromDate(context),
-                    child: Text(
-                      fromDate == null
-                          ? "Pick Start Date"
-                          : "${fromDate!.toLocal()}".split(' ')[0],
-                    ),
-                  ),
-                  Text(
-                    "To",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () => pickToDate(context),
-                    child: Text(
-                      toDate == null
-                          ? "Pick End Date"
-                          : "${toDate!.toLocal()}".split(' ')[0],
-                    ),
-                  ),
-                ],
+              ElevatedButton(
+                onPressed: _isDeleting ? null : handleDelete,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  
+                ),
+                child: Text(
+                  _isDeleting ? "Deleting..." : "Delete All",
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-              SizedBox(height: 30,),
-
-              CustomDropdown(
-                textColor: Colors.white,
-                themeColor: Colors.white,
-                label: "Event Report Format", 
-                ddController: eventReportFormat, 
-                ddEntries: [
-                  for(String i in ["pdf","excel"])
-                    DropdownMenuEntry(
-                      value: i, 
-                      label: i,
-                    )
-                ], 
-                onSelected: (value)=>print(value)
+              ElevatedButton(
+                onPressed: _isSubmitting ? null :handleDownload,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  
+                ),
+                child: Text(
+                  _isSubmitting ? "Downloading..." : "Download",
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-              
-              SizedBox(height: 10,),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: CustomTextField(label: "Forward To (Optional)",controller: forwardTo,themeColor: Colors.white,fontColor: Colors.white,),
-              )
             ],
+          ),
+        ),
+        body: Container(
+          width: double.infinity,
+          margin: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              Colors.orange.shade400,
+              Colors.orange.shade600,
+              Colors.orange.shade800,
+            ]),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.orange.shade800,
+                blurRadius: 5,
+                spreadRadius: 2,
+                blurStyle: BlurStyle.outer,
+              ),
+            ],
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                      ),
+                      onPressed: () => pickFromDate(context),
+                      child: Text(
+                        fromDate == null
+                            ? "Pick Start Date"
+                            : "${fromDate!.toLocal()}".split(' ')[0],
+                      ),
+                    ),
+                    Text(
+                      "To",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                      ),
+                      onPressed: () => pickToDate(context),
+                      child: Text(
+                        toDate == null
+                            ? "Pick End Date"
+                            : "${toDate!.toLocal()}".split(' ')[0],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 30,),
+      
+                CustomDropdown(
+                  textColor: Colors.white,
+                  themeColor: Colors.white,
+                  label: "Event Report Format", 
+                  ddController: eventReportFormat, 
+                  ddEntries: [
+                    for(String i in ["pdf","excel"])
+                      DropdownMenuEntry(
+                        value: i, 
+                        label: i,
+                      )
+                  ], 
+                  onSelected: (value)=>print(value)
+                ),
+                
+                SizedBox(height: 10,),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: CustomTextField(label: "Forward To (Optional)",controller: forwardTo,themeColor: Colors.white,fontColor: Colors.white,),
+                )
+              ],
+            ),
           ),
         ),
       ),

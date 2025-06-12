@@ -3,17 +3,36 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    // firebase plugin
+    id("com.google.gms.google-services")
+}
+
+dependencies {
+    //  Firebase BOM
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+
+    //  Add Firebase products (no version needed)
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging") // for FCM
+
+    // flutter local notification
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+
+    implementation("androidx.window:window:1.0.0")
+    implementation("androidx.window:window-java:1.0.0")
 }
 
 android {
     namespace = "com.example.sampleflutter"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     //flutter.ndkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "29.0.13113456"
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        
     }
 
     kotlinOptions {
@@ -22,13 +41,14 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.ntk.namaitharuvarkovil"
+        applicationId = "com.example.nanmaitharuvarkovil"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {

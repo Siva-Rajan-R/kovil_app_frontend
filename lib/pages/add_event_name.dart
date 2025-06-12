@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/utils/builders/event_name.dart';
 import 'package:sampleflutter/custom_controls/event_name_card.dart';
 import 'package:sampleflutter/utils/network_request.dart';
+import 'package:sampleflutter/utils/random_loading.dart';
 
 Widget makeEventNamesAmountCard(List eventNamesAmount, bool isForNeivethiyam) {
   return ListView.builder(
@@ -68,7 +70,22 @@ class AddEventName extends StatelessWidget {
                 ]),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator(color: Colors.orange));
+                    return Center(
+                child: Column(
+                  
+                  children: [
+                    LottieBuilder.asset(getRandomLoadings()),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Please wait while fetching event names...",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
+                        VerticalDivider(),
+                        SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
+                      ],
+                    )
+                  ],
+                )
+              );
                   }
                   final normalEventsAmnt = snapshot.data?[0]['normalEventsAmnt'] ?? [];
                   final specialEventsAmnt = snapshot.data?[0]['specialEventsAmnt'] ?? [];

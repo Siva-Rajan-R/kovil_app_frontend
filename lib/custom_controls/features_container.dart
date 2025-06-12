@@ -3,16 +3,20 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sampleflutter/utils/secure_storage_init.dart';
+import 'package:sampleflutter/utils/delete_local_storage.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
+import 'package:sampleflutter/utils/network_request.dart';
 
 
 
-class FeaturesContainer extends StatelessWidget{
+class FeaturesContainer extends StatefulWidget{
   final String svgLink;
   final String label;
   final Color shadowColor;
   final Color containerColor;
   final Widget route;
+
+  
 
   const FeaturesContainer(
     {
@@ -26,87 +30,117 @@ class FeaturesContainer extends StatelessWidget{
   );
 
   @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () async{
-          // Navigator.of(context).pushNamed(route);
-          if (label=='Logout'){
-            print("logout ulla");
-            AwesomeDialog(
-            context: context,
-            btnOkText: "Yes",
-            dismissOnTouchOutside: false,
-            dismissOnBackKeyPress: false,
-            dialogType: DialogType.question,
-            animType: AnimType.topSlide,
-            title: 'Log out',
-            desc: 'Are you sure , Do you Want to Logout ?',
-            btnCancelOnPress: () {},
-            btnOkOnPress: () async{
-            await secureStorage.delete(key: 'accessToken');
-            await secureStorage.delete(key: 'refreshToken');
-            await secureStorage.delete(key: 'role');
-            await secureStorage.delete(key: 'refreshTokenExpDate');
-            await secureStorage.write(key: 'isLoggedIn', value: 'false');
-            Navigator.pushReplacementNamed(context, '/login');
-            },
-            ).show();
+  State<FeaturesContainer> createState() => _FeaturesContainerState();
+}
 
-          }
-          else{
-            Navigator.push(context,CupertinoPageRoute(builder: (context)=>route));
-          }
-          print("clicked container $label");
-        },
-        child: Container(
-            width: 80,
-            height: 100,
+class _FeaturesContainerState extends State<FeaturesContainer> {
+
+  bool isLoading=false;
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () async{
+              if (widget.label=='Logout'){
+                print("logout ulla");
+                AwesomeDialog(
+                  context: context,
+                  btnOkText: "Yes",
+                  dismissOnTouchOutside: false,
+                  dismissOnBackKeyPress: false,
+                  dialogType: DialogType.question,
+                  animType: AnimType.topSlide,
+                  title: 'Log out',
+                  desc: 'Are you sure , Do you Want to Logout ?',
+                  btnCancelOnPress: () {},
+                  btnOkOnPress: () async{
+                    setState(() {
+                      isLoading=true;
+                    });
+                    await NetworkService.sendRequest(
+                      path: "/app/notify/token",
+                      context: context,
+                      method: "DELETE",
+                      body: {
+                        "device_id":deviceId
+                      }
+                    );
+                    
+                    await deleteStoredLocalStorageValues();
+                  
+                    setState(() {
+                      isLoading=false;
+                    });
+        
+                    Navigator.pushReplacementNamed(context, '/login');
+        
+                    
+        
+                  },
+              
+                ).show();
+        
+              }
+              else{
+                Navigator.push(context,CupertinoPageRoute(builder: (context)=>widget.route));
+              }
+              print("clicked container ${widget.label}");
+            },
+            child: Container(
+                width: 85,
+                height: 100,
+                
+                padding: EdgeInsets.all(8.0),
+                margin: EdgeInsets.all(8.0),
             
-            padding: EdgeInsets.all(8.0),
-            margin: EdgeInsets.all(8.0),
-        
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-              color: containerColor,
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 3,
-                  spreadRadius: 2,
-                  blurStyle: BlurStyle.outer,
-                  color: shadowColor
-                )
-              ]
-            ),
-        
-            child: Column(
-              children: [
-        
-                SvgPicture.asset(
-                  svgLink,
-                  width: 50,
-                  height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                  color: widget.containerColor,
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 3,
+                      spreadRadius: 2,
+                      blurStyle: BlurStyle.outer,
+                      color: widget.shadowColor
+                    )
+                  ]
                 ),
-        
-                Expanded(
-                  child: Text(
-                    label,
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12
+            
+                child: Column(
+                  children: [
+            
+                    SvgPicture.asset(
+                      widget.svgLink,
+                      width: 50,
+                      height: 50,
                     ),
-                  )
-                )
-        
-              ],
-            ),
+            
+                    Expanded(
+                      child: Text(
+                        widget.label,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12
+                        ),
+                      )
+                    )
+            
+                  ],
+                ),
+              ),
           ),
-      ),
+        ),
+
+        if(isLoading)
+          Positioned.fill(child: Center(child: CircularProgressIndicator(color: Colors.black,),))
+      ],
     );
   }
 }

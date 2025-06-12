@@ -12,3 +12,16 @@ Future<void> makePhoneCall(String phoneNumber,BuildContext context) async {
     customSnackBar(content: 'Could not launch $phoneNumber', contentType:AnimatedSnackBarType.info).show(context);
   }
 }
+
+Future<void> openUrl(String url, BuildContext context) async {
+  final Uri uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } else {
+    customSnackBar(
+      content: 'Could not open $url',
+      contentType: AnimatedSnackBarType.info,
+    ).show(context);
+  }
+}
+

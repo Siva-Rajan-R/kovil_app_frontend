@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/event_card.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/custom_ad.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:sampleflutter/utils/network_request.dart';
+import 'package:sampleflutter/utils/random_loading.dart';
 
 Widget _buildEvents({
   required List events,
@@ -126,7 +128,22 @@ class _TodayEventsPageState extends State<TodayEventsPage> {
                 future: _eventsFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: Colors.orange));
+                    return Center(
+                child: Column(
+                 
+                  children: [
+                    LottieBuilder.asset(getRandomLoadings()),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Please wait while fetching events...",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
+                        VerticalDivider(),
+                        SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
+                      ],
+                    )
+                  ],
+                )
+              );
                   }
 
                   final pending = snapshot.data?['pending'] ?? [];

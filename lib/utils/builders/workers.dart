@@ -54,57 +54,60 @@ class _AddWorkersState extends State<AddWorkers> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          Container(
-            alignment: Alignment.center,
-            margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(10),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  Colors.white10,
-                  Colors.white24,
-                  Colors.white54
-                ]),
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.orange.shade500,
-                    blurRadius: 5,
-                    spreadRadius: 2,
-                    blurStyle: BlurStyle.outer
-                  )
-                ]
-              ),
-            child: Column(
-              children: [
-                CustomTextField(label: "Worker name", controller: workerName),
-                const SizedBox(height: 30),
-                CustomTextField(
-                  label: "Worker number",
-                  controller: workerNumber,
-                  keyboardtype: TextInputType.number,
+    return PopScope(
+      canPop: isLoading? false : true,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Colors.white10,
+                    Colors.white24,
+                    Colors.white54
+                  ]),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.shade500,
+                      blurRadius: 5,
+                      spreadRadius: 2,
+                      blurStyle: BlurStyle.outer
+                    )
+                  ]
                 ),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: isLoading
-                      ? null // Disable the button when loading
-                      : () => addWorkerName(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+              child: Column(
+                children: [
+                  CustomTextField(label: "Worker name", controller: workerName),
+                  const SizedBox(height: 30),
+                  CustomTextField(
+                    label: "Worker number",
+                    controller: workerNumber,
+                    keyboardtype: TextInputType.number,
                   ),
-                  child: isLoading
-                      ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
-                      : Text("Add", style: TextStyle(color: Colors.white)),
-                ),
-              ],
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: isLoading
+                        ? null // Disable the button when loading
+                        : () => addWorkerName(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                    ),
+                    child: isLoading
+                        ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
+                        : Text("Add", style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
             ),
-          ),
-          
-        ],
+            
+          ],
+        ),
       ),
     );
   }

@@ -22,7 +22,6 @@ class _AddEventNewNameState extends State<AddEventNewName> {
   final TextEditingController isForDD = TextEditingController();
 
   bool isEventLoading = false;
-  bool isNeivethiyamLoading = false;
   
   int? selectedDdValues; // Flag for loading state
 
@@ -86,70 +85,73 @@ class _AddEventNewNameState extends State<AddEventNewName> {
       {"label":"Neivethiyam","value":2}
     ];
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          Container(
-            alignment: Alignment.center,
-            margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(10),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  Colors.white10,
-                  Colors.white24,
-                  Colors.white54
-                ]),
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.orange.shade500,
-                    blurRadius: 5,
-                    spreadRadius: 2,
-                    blurStyle: BlurStyle.outer
-                  )
-                ]
-              ),
-            child: Column(
-              children: [
-                CustomTextField(label: "Name", controller: name),
-                const SizedBox(height: 30),
-                CustomTextField(
-                  label: "Price",
-                  controller: price,
-                  keyboardtype: TextInputType.number,
+    return PopScope(
+      canPop: isEventLoading? false : true,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Colors.white10,
+                    Colors.white24,
+                    Colors.white54
+                  ]),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.shade500,
+                      blurRadius: 5,
+                      spreadRadius: 2,
+                      blurStyle: BlurStyle.outer
+                    )
+                  ]
                 ),
-                const SizedBox(height: 30),
-                CustomDropdown(
-                  label: "Is for", 
-                  ddController: isForDD, 
-                  ddEntries: ddValues.map((item){
-                    return DropdownMenuEntry(value: item['value'], label: item['label']);
-                  }).toList(), 
-                  onSelected: (value){
-                    setState(() {
-                      selectedDdValues=value;
-                    });
-                  }
-                ),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: isEventLoading
-                      ? null // Disable the button when loading
-                      : () => addEventName(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+              child: Column(
+                children: [
+                  CustomTextField(label: "Name", controller: name),
+                  const SizedBox(height: 30),
+                  CustomTextField(
+                    label: "Price",
+                    controller: price,
+                    keyboardtype: TextInputType.number,
                   ),
-                  child: isEventLoading
-                      ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
-                      : Text("Add", style: TextStyle(color: Colors.white)),
-                ),
-              ],
+                  const SizedBox(height: 30),
+                  CustomDropdown(
+                    label: "Is for", 
+                    ddController: isForDD, 
+                    ddEntries: ddValues.map((item){
+                      return DropdownMenuEntry(value: item['value'], label: item['label']);
+                    }).toList(), 
+                    onSelected: (value){
+                      setState(() {
+                        selectedDdValues=value;
+                      });
+                    }
+                  ),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: isEventLoading
+                        ? null // Disable the button when loading
+                        : () => addEventName(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                    ),
+                    child: isEventLoading
+                        ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
+                        : Text("Add", style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
             ),
-          ),
-          
-        ],
+            
+          ],
+        ),
       ),
     );
   }

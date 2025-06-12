@@ -1,9 +1,11 @@
 
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/workers_card.dart';
 import 'package:sampleflutter/utils/builders/workers.dart';
 import 'package:sampleflutter/utils/network_request.dart';
+import 'package:sampleflutter/utils/random_loading.dart';
 
 Widget makeWorkersNameCard(List workersName){
   
@@ -54,7 +56,22 @@ class AddWorkerPage extends StatelessWidget{
                 future: getWorkersNames(context: context), 
                 builder: (context,snapshot){
                   if(snapshot.connectionState==ConnectionState.waiting){
-                    return Center(child:CircularProgressIndicator(color: Colors.orange,));
+                    return Center(
+                      child: Column(
+                        
+                        children: [
+                          LottieBuilder.asset(getRandomLoadings()),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Please wait while fetching workers...",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
+                              VerticalDivider(),
+                              SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
+                            ],
+                          )
+                        ],
+                      )
+                    );
                   }
                   else{
                     final List workersName=snapshot.data ?? [];

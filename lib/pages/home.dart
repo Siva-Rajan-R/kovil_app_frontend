@@ -1,4 +1,6 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/features_container.dart';
 import 'package:sampleflutter/pages/add_event_name.dart';
@@ -8,10 +10,14 @@ import 'package:sampleflutter/pages/all_events.dart';
 import 'package:sampleflutter/pages/dashboard.dart';
 import 'package:sampleflutter/pages/event_download.dart';
 import 'package:sampleflutter/pages/login.dart';
+import 'package:sampleflutter/pages/send_notification.dart';
 import 'package:sampleflutter/pages/tamil_calendar.dart';
 import 'package:sampleflutter/pages/today_events.dart';
 import 'package:sampleflutter/pages/user.dart';
+import 'package:sampleflutter/utils/delete_local_storage.dart';
 import 'package:sampleflutter/utils/enums.dart';
+import 'package:sampleflutter/utils/open_phone.dart';
+import 'package:sampleflutter/utils/random_loading.dart';
 import 'package:sampleflutter/utils/secure_storage_init.dart';
 
 List<Widget> rowBuilder(List<Map<String,dynamic>> items){
@@ -44,12 +50,20 @@ List<Widget> rowBuilder(List<Map<String,dynamic>> items){
   
 
 
-class HomePage extends StatelessWidget{
-  
-  const HomePage({super.key});
+class HomePage extends StatefulWidget{
+  final Map? triggerVersionDialogInfo;
+  const HomePage(
+    {
+      this.triggerVersionDialogInfo,
+      super.key
+    }
+  );
 
-  
-  
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   Future getCurrentUserRole() async {
     return await secureStorage.read(key: 'role');
   }
@@ -61,7 +75,28 @@ class HomePage extends StatelessWidget{
       future: getCurrentUserRole(),
       builder: (context, snapshot){
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));
+          return MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    LottieBuilder.asset(getRandomLoadings()),
+                    SizedBox(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Please wait while fetching",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
+                        VerticalDivider(),
+                        SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
+                      ],
+                    )
+                  ],
+                )
+              )
+            )
+          );
         }
         else{
           final String curUserRole=snapshot.data ?? "";
@@ -76,6 +111,7 @@ class HomePage extends StatelessWidget{
             {"label":"Users","svg":"assets/svg/users-young-svgrepo-com.svg","cc":Colors.cyan.shade50,"sc":Colors.cyan.shade100,"route":UserPage(curUser: curUserRole,)},
             {"label":"Download&Delete","svg":"assets/svg/download-svgrepo-com.svg","cc":Colors.grey.shade300,"sc":Colors.grey.shade300,"route":EventDownloadPage()},
             {"label":"Dashboard","svg":"assets/svg/analytics-clipboard-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade300,"route":DashboardPage()},
+            {"label":"Send\nNotification","svg":"assets/svg/notification-bell-svgrepo-com.svg","cc":Colors.orange.shade50,"sc":Colors.orange.shade300,"route":SendNotificationPage()},
             {"label":"Logout","svg":"assets/svg/logout-svgrepo-com.svg","cc":Colors.red.shade50,"sc":Colors.red.shade100,"route":LoginPage()},
             
           ];
@@ -90,10 +126,64 @@ class HomePage extends StatelessWidget{
             ];
             print(visibleFeatures);
           }
-          
+
+          List<Widget> actions=[];
+          if (widget.triggerVersionDialogInfo!=null){
+            if (widget.triggerVersionDialogInfo!['triggerDialog'] ?? false) {
+              widget.triggerVersionDialogInfo!["triggerDialog"]=false;
+              actions.add(
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: IconButton(
+                    icon: Icon(Icons.download),
+                    onPressed: () {
+                      openUrl(widget.triggerVersionDialogInfo!["updateUrl"], context);
+                    },
+                  ),
+                )
+              );
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                AwesomeDialog(
+                  context: context,
+                  btnOkText: "Install",
+                  btnCancelText: "Later",
+                  btnCancelColor: Colors.yellow.shade700,
+                  headerAnimationLoop: false,
+                  dismissOnTouchOutside: false,
+                  dismissOnBackKeyPress: false,
+                  dialogType: DialogType.info,
+                  animType: AnimType.topSlide,
+                  title: 'New Version',
+                  desc: 'A new version is available ${widget.triggerVersionDialogInfo!['currentVersion']}. Please install.',
+                  btnOkOnPress: () async {
+                    print("pressed install");
+                    if (widget.triggerVersionDialogInfo!['isTriggerLogin']){
+                      await deleteStoredLocalStorageValues();
+                    }
+                    openUrl(widget.triggerVersionDialogInfo!["updateUrl"], context);
+                  },
+                  btnCancelOnPress: widget.triggerVersionDialogInfo!['isMandatory']? null : ()=>print("later clicked"),
+                  autoDismiss: false,
+                  onDismissCallback: (type) {
+                    print(type);
+                    if (widget.triggerVersionDialogInfo!['isMandatory']){
+                      if (widget.triggerVersionDialogInfo!['oldVersion'] == widget.triggerVersionDialogInfo!['currentVersion']) {
+                      
+                        Navigator.of(context).pop();
+                      }
+                    }
+                    else{
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  
+                ).show();
+              });
+            }
+          }
           return Scaffold(
-            appBar: KovilAppBar(withIcon: true,),
-              body: SingleChildScrollView(
+            appBar: KovilAppBar(withIcon: true,actions: actions,),
+              body:SingleChildScrollView(
                 child: Column(
                   children: [
                     Column(

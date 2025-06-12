@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "424295283811",
+    "firebase_url": "https://nanmaitharvuar-kovilapp-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "nanmaitharvuar-kovilapp",
+    "storage_bucket": "nanmaitharvuar-kovilapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:424295283811:android:291199e4db5ad5ec4a4c56",
+        "android_client_info": {
+          "package_name": "com.example.nanmaitharuvarkovil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_AY1PhjEAtD_ZqAtqSBquAEhGMK8lYL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

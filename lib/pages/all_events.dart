@@ -3,10 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_ad.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/event_card.dart';
 import 'package:sampleflutter/utils/network_request.dart';
+import 'package:sampleflutter/utils/random_loading.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class AllEventsPage extends StatefulWidget {
@@ -18,7 +20,7 @@ class AllEventsPage extends StatefulWidget {
 }
 
 class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateMixin {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
@@ -199,7 +201,23 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
                 future: _eventsFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: Colors.orange));
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          LottieBuilder.asset(getRandomLoadings(),height: 200,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Please wait while fetching events...",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
+                              VerticalDivider(),
+                              SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
+                            ],
+                          )
+                        ],
+                      )
+                    );
                   }
 
                   final pending = snapshot.data?['pending'] ?? [];

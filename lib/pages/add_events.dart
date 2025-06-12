@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
@@ -7,6 +8,7 @@ import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
 import 'package:sampleflutter/pages/add_events_next.dart';
 import 'package:intl/intl.dart';
 import 'package:sampleflutter/utils/network_request.dart';
+import 'package:sampleflutter/utils/random_loading.dart';
 
 String formatTimeOfDay(TimeOfDay tod) {
   final now = DateTime.now();
@@ -235,10 +237,20 @@ class _AddEventsPageState extends State<AddEventsPage> {
       body:
           isloading
               ? Center(
-                child: CircularProgressIndicator(
-                  color: Colors.orange,
-                  strokeWidth: 3,
-                ),
+                child: Column(
+                  
+                  children: [
+                    LottieBuilder.asset(getRandomLoadings()),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Please wait while fetching event details...",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
+                        VerticalDivider(),
+                        SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
+                      ],
+                    )
+                  ],
+                )
               )
               : SingleChildScrollView(
                 child: Column(

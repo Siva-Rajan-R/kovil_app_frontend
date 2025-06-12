@@ -2,11 +2,13 @@
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/utils/network_request.dart';
+import 'package:sampleflutter/utils/random_loading.dart';
 
 
 
@@ -200,201 +202,219 @@ class _DashboardState extends State<WorkerDashboardPage>{
   @override
   Widget build(BuildContext context) {
     
-    return Scaffold(
-      appBar: KovilAppBar(height: 100,),
-      bottomNavigationBar: _isFullLoading? null 
-      : CustomBottomAppbar(
-        bottomAppbarChild: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: _isDeleting ? null : handleDelete,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                
-              ),
-              child: Text(
-                _isDeleting ? "Reseting..." : "Reset",
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: _isSubmitting ? null :handleDownload,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                
-              ),
-              child: Text(
-                _isSubmitting ? "Downloading..." : "Download",
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: _isFullLoading? Center(child: CircularProgressIndicator(color: Colors.orange,),)
-      : SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 20,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
+    return PopScope(
+      canPop: (_isCalculating || _isDeleting || _isSubmitting)? false : true,
+      child: Scaffold(
+        appBar: KovilAppBar(height: 100,),
+        bottomNavigationBar: _isFullLoading? null 
+        : CustomBottomAppbar(
+          bottomAppbarChild: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: _isDeleting ? null : handleDelete,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
+                  
                 ),
-                onPressed: () => pickFromDate(context),
                 child: Text(
-                  fromDate == null
-                      ? "Pick Start Date"
-                      : "${fromDate!.toLocal()}".split(' ')[0],
-                ),
-              ),
-              Text(
-                "To",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.orange,
-                  fontWeight: FontWeight.w600
+                  _isDeleting ? "Reseting..." : "Reset",
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
               ElevatedButton(
+                onPressed: _isSubmitting ? null :handleDownload,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
+                  
                 ),
-                onPressed: () => pickToDate(context),
                 child: Text(
-                  toDate == null
-                      ? "Pick End Date"
-                      : "${toDate!.toLocal()}".split(' ')[0],
+                  _isSubmitting ? "Downloading..." : "Download",
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
-              ],
-            ),
+            ],
+          ),
+        ),
+        body: _isFullLoading? Center(
+          child: Column(
             
-            SizedBox(height: 10,),
-            Center(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.99,
-                height: 440,
-                child: Card(
-                  color: Colors.grey.shade100,
-                  elevation: 4,
-                  margin: const EdgeInsets.all(12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
+            children: [
+              LottieBuilder.asset(getRandomLoadings()),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Please wait while fetching worker dashboard",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
+                  VerticalDivider(),
+                  SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
+                ],
+              )
+            ],
+          )
+        )
+        : SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 20,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
                   ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Total No Of Events : $totNofEvents',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  onPressed: () => pickFromDate(context),
+                  child: Text(
+                    fromDate == null
+                        ? "Pick Start Date"
+                        : "${fromDate!.toLocal()}".split(' ')[0],
+                  ),
+                ),
+                Text(
+                  "To",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.orange,
+                    fontWeight: FontWeight.w600
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () => pickToDate(context),
+                  child: Text(
+                    toDate == null
+                        ? "Pick End Date"
+                        : "${toDate!.toLocal()}".split(' ')[0],
+                  ),
+                ),
+                ],
+              ),
+              
+              SizedBox(height: 10,),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.99,
+                  height: 440,
+                  child: Card(
+                    color: Colors.grey.shade100,
+                    elevation: 4,
+                    margin: const EdgeInsets.all(12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Total No Of Events : $totNofEvents',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                      const Divider(),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
+                        const Divider(),
+                        Expanded(
                           child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: DataTable(
-                              headingRowColor: WidgetStateColor.resolveWith((states) => Colors.blueGrey.shade300),
-                              dataRowColor: WidgetStateColor.resolveWith((states) => Colors.grey.shade100),
-                              columnSpacing: 24,
-                              columns: const [
-                                DataColumn(
-                                  label: Center(
-                                    child: Text(
-                                      'Name',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            scrollDirection: Axis.vertical,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                headingRowColor: WidgetStateColor.resolveWith((states) => Colors.blueGrey.shade300),
+                                dataRowColor: WidgetStateColor.resolveWith((states) => Colors.grey.shade100),
+                                columnSpacing: 24,
+                                columns: const [
+                                  DataColumn(
+                                    label: Center(
+                                      child: Text(
+                                        'Name',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Center(
-                                    child: Text(
-                                      'Events Participated',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  DataColumn(
+                                    label: Center(
+                                      child: Text(
+                                        'Events Participated',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Center(
-                                    child: Text(
-                                      'Total Amount (₹)',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  DataColumn(
+                                    label: Center(
+                                      child: Text(
+                                        'Total Amount (₹)',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                              rows: workersData.map((item) {
-                                print(item);
-                                int totAmount = item['no_of_participated_events'] * amount;
-                                return DataRow(
-                                  cells: [
-                                    DataCell(Text(item['name'], style: const TextStyle(fontSize: 14))),
-                                    DataCell(Center(child: Text(item['no_of_participated_events'].toString(), style: const TextStyle(fontSize: 14)))),
-                                    DataCell(Center(child: Text(totAmount.toString(), style: const TextStyle(fontSize: 14)))),
-                                  ],
-                                );
-                              }).toList(),
+                                ],
+                                rows: workersData.map((item) {
+                                  print(item);
+                                  int totAmount = item['no_of_participated_events'] * amount;
+                                  return DataRow(
+                                    cells: [
+                                      DataCell(Text(item['name'], style: const TextStyle(fontSize: 14))),
+                                      DataCell(Center(child: Text(item['no_of_participated_events'].toString(), style: const TextStyle(fontSize: 14)))),
+                                      DataCell(Center(child: Text(totAmount.toString(), style: const TextStyle(fontSize: 14)))),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(child: CustomTextField(label: "Enter a amount",controller: amountToCalculate,)),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(child: CustomTextField(label: "Enter a amount",controller: amountToCalculate,)),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: (){
+                        print(amount);
+                        if (amountToCalculate.text.isNotEmpty && int.tryParse(amountToCalculate.text)!=null){
+                          setState(() {
+                            _isCalculating=true;
+                          });
+                          
+                          setState(() {
+                            // amountToCalculate.text=amount.toString();
+                            amount =int.parse(amountToCalculate.text);
+                            _isCalculating=false;
+                          });       
+                        }
+                        else{
+                
+                          customSnackBar(content: "Enter a valid number", contentType: AnimatedSnackBarType.info).show(context);
+                        }
+                      },
+                      child: Text(
+                        _isCalculating
+                            ? "Calculating..."
+                            : "Calculate",
+                      ),
                     ),
-                    onPressed: (){
-                      print(amount);
-                      if (amountToCalculate.text.isNotEmpty && int.tryParse(amountToCalculate.text)!=null){
-                        setState(() {
-                          _isCalculating=true;
-                        });
-                        
-                        setState(() {
-                          // amountToCalculate.text=amount.toString();
-                          amount =int.parse(amountToCalculate.text);
-                          _isCalculating=false;
-                        });       
-                      }
-                      else{
-              
-                        customSnackBar(content: "Enter a valid number", contentType: AnimatedSnackBarType.info).show(context);
-                      }
-                    },
-                    child: Text(
-                      _isCalculating
-                          ? "Calculating..."
-                          : "Calculate",
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            
-          ],
-        ),
-      )
+              
+            ],
+          ),
+        )
+      ),
     );
   }
 }
