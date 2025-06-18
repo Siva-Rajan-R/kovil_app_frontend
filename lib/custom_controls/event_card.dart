@@ -1,13 +1,14 @@
 
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sampleflutter/pages/add_events.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/pages/detailed_event.dart';
-import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/pages/status_update.dart';
 import 'package:sampleflutter/utils/enums.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/open_phone.dart';
 
@@ -31,10 +32,8 @@ List<Widget> eventStatusUpdateButtonsBuilder(List<String> labels,String eventId,
 class EventCard extends StatefulWidget{
   final Map eventDetails;
   final int currentTabIndex;
-  final String curUser;
   
   const EventCard({
-    required this.curUser,
     required this.eventDetails,
     required this.currentTabIndex,
     super.key
@@ -93,7 +92,7 @@ class _EventCardState extends State<EventCard> {
   Widget build(BuildContext context) {
     final Map eventDetails=widget.eventDetails;
     final int currentTabIndex=widget.currentTabIndex;
-    final String curUser=widget.curUser;
+    final String curUser=currentUserRole!;
 
     print("ederdrdfffyf $eventDetails");
     List<String> labels=[
@@ -121,10 +120,15 @@ class _EventCardState extends State<EventCard> {
 
     return PopScope(
       canPop: isEventloading? false : true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop){
+          customSnackBar(content: "Wait until request complete...", contentType: AnimatedSnackBarType.info).show(context);
+        }
+      },
       child: Stack(
         children: [
           GestureDetector(
-            onTap: () => Navigator.push(context, CupertinoPageRoute(builder: (context)=>DetailedEventPage(eventDetails: eventDetails,eventStatusUpdateButtons: buttons,curUserRole: widget.curUser,))),
+            onTap: () => Navigator.push(context, CupertinoPageRoute(builder: (context)=>DetailedEventPage(eventDetails: eventDetails,eventStatusUpdateButtons: buttons,))),
             child: Container(
               
               margin: EdgeInsets.all(10),
@@ -179,14 +183,7 @@ class _EventCardState extends State<EventCard> {
                           icon: Icon(Icons.more_horiz,color: Colors.white,),
                           onSelected: (value)async{
                             if(value=='edit'){
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => AddEventsPage(
-                                    existingEventDetails: eventDetails,
-                                  )
-                                ),
-                              );
+                              Navigator.popUntil(context, (route) => route.isFirst);
                             }
                             else if(value=="delete"){
                               AwesomeDialog(
@@ -208,11 +205,7 @@ class _EventCardState extends State<EventCard> {
                                     isEventloading=false;
                                   });
                                   if(res!=null){
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      CupertinoPageRoute(builder: (context) => HomePage()),
-                                      (route) => false,
-                                    );
+                                    Navigator.popUntil(context, (route) => route.isFirst);
                                   }
                                 }
                               ).show();

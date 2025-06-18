@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sampleflutter/utils/enums.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/open_phone.dart';
 
-Widget buildEventInfo(Map eventDetails, String userRole, BuildContext context) {
+Widget buildEventInfo(Map eventDetails, BuildContext context) {
   print("event $eventDetails['paid_amount']");
   final List<String> eventStartAt = eventDetails["event_start_at"].split(":");
   final List<String> eventEndAt = eventDetails["event_end_at"].split(":");
@@ -300,7 +301,7 @@ Widget buildEventInfo(Map eventDetails, String userRole, BuildContext context) {
                   ),
                   SizedBox(width: 10),
                   Text(
-                    userRole == UserRoleEnum.ADMIN.name
+                    currentUserRole == UserRoleEnum.ADMIN.name
                         ? "${eventDetails['payment_status']} ($paid ₹)"
                         : eventDetails["payment_status"],
                     style: TextStyle(
@@ -338,7 +339,7 @@ Widget buildEventInfo(Map eventDetails, String userRole, BuildContext context) {
                   ),
                   SizedBox(width: 10),
                   Text(
-                    userRole == UserRoleEnum.ADMIN.name
+                    currentUserRole == UserRoleEnum.ADMIN.name
                         ? "Total Amount ($total ₹)"
                         : "-----",
                     style: TextStyle(
@@ -358,7 +359,7 @@ Widget buildEventInfo(Map eventDetails, String userRole, BuildContext context) {
                   ),
                   SizedBox(width: 10),
                   Text(
-                    userRole == UserRoleEnum.ADMIN.name
+                    currentUserRole == UserRoleEnum.ADMIN.name
                         ? profitOrLoss >= 0
                             ? "Profit ($profitOrLoss ₹)"
                             : "Loss ($profitOrLoss ₹)"

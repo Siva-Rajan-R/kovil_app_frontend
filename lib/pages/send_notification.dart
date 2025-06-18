@@ -1,13 +1,13 @@
 import 'dart:io';
 
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
-import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/compress_image.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
@@ -25,7 +25,7 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
   TextEditingController notifyTitle=TextEditingController();
   TextEditingController notifyBody=TextEditingController();
   
-  double uploadingCurrentStatus=0.0;
+  double? uploadingCurrentStatus;
   bool _isSending=false;
   bool _isCompressing=false;
 
@@ -45,7 +45,11 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
       setState((){
         _isCompressing=true;
       });
-      File compressedFile=await compressImageToTargetSize(File(pickedFile.path), 5*1024,returnAsFile: true);
+
+      File compressedFile=File(pickedFile.path);
+      if (await pickedFile.length()>=300*1024){
+        compressedFile=await compressImageToTargetSize(File(pickedFile.path), 250*1024,returnAsFile: true);
+      }
       setState(() {
         _isCompressing=false;
         _selectedImage = compressedFile;
@@ -72,24 +76,33 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
       imageFile: _selectedImage,
       nameOfImageField: "notification_image",
       onUploadProgress: (value){
+        print("value : $value");
         setState(() {
-          uploadingCurrentStatus=value;
+          double? custValue=value;
+          if (uploadingCurrentStatus!=null && custValue==1){
+            custValue=null;
+            print("hrllo");
+          }
+          uploadingCurrentStatus=custValue;
         });
       }
     );
-    if(_selectedImage!=null){
-     await  _selectedImage!.delete();
-    }
+    
     setState(() {
       _isSending=false;
     });
 
     if (res!=null) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        CupertinoPageRoute(builder: (_) => HomePage()),
-        (_) => false,
-      );
+      if(_selectedImage!=null){
+        await  _selectedImage!.delete();
+      }
+      // Navigator.pushAndRemoveUntil(
+      //   context,
+      //   CupertinoPageRoute(builder: (_) => HomePage()),
+      //   (_) => false,
+      // );
+
+      Navigator.pop(context);
     }
   }
 
@@ -97,6 +110,11 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
   Widget build(BuildContext context) {
     return PopScope(
       canPop: (_isCompressing || _isSending)? false : true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop){
+          customSnackBar(content: "Wait until request complete...", contentType: AnimatedSnackBarType.info).show(context);
+        }
+      },
       child: Scaffold(
         appBar: KovilAppBar(withIcon: true,),
         bottomNavigationBar: CustomBottomAppbar(
@@ -109,7 +127,7 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
               ),
               child: (_isSending==true && _selectedImage!=null) ? LinearProgressIndicator(
                   value: uploadingCurrentStatus,
-                  minHeight: 10,
+                  minHeight: 8,
                   
                   backgroundColor: Colors.white,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
@@ -147,7 +165,7 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
             child: Column(
               children: [
                 Text(
-                  "Send Notificication To All",
+                  "Send Notification To All",
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,

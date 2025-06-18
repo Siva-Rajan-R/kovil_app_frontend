@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -141,9 +142,30 @@ Widget buildEventReport(Map eventDetails,BuildContext context){
               child: Container(
                 height: 250,
                 margin: EdgeInsets.all(10),
-                child: Image.network(
-                  eventDetails["image_url"],
-                  gaplessPlayback: true,
+                child: CachedNetworkImage(
+                  imageUrl:eventDetails["image_url"],
+                  placeholder: (context, url) {
+                                return SizedBox(
+                                  height: 100,
+                                  child: Center(
+                                    child: CircularProgressIndicator(color: Colors.orange,),
+                                  ),
+                                );
+                  },
+                  errorWidget: (context, error, stackTrace) {
+                    print("Image load error: $error"); // 👈 debug print
+                    return const Center(
+                      child: SizedBox(
+                        height: 100,
+                        child: Text(
+                          '⚠️ Unable to load image. Check your internet connection.',
+                          style: TextStyle(color: Colors.red,fontWeight: FontWeight.w600),
+                          textAlign: TextAlign.center,
+
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             )

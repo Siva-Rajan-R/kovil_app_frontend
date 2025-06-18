@@ -53,7 +53,10 @@ dependencies:
   dio: ^5.8.0+1
   flutter_image_compress: ^2.1.0
   path_provider: ^2.1.1
-  internet_speed_test: ^1.5.0
+  intl: ^0.20.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  cached_network_image: ^3.3.1
   
   # flutter_secure_storage: ^9.0.0
 

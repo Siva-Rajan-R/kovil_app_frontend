@@ -5,16 +5,15 @@ import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/utils/builders/event_info.dart';
 import 'package:sampleflutter/utils/builders/event_report.dart';
 import 'package:sampleflutter/utils/enums.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 
 class DetailedEventPage extends StatefulWidget {
   final Map eventDetails;
   final List<Widget> eventStatusUpdateButtons;
-  final String curUserRole;
   
   const DetailedEventPage({
     required this.eventDetails,
     required this.eventStatusUpdateButtons,
-    required this.curUserRole,
     super.key,
   });
 
@@ -31,7 +30,7 @@ class _DetailedEventPageState extends State<DetailedEventPage> with SingleTicker
   void initState() {
 
     super.initState();
-    _tabController = TabController(length: widget.curUserRole==UserRoleEnum.ADMIN.name? 3 : 2, vsync: this);
+    _tabController = TabController(length: currentUserRole==UserRoleEnum.ADMIN.name? 3 : 2, vsync: this);
 
     _tabController.addListener(() {
       setState(() {
@@ -66,8 +65,8 @@ class _DetailedEventPageState extends State<DetailedEventPage> with SingleTicker
         children: [
           SizedBox(height: 10),
           TabBar(
-            isScrollable: widget.curUserRole == UserRoleEnum.ADMIN.name? true : false,
-            tabAlignment: widget.curUserRole == UserRoleEnum.ADMIN.name? TabAlignment.center : TabAlignment.fill,
+            isScrollable: currentUserRole == UserRoleEnum.ADMIN.name? true : false,
+            tabAlignment: currentUserRole == UserRoleEnum.ADMIN.name? TabAlignment.center : TabAlignment.fill,
             labelPadding: EdgeInsets.only(left: 25,right: 25),
             controller: _tabController,
             labelColor: Colors.black,
@@ -75,7 +74,7 @@ class _DetailedEventPageState extends State<DetailedEventPage> with SingleTicker
             tabs:  [
               Tab(text: 'Event Info'),
               Tab(text: 'Event Report'),
-              if (widget.curUserRole == UserRoleEnum.ADMIN.name) Tab(text: 'Contact Description')
+              if (currentUserRole == UserRoleEnum.ADMIN.name) Tab(text: 'Contact Description')
             ],
             onTap: (index){
               print("jiiiij $index");
@@ -88,9 +87,9 @@ class _DetailedEventPageState extends State<DetailedEventPage> with SingleTicker
             child: TabBarView(
               controller: _tabController,
               children: [
-                buildEventInfo(widget.eventDetails, widget.curUserRole,context),
+                buildEventInfo(widget.eventDetails,context),
                 buildEventReport(widget.eventDetails, context),
-                if (widget.curUserRole == UserRoleEnum.ADMIN.name) ContactDescCard(eventDetails: widget.eventDetails,),
+                if (currentUserRole == UserRoleEnum.ADMIN.name) ContactDescCard(eventDetails: widget.eventDetails,),
               ],
             ),
           ),

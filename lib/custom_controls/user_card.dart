@@ -1,9 +1,10 @@
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:sampleflutter/pages/home.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/utils/enums.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
 import 'package:sampleflutter/utils/open_phone.dart';
@@ -11,11 +12,9 @@ import 'package:sampleflutter/utils/open_phone.dart';
 
 class UserCard extends StatefulWidget{
   final Map user;
-  final String curUser;
   
   const UserCard({
     required this.user,
-    required this.curUser,
     super.key
   });
 
@@ -30,6 +29,11 @@ class _UserCardState extends State<UserCard> {
     print(widget.user);
     return PopScope(
       canPop: isloading? false : true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop){
+          customSnackBar(content: "Wait until request complete...", contentType: AnimatedSnackBarType.info).show(context);
+        }
+      },
       child: Stack(
         children: [
           Container(
@@ -59,7 +63,7 @@ class _UserCardState extends State<UserCard> {
                   Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    widget.curUser==UserRoleEnum.ADMIN.name?
+                    currentUserRole==UserRoleEnum.ADMIN.name?
                       PopupMenuButton(
                         icon: Icon(Icons.more_horiz,color: Colors.white,),
                         onSelected: (value)async{
@@ -83,13 +87,8 @@ class _UserCardState extends State<UserCard> {
                                 setState(() {
                                     isloading=false;
                                   });
-          
                                 if(res!=null){
-                                  Navigator.pushAndRemoveUntil(
-                                    context,
-                                    CupertinoPageRoute(builder: (context) => HomePage()),
-                                    (route) => false,
-                                  );
+                                 Navigator.pop(context);
                                 }
                               },
                             ).show();
@@ -114,13 +113,8 @@ class _UserCardState extends State<UserCard> {
                                 setState(() {
                                     isloading=false;
                                   });
-          
                                 if(res!=null){
-                                  Navigator.pushAndRemoveUntil(
-                                    context,
-                                    CupertinoPageRoute(builder: (context) => HomePage()),
-                                    (route) => false,
-                                  );
+                                  Navigator.pop(context);
                                 }
                               },
                             ).show();

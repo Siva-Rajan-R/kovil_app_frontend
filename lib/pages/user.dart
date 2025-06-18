@@ -7,15 +7,16 @@ import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
 
-Widget _buildUsers({required List users,required BuildContext context,required String curuser }){
+Widget _buildUsers({required List users,required BuildContext context}){
   if (users!=[]){
     print("naan aagi");
     return ListView.builder(
-        itemCount: users.length,
-        itemBuilder: (context,index){
-          return UserCard(user: users[index],curUser: curuser,);
-        }
-      );
+      physics: BouncingScrollPhysics(),
+      itemCount: users.length,
+      itemBuilder: (context,index){
+        return RepaintBoundary(child: UserCard(user: users[index]));
+      }
+    );
   }
 
   else{
@@ -27,8 +28,7 @@ Widget _buildUsers({required List users,required BuildContext context,required S
 
 // ignore: must_be_immutable
 class UserPage extends StatelessWidget{
-  final String curUser;
-  const UserPage({super.key,required this.curUser});
+  const UserPage({super.key});
 
   Future getUsers(BuildContext context)async {
     final List<Map> users;
@@ -105,8 +105,8 @@ class UserPage extends StatelessWidget{
                     }
                     return TabBarView(
                           children: [
-                            admins.isNotEmpty? _buildUsers(users: admins,context: context,curuser: curUser) : Center(child: Text("No Data Found"),),
-                            users.isNotEmpty? _buildUsers(users: users,context: context,curuser: curUser) : Center(child: Text("No Data Found"),)
+                            admins.isNotEmpty? _buildUsers(users: admins,context: context) : Center(child: Text("No Data Found"),),
+                            users.isNotEmpty? _buildUsers(users: users,context: context) : Center(child: Text("No Data Found"),)
                           ],
                       );
                   }

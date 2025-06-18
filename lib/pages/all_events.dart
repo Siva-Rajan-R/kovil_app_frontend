@@ -12,8 +12,7 @@ import 'package:sampleflutter/utils/random_loading.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class AllEventsPage extends StatefulWidget {
-  final String curUser;
-  const AllEventsPage({super.key, required this.curUser});
+  const AllEventsPage({super.key});
 
   @override
   State<AllEventsPage> createState() => _AllEventsPageState();
@@ -86,12 +85,14 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
 
   Widget _buildEvents({required List events, required int currentTabIndex}) {
     return ListView.builder(
+      physics: BouncingScrollPhysics(),
       itemCount: events.length,
       itemBuilder: (context, index) {
-        return EventCard(
-          eventDetails: events[index],
-          currentTabIndex: currentTabIndex,
-          curUser: widget.curUser,
+        return RepaintBoundary(
+          child: EventCard(
+            eventDetails: events[index],
+            currentTabIndex: currentTabIndex,
+          ),
         );
       },
     );

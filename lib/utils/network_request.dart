@@ -1,6 +1,6 @@
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:internet_speed_test/internet_speed_test.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/utils/delete_local_storage.dart';
 import 'dart:convert';
@@ -215,25 +215,25 @@ import 'package:dio/dio.dart';
 
 // https://muddy-danette-sivarajan-1b1beec7.koyeb.app
 
-Future<void> checkInternetSpeed(BuildContext context) async {
-  final internetSpeedTest = InternetSpeedTest();
-  await internetSpeedTest.startDownloadTesting(
-    onDone: (transferRate,unit){
-      print("$transferRate $unit");
-      if (transferRate<1){
-        customSnackBar(content: "Your Internet Speed is Too Low , It takes some Time...", contentType: AnimatedSnackBarType.info).show(context);
-      }
-      else{
-        print("internet speed is good");
-      }
-    }, 
-    onProgress: (percent, transferRate, unit) {
-      print("$transferRate $percent $unit");
-    },
-    onError: (errorMessage, speedTestError) => print(" $errorMessage $speedTestError"),
-  );
+// Future<void> checkInternetSpeed(BuildContext context) async {
+//   final internetSpeedTest = InternetSpeedTest();
+//   await internetSpeedTest.startDownloadTesting(
+//     onDone: (transferRate,unit){
+//       print("$transferRate $unit");
+//       if (transferRate<1){
+//         customSnackBar(content: "Your Internet Speed is Too Low , It takes some Time...", contentType: AnimatedSnackBarType.info).show(context);
+//       }
+//       else{
+//         print("internet speed is good");
+//       }
+//     }, 
+//     onProgress: (percent, transferRate, unit) {
+//       print("$transferRate $percent $unit");
+//     },
+//     onError: (errorMessage, speedTestError) => print(" $errorMessage $speedTestError"),
+//   );
   
-}
+// }
 const String BASEURL = "https://muddy-danette-sivarajan-1b1beec7.koyeb.app";
 class NetworkService{
   // Replace with your actual base URL
@@ -261,17 +261,20 @@ class NetworkService{
       return null;
     }
 
-    checkInternetSpeed(context);
+    // checkInternetSpeed(context);
     String? accessToken;
     String? refreshToken;
     String? refreshTokenExpDateStr;
+
+    final eTagBox=Hive.box("eTagBox");
+    final eTagCachedDatasBox=Hive.box("eTagCachedDatasBox");
 
     if (!isLoginPage) {
       // Read access and refresh tokens from secure storage
       accessToken = await secureStorage.read(key: 'accessToken');
       refreshToken = await secureStorage.read(key: 'refreshToken');
       refreshTokenExpDateStr = await secureStorage.read(key: 'refreshTokenExpDate');
-      print("$refreshTokenExpDateStr $refreshToken");
+      print("888888888888888888888888888888888888888888$refreshTokenExpDateStr $refreshToken");
       // Check if refresh token has expired
       if (refreshTokenExpDateStr != null) {
         final refreshExp = DateTime.parse(refreshTokenExpDateStr);
@@ -280,7 +283,7 @@ class NetworkService{
           print("vanakamm");
           await deleteStoredLocalStorageValues();
           customSnackBar(content: "Session expired. Please log in again 0",contentType: AnimatedSnackBarType.info).show(context);
-          // Navigator.of(context).pushReplacementNamed('/login');
+          Navigator.of(context).pushReplacementNamed('/login');
           return null;
         }
       }
@@ -299,6 +302,11 @@ class NetworkService{
     if (isJson && !isMultipart) {
       requestHeaders['Content-Type'] = 'application/json';
     }
+    if (eTagBox.containsKey('eTag$path')){
+      final cachedETag=eTagBox.get('eTag$path');
+      print("i got the etag $cachedETag");
+      requestHeaders['If-None-Match']=cachedETag;
+    }
 
     // Create Dio instance with base options
     BaseOptions options = BaseOptions(
@@ -308,9 +316,9 @@ class NetworkService{
     final dio = Dio(options);  // Instantiate Dio client:contentReference[oaicite:10]{index=10}
 
     dynamic responseData;
+    Response response;
 
     try {
-      Response response;
       // Prepare data for request
       dynamic requestData;
       Options requestOptions = Options(method: method);
@@ -373,6 +381,15 @@ class NetworkService{
       // If response is unauthorized and not yet retried, attempt to refresh token:contentReference[oaicite:14]{index=14}
       
     } on DioException catch (dioError) {
+
+      if (dioError.response!.statusCode==304){
+        if (eTagCachedDatasBox.containsKey('eTagCachedData$path')){
+          final cachedETagData=eTagCachedDatasBox.get('eTagCachedData$path');
+          print("i got the etagcached data $cachedETagData");
+          return cachedETagData;
+        }
+      }
+
       if (dioError.response!.statusCode == 401 && !isRetry) {
         print("ullokjnjinhb");
         if (refreshToken != null) {
@@ -416,16 +433,16 @@ class NetworkService{
             }
           } catch (e) {
             // Token refresh failed
-            await deleteStoredLocalStorageValues();
+            // await deleteStoredLocalStorageValues();
             customSnackBar(content: "Session expired. Please log in again 1",contentType: AnimatedSnackBarType.info).show(context);
-            Navigator.of(context).pushReplacementNamed('/login');
+            // Navigator.of(context).pushReplacementNamed('/login');
             return null;
           }
         } else {
           // No refresh token stored
           await deleteStoredLocalStorageValues();
           customSnackBar(content: "Session expired. Please log in again 2",contentType: AnimatedSnackBarType.info).show(context);
-          Navigator.of(context).pushReplacementNamed('/login');
+          await Navigator.of(context).pushReplacementNamed('/login');
           return null;
         }
       }
@@ -434,8 +451,9 @@ class NetworkService{
       if (dioError.response != null && dioError.response?.statusCode == 401) {
         print("Session expired. Please log in again 3");
         // Unauthorized and already retried or no refresh token
+        await deleteStoredLocalStorageValues();
         customSnackBar(content: "Session expired. Please log in again 3",contentType: AnimatedSnackBarType.info).show(context);
-        Navigator.of(context).pushReplacementNamed('/login');
+        await Navigator.of(context).pushReplacementNamed('/login');
         return null;
       } else if (dioError.response != null && (dioError.response?.statusCode == 422 || dioError.response?.statusCode == 409)) {
         // Other errors
@@ -459,7 +477,14 @@ class NetworkService{
       customSnackBar(content: responseData,contentType: AnimatedSnackBarType.success).show(context);
     }
 
-    print("==============================$responseData");
+    print("==============================$responseData ${response.headers.value("etag")} ${response.headers.value("ETag")}");
+    
+    final newETag=response.headers.value("etag");
+    print("taggg ggg $newETag");
+    if (newETag!=null){
+      await eTagBox.put('eTag$path', newETag);
+      await eTagCachedDatasBox.put('eTagCachedData$path', responseData);
+    }
     return responseData;
   }
 }

@@ -10,9 +10,10 @@ import 'package:sampleflutter/utils/random_loading.dart';
 Widget makeWorkersNameCard(List workersName){
   
   return ListView.builder(
+    physics: BouncingScrollPhysics(),
     itemCount: workersName.length,
     itemBuilder: (context,index){
-      return WorkersNameCard(workerName: workersName[index]['name'], workerNo: workersName[index]['mobile_number'],workerParticipatedEvents: workersName[index]["no_of_participated_events"] ?? 0,);
+      return RepaintBoundary(child: WorkersNameCard(workerName: workersName[index]['name'], workerNo: workersName[index]['mobile_number'],workerParticipatedEvents: workersName[index]["no_of_participated_events"] ?? 0,));
     }
   );
 }

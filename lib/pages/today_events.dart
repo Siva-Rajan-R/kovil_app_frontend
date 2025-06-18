@@ -13,23 +13,23 @@ Widget _buildEvents({
   required List events,
   required int currentTabIndex,
   required BuildContext context,
-  required String curUser,
 }) {
   return ListView.builder(
+    physics: BouncingScrollPhysics(),
     itemCount: events.length,
     itemBuilder: (context, index) {
-      return EventCard(
-        eventDetails: events[index],
-        currentTabIndex: currentTabIndex,
-        curUser: curUser,
+      return  RepaintBoundary(
+        child: EventCard(
+          eventDetails: events[index],
+          currentTabIndex: currentTabIndex,
+        ),
       );
     },
   );
 }
 
 class TodayEventsPage extends StatefulWidget {
-  final String curUser;
-  const TodayEventsPage({super.key, required this.curUser});
+  const TodayEventsPage({super.key});
 
   @override
   State<TodayEventsPage> createState() => _TodayEventsPageState();
@@ -153,13 +153,13 @@ class _TodayEventsPageState extends State<TodayEventsPage> {
                   return TabBarView(
                     children: [
                       pending.isNotEmpty
-                          ? _buildEvents(events: pending, currentTabIndex: 0, context: context, curUser: widget.curUser)
+                          ? _buildEvents(events: pending, currentTabIndex: 0, context: context)
                           : const Center(child: Text("No Data Found")),
                       canceled.isNotEmpty
-                          ? _buildEvents(events: canceled, currentTabIndex: 1, context: context, curUser: widget.curUser)
+                          ? _buildEvents(events: canceled, currentTabIndex: 1, context: context)
                           : const Center(child: Text("No Data Found")),
                       finished.isNotEmpty
-                          ? _buildEvents(events: finished, currentTabIndex: 2, context: context, curUser: widget.curUser)
+                          ? _buildEvents(events: finished, currentTabIndex: 2, context: context)
                           : const Center(child: Text("No Data Found")),
                     ],
                   );

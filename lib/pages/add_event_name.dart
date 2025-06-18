@@ -8,13 +8,16 @@ import 'package:sampleflutter/utils/random_loading.dart';
 
 Widget makeEventNamesAmountCard(List eventNamesAmount, bool isForNeivethiyam) {
   return ListView.builder(
+    physics: BouncingScrollPhysics(),
     itemCount: eventNamesAmount.length,
     itemBuilder: (context, index) {
-      return EventNameAmountCard(
-        eventNameId: eventNamesAmount[index]['id'],
-        eventName: eventNamesAmount[index]['name'],
-        eventAmount: eventNamesAmount[index]['amount'].toString(),
-        isForNeivethiyam: isForNeivethiyam,
+      return RepaintBoundary(
+        child: EventNameAmountCard(
+          eventNameId: eventNamesAmount[index]['id'],
+          eventName: eventNamesAmount[index]['name'],
+          eventAmount: eventNamesAmount[index]['amount'].toString(),
+          isForNeivethiyam: isForNeivethiyam,
+        ),
       );
     },
   );

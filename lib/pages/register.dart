@@ -1,5 +1,7 @@
 
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sampleflutter/utils/global_variables.dart';
@@ -25,6 +27,11 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: isLoading? false : true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop){
+          customSnackBar(content: "Wait until request complete...", contentType: AnimatedSnackBarType.info).show(context);
+        }
+      },
       child: Scaffold(
           body: Container(
         width: double.infinity,

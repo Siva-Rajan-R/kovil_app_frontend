@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/utils/network_request.dart';
@@ -71,18 +72,17 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
                         minScale: 0.5,
                         maxScale: 4.0,
                         panEnabled: true,
-                        child: Image.network(
-                          "$BASEURL/panchagam/calendar?date=${DateFormat("yyyy-MM-dd").format(_selectedDay)}",
-                            loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
+                        child: CachedNetworkImage(
+                          imageUrl:"$BASEURL/panchagam/calendar?date=${DateFormat("yyyy-MM-dd").format(_selectedDay)}",
+                            placeholder: (context, url) {
                                 return SizedBox(
                                   height: 100,
                                   child: Center(
                                     child: CircularProgressIndicator(color: Colors.orange,),
                                   ),
                                 );
-                              },
-                            errorBuilder: (context, error, stackTrace) {
+                            },
+                            errorWidget: (context, error, stackTrace) {
                               print("Image load error: $error"); // 👈 debug print
                               return const Center(
                                 child: SizedBox(

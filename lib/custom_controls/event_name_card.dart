@@ -1,8 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
 // ignore: must_be_immutable
@@ -91,11 +89,7 @@ class _EventNameAmountCard extends State<EventNameAmountCard>{
                               isLoading=false;
                             });
                               if(res!=null){
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  CupertinoPageRoute(builder: (context) => HomePage()),
-                                  (route) => false,
-                                );
+                                Navigator.pop(context);
                               }
                               
                             }

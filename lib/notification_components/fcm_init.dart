@@ -43,7 +43,7 @@ Future<void> initFCM(BuildContext context) async {
 
   if (storedFcmToken!=fcmToken){
     print("triggers new token =======================================");
-    NetworkService.sendRequest(
+    await NetworkService.sendRequest(
       path: "/app/notify/register-update", 
       context: context,
       method: "POST",
@@ -56,9 +56,10 @@ Future<void> initFCM(BuildContext context) async {
     await secureStorage.write(key: "fcmToken", value: fcmToken);
   }
   //sending token to backend
-  messaging.onTokenRefresh.listen((newFcmToken){
+  messaging.onTokenRefresh.listen((newFcmToken) async{
+    fcmToken=newFcmToken;
     print("triggred --------------------------------------------------- new token");
-    NetworkService.sendRequest(
+    await NetworkService.sendRequest(
       path: "/app/notify/register-update", 
       context: context,
       method: "POST",
@@ -67,6 +68,7 @@ Future<void> initFCM(BuildContext context) async {
         "device_id":deviceId
       }
     );
+    await secureStorage.write(key: "fcmToken", value: fcmToken);
   });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -101,7 +103,7 @@ FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
   String screen=message.data["screen"];
   print("this is the go to screen $screen");
 
-  if (screen=="events"){
+  if (screen=="event_page"){
     Navigator.pushNamed(context, "/tamil-calendar");
   }
 });

@@ -1,7 +1,9 @@
 
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
@@ -52,17 +54,18 @@ class _LoginPageState extends State<LoginPage> {
 
     
     if (res!=null) {
+      print("1234567890`0`hruihrf ulla ${context.mounted}");
       await FirebaseMessaging.instance.subscribeToTopic("all");
-      await FirebaseMessaging.instance.subscribeToTopic("test");
+      // await FirebaseMessaging.instance.subscribeToTopic("test");
       await secureStorage.write(key: "accessToken", value: res['access_token']);
       await secureStorage.write(key: "refreshToken", value: res['refresh_token']);
+      print("999999999999999999999999999999999999999999999999${await secureStorage.read(key: "refreshToken")}");
       await secureStorage.write(key: 'role', value: res['role']);
       await secureStorage.write(key: 'refreshTokenExpDate', value: res['refresh_token_exp_date']);
       await secureStorage.write(key: 'isLoggedIn', value: 'true');
 
-      if (context.mounted) {
-        Navigator.pushReplacementNamed(context, "/home");
-      }
+      currentUserRole=res['role'];
+      await Navigator.pushReplacementNamed(context, "/home");
     }
 
     setState(() {
@@ -74,6 +77,11 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: _isLoading? false : true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop){
+          customSnackBar(content: "Wait until request complete...", contentType: AnimatedSnackBarType.info).show(context);
+        }
+      },
       child: Scaffold(
         body: Container(
           width: double.infinity,

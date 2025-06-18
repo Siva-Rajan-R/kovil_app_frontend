@@ -1,13 +1,13 @@
 import 'dart:io';
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
-import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/compress_image.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
@@ -29,7 +29,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
 
   bool isLoading=false;
 
-  double uploadingCurrentStatus=0.0;
+  double? uploadingCurrentStatus;
 
   File? _selectedImage;
   String? _selectedImagePath;
@@ -62,7 +62,10 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
         _isCompressing=true;
       });
 
-      File compressedFile=await compressImageToTargetSize(File(pickedFile.path), 5*1024*1024,returnAsFile: true);
+      File compressedFile=File(pickedFile.path);
+      if (await pickedFile.length()>5*1024*1024){
+        compressedFile=await compressImageToTargetSize(File(pickedFile.path), 15*1024*1024,returnAsFile: true);
+      }
       
       setState(() {
         _isCompressing=false;
@@ -120,19 +123,22 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       nameOfImageField: nameOfImageField,
       onUploadProgress: (progress){
         setState(() {
-          uploadingCurrentStatus=progress;
+          double? custValue=progress;
+          if (uploadingCurrentStatus!=null && progress==1){
+            custValue=null;
+          }
+          uploadingCurrentStatus=custValue;
         });
       }
     );
     setState(() => _isSubmitting = false);
     print(res);
-
+    
     if (res!=null) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        CupertinoPageRoute(builder: (_) => HomePage()),
-        (_) => false,
-      );
+      if(_selectedImage!=null){
+        await  _selectedImage!.delete();
+      }
+      Navigator.popUntil(context, (route) => route.isFirst);
     } 
 
     
@@ -226,6 +232,11 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     )
     : PopScope(
       canPop: (_isCompressing || _isSubmitting)? false : true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop){
+          customSnackBar(content: "Wait until request complete...", contentType: AnimatedSnackBarType.info).show(context);
+        }
+      },
       child: Scaffold(
         bottomNavigationBar: CustomBottomAppbar(
           bottomAppbarChild: Center(

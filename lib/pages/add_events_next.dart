@@ -1,12 +1,10 @@
 import 'package:animated_snack_bar/animated_snack_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
-import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
 class AddEventsNextPage extends StatefulWidget {
@@ -157,11 +155,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
       setState(() => isLoading = false);
 
       if (res != null) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          CupertinoPageRoute(builder: (context) => HomePage()),
-          (route) => false,
-        );
+        Navigator.popUntil(context, (route) => route.isFirst);
       }
     }
   }
@@ -170,6 +164,11 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: isLoading? false : true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop){
+          customSnackBar(content: "Wait until request complete...", contentType: AnimatedSnackBarType.info).show(context);
+        }
+      },
       child: Scaffold(
         appBar: KovilAppBar(height: 100),
         body: SingleChildScrollView(

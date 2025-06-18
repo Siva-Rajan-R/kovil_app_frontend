@@ -1,11 +1,12 @@
-
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sampleflutter/utils/secure_storage_init.dart';
 
 Future<void> deleteStoredLocalStorageValues()async {
-
-  await FirebaseMessaging.instance.unsubscribeFromTopic("all");
-  await FirebaseMessaging.instance.deleteToken();
+  await Hive.box("eTagBox").clear();
+  await Hive.box("eTagCachedDatasBox").clear();
+  // await FirebaseMessaging.instance.unsubscribeFromTopic("all");
+  // await FirebaseMessaging.instance.unsubscribeFromTopic("test");
+  // await FirebaseMessaging.instance.deleteToken();
   
   await secureStorage.delete(key: 'accessToken');
   await secureStorage.delete(key: 'refreshToken');

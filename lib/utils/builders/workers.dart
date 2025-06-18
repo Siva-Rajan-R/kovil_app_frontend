@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
-import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
 class AddWorkers extends StatefulWidget {
@@ -41,11 +41,7 @@ class _AddWorkersState extends State<AddWorkers> {
 
 
       if (res!=null) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          CupertinoPageRoute(builder: (context) => HomePage()),
-          (route) => false,
-        );
+        Navigator.pop(context);
       }
     
       
@@ -56,6 +52,11 @@ class _AddWorkersState extends State<AddWorkers> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: isLoading? false : true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop){
+          customSnackBar(content: "Wait until request complete...", contentType: AnimatedSnackBarType.info).show(context);
+        }
+      },
       child: SingleChildScrollView(
         child: Column(
           children: [
