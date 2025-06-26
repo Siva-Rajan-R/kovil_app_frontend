@@ -21,6 +21,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController role = TextEditingController();
   final TextEditingController password = TextEditingController();
 
+  List<FocusNode> focusNodes = List.generate(5, (_) => FocusNode());
+
   bool isLoading = false;
 
   @override
@@ -108,6 +110,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                 label: "Enter the name",
                                 controller: name,
                                 keyboardtype: TextInputType.name,
+                                focusNode: focusNodes[0],
+                                onSubmitted: (_){
+                                  FocusScope.of(context).requestFocus(focusNodes[1]);
+                                },
                               )),
                           SizedBox(height: 10),
                           Padding(
@@ -116,6 +122,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                 label: "Enter email",
                                 controller: email,
                                 keyboardtype: TextInputType.emailAddress,
+                                focusNode: focusNodes[1],
+                                onSubmitted: (_){
+                                  FocusScope.of(context).requestFocus(focusNodes[2]);
+                                },
                               )),
                           SizedBox(height: 10),
                           Padding(
@@ -124,6 +134,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                 label: "Enter mobile number",
                                 controller: mobileNumber,
                                 keyboardtype: TextInputType.number,
+                                focusNode: focusNodes[2],
+                                onSubmitted: (_){
+                                  FocusScope.of(context).requestFocus(focusNodes[3]);
+                                },
                               )),
                           SizedBox(height: 10),
                           Padding(
@@ -132,11 +146,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                 label: "Enter the password",
                                 controller: password,
                                 keyboardtype: TextInputType.visiblePassword,
+                                focusNode: focusNodes[3],
+                                onSubmitted: (_){
+                                  FocusScope.of(context).requestFocus(focusNodes[4]);
+                                },
                               )),
                           SizedBox(height: 10),
                           DropdownMenu(
                             width: 280,
                             label: Text("Role"),
+                            focusNode: focusNodes[4],
+                            
                             controller: role,
                             menuStyle: MenuStyle(
                                 backgroundColor:
@@ -156,8 +176,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                         isLoading = true;
                                       });
       
-                                      final res =
-                                          await NetworkService.sendRequest(
+                                      final res = await NetworkService.sendRequest(
                                               path: '/register',
                                               context: context,
                                               method: 'POST',

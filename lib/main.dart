@@ -1,12 +1,14 @@
+import 'dart:io';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sampleflutter/notification_components/fcm_init.dart';
 import 'package:sampleflutter/notification_components/local_notfiy_init.dart';
+import 'package:sampleflutter/pages/desktop_home.dart';
 import 'package:sampleflutter/pages/forgot.dart';
 import 'package:sampleflutter/pages/home.dart';
 import 'package:sampleflutter/pages/login.dart';
@@ -16,6 +18,8 @@ import 'package:sampleflutter/utils/get_device_info.dart';
 import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/secure_storage_init.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 
 
@@ -24,13 +28,18 @@ import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  await Firebase.initializeApp();
-  await setupFlutterNotifications();
-  
-  await Hive.initFlutter();
-  await Hive.openBox("eTagBox");
-  await Hive.openBox("eTagCachedDatasBox");
+    if (Platform.isAndroid || Platform.isIOS){
+      await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    }
+    await setupFlutterNotifications();
+    
+    await Hive.initFlutter();
+    await Hive.openBox("eTagBox");
+    await Hive.openBox("eTagCachedDatasBox");
+    tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation("Asia/Kolkata"));
+    
   
   runApp(MyKovilApp());
 }
@@ -67,11 +76,12 @@ class _MyKovilAppState extends State<MyKovilApp> {
   @override
   void initState(){
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      initFCM(context);
-    });
+    if (Platform.isAndroid || Platform.isIOS){
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        initFCM(context);
+      });
+    }
     futureCheckLogin=checkLogin(context);
-
     Future.delayed(Duration(milliseconds: 100), () {
       setState(() {
         _scale = 1.0;
@@ -138,12 +148,20 @@ class _MyKovilAppState extends State<MyKovilApp> {
           final bool isLoggedIn = snapshot.data['loggedIn'] ?? false;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: isLoggedIn ? HomePage() :  LoginPage(),
+            theme: ThemeData(
+              fontFamily: 'BalooThambi2',
+              textTheme: ThemeData.light().textTheme.copyWith(
+                bodyLarge: TextStyle(fontFamily: 'BalooThambi2'),
+                bodyMedium: TextStyle(fontFamily: 'BalooThambi2'),
+              ),
+            ),
+            home: isLoggedIn ? (MediaQuery.of(context).size.width>400) ? DesktopHomePage() : HomePage() :  LoginPage(),
             routes: {
               "/login": (context) =>  LoginPage(),
               "/register": (context) =>  RegisterPage(),
               "/forgot":(context)=>ForgotPage(),
               "/home": (context) =>  HomePage(),
+              '/desktop-home':(context)=> DesktopHomePage(),
               "/tamil-calendar": (context) =>  TamilCalendarPage(),
               
               

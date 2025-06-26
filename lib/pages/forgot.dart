@@ -19,7 +19,37 @@ class ForgotPage extends StatefulWidget {
 class _ForgotPageState extends State<ForgotPage> {
   final emailOrNo = TextEditingController();
   final password = TextEditingController();
+  List<FocusNode> focusNodes = List.generate(2, (_) => FocusNode());
   bool isLoading = false;
+
+  Future onForgotPassword()async{
+    setState(() {
+      isLoading = true;
+    });
+
+    print("emailOrNo:${emailOrNo.text},password:${password.text}");
+    final res = await NetworkService.sendRequest(
+        path: '/forgot',
+        context: context,
+        method: 'PUT',
+        body: {
+          'email_or_no': emailOrNo.text,
+          'new_password': password.text,
+          'fcm_token':fcmToken,
+
+          },
+        isLoginPage: true
+    );
+
+    if (res!=null) {
+      Navigator.pushReplacementNamed(
+          context, "/login");
+    } 
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +136,10 @@ class _ForgotPageState extends State<ForgotPage> {
                                   label: "Enter email or number",
                                   keyboardtype: TextInputType.text,
                                   controller: emailOrNo,
+                                  focusNode: focusNodes[0],
+                                  onSubmitted: (_){
+                                    FocusScope.of(context).requestFocus(focusNodes[1]);
+                                  },
                                 )),
                             SizedBox(height: 20),
                             SizedBox(
@@ -115,42 +149,17 @@ class _ForgotPageState extends State<ForgotPage> {
                                     label: "Enter the New password",
                                     keyboardtype: TextInputType.visiblePassword,
                                     controller: password,
+                                    focusNode: focusNodes[1],
+                                    onSubmitted: isLoading
+                                    ? null
+                                    : (_) => onForgotPassword(),
                                   )),
                             ),
                             SizedBox(height: 20),
                             ElevatedButton(
                                 onPressed: isLoading
                                     ? null
-                                    : () async {
-                                        setState(() {
-                                          isLoading = true;
-                                        });
-      
-                                        print(
-                                            "emailOrNo:${emailOrNo.text},password:${password.text}");
-                                        final res = await NetworkService
-                                            .sendRequest(
-                                                path: '/forgot',
-                                                context: context,
-                                                method: 'PUT',
-                                                body: {
-                                                'email_or_no': emailOrNo.text,
-                                                'new_password': password.text,
-                                                'fcm_token':fcmToken,
-      
-                                                },
-                                                isLoginPage: true
-                                            );
-      
-                                        if (res!=null) {
-                                          Navigator.pushReplacementNamed(
-                                              context, "/login");
-                                        } 
-      
-                                        setState(() {
-                                          isLoading = false;
-                                        });
-                                      },
+                                    : () => onForgotPassword(),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.orange,
                                 ),

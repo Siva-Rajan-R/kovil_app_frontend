@@ -13,9 +13,10 @@ import 'package:sampleflutter/utils/network_request.dart';
 
 class StatusUpdatePage extends StatefulWidget {
   final String eventStatus;
+  final bool isForAssign;
   final String eventId;
   final Map? existingEventDetails;
-  const StatusUpdatePage({required this.eventStatus,required this.eventId, this.existingEventDetails, super.key});
+  const StatusUpdatePage({required this.eventStatus,required this.eventId, this.existingEventDetails, this.isForAssign=true,super.key});
 
   @override
   State<StatusUpdatePage> createState() => _StatusUpdatePageState();
@@ -97,6 +98,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     File? imageFile=_selectedImage;
     bool isMultipart= true;
     String nameOfImageField="image";
+    String method='PUT';
 
     if (widget.eventStatus.toLowerCase() == "pending" || widget.eventStatus.toLowerCase() == "canceled"){
       body={
@@ -110,12 +112,20 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       isMultipart= false;
       nameOfImageField="";
     }
-
+    if (widget.isForAssign){
+      isJson=true;
+      path='/event/assign';
+      isMultipart=false;
+      nameOfImageField="";
+      imageFile=null;
+      method='POST';
+      
+    }
     print(body);
     final res = await NetworkService.sendRequest(
       path: path,
       context: context,
-      method: "PUT",
+      method: method,
       isJson: isJson,
       isMultipart: isMultipart,
       imageFile: imageFile,
@@ -138,6 +148,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       if(_selectedImage!=null){
         await  _selectedImage!.delete();
       }
+
       Navigator.popUntil(context, (route) => route.isFirst);
     } 
 
@@ -191,15 +202,15 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     String stsdesc="";
 
     if (existsDetails!=null){
-
+      final bool isForAssign=widget.isForAssign; 
       print("existsss $existsDetails");
       efeedback=existsDetails['feedback'] ?? "";
-      earchagar=existsDetails['archagar'] ?? "";
-      eabisegam=existsDetails['abisegam'] ?? "";
-      ehelper=existsDetails['helper'] ?? "";
-      epoo=existsDetails['poo'] ?? "";
-      eread=existsDetails['read'] ?? "";
-      eprepare=existsDetails['prepare'] ?? "";
+      earchagar=isForAssign? existsDetails['assigned_archagar'] ?? "" : existsDetails['archagar'] ?? "";
+      eabisegam=isForAssign? existsDetails['assigned_abisegam'] ?? "":existsDetails['abisegam'] ?? "";
+      ehelper=isForAssign? existsDetails['assigned_helper'] ?? "": existsDetails['helper'] ?? "";
+      epoo=isForAssign? existsDetails['assigned_poo'] ?? "": existsDetails['poo'] ?? "";
+      eread=isForAssign? existsDetails['assigned_read'] ?? "": existsDetails['read'] ?? "";
+      eprepare=isForAssign? existsDetails['assigned_prepare'] ?? "" : existsDetails['prepare'] ?? "";
       stsdesc=existsDetails['event_pending_canceled_description'] ?? "";
     }
     feedback=TextEditingController(text: efeedback);
@@ -254,7 +265,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
                   color: Colors.white,
                 )
               : Text(
-                 _isSubmitting? " Submitting..." :" Submit",
+                 _isSubmitting? "Submitting..." : "Submit",
                 style: const TextStyle(color: Colors.white),
               ),
             ),
@@ -263,89 +274,108 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       
         appBar: const KovilAppBar(withIcon: true),
         body: (widget.eventStatus.toLowerCase() == "pending" || widget.eventStatus.toLowerCase() == "canceled")? 
-        Padding(
-          padding: const EdgeInsets.all(10),
-          child: TextField(
-            controller: statusDesc,
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w600),
-            cursorColor: Colors.orange,
-            minLines: 5,
-            decoration: InputDecoration(
-              hintText: 'Write a reason for ${widget.eventStatus}...',
-              hintStyle: const TextStyle(
-                  color: Colors.grey, fontWeight: FontWeight.w500),
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black38),
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width>400? 500 : null,
+              child: TextField(
+                controller: statusDesc,
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.w600),
+                cursorColor: Colors.orange,
+                minLines: 5,
+                decoration: InputDecoration(
+                  hintText: 'Write a reason for ${widget.eventStatus}...',
+                  hintStyle: const TextStyle(
+                      color: Colors.grey, fontWeight: FontWeight.w500),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black38),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.orange),
+                  ),
+                  alignLabelWithHint: true,
+                ),
+                keyboardType: TextInputType.multiline,
+                maxLines: 6,
               ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.orange),
-              ),
-              alignLabelWithHint: true,
             ),
-            keyboardType: TextInputType.multiline,
-            maxLines: 6,
           ),
         )
         : SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (canPickImage)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (widget.isForAssign==false)
+                Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: GestureDetector(
-                        onTap: _pickImage,
-                        child: DottedBorder(
-                          color: Colors.orange,
-                          child: Container(
-                            width: 200,
-                            height: 200,
-                            alignment: Alignment.center,
-                            child: _selectedImage == null
-                                ? const Text("Select Photo\n(Optional)",textAlign: TextAlign.center,style: TextStyle(color: Colors.black),)
-                                : _isCompressing? CircularProgressIndicator(color: Colors.orange,) 
-                                : Image.file(
-                                    _selectedImage!,
-                                    fit: BoxFit.cover,
-                                  ),
+                    if (canPickImage)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: _pickImage,
+                              child: DottedBorder(
+                                color: Colors.orange,
+                                child: Container(
+                                  width: 200,
+                                  height: 200,
+                                  alignment: Alignment.center,
+                                  child: _selectedImage == null
+                                      ? const Text("Select Photo\n(Optional)",textAlign: TextAlign.center,style: TextStyle(color: Colors.black),)
+                                      : _isCompressing? CircularProgressIndicator(color: Colors.orange,) 
+                                      : Image.file(
+                                          _selectedImage!,
+                                          fit: BoxFit.cover,
+                                        ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
+                
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: SizedBox(width: 400,child: CustomTextField(label:"நிகழ்வு கருத்து",controller:feedback,)),
+                    )
                   ],
                 ),
-              
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: CustomTextField(label:"நிகழ்வு கருத்து",controller:feedback,),
-              ),
-      
-              for (int i = 0; i < ddLabels.length; i++) 
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: CustomDropdown(
-                      Width: 400,
-                      label: ddLabels[i]['label'],
-                      ddController: ddLabels[i]['controller'],
-                      ddEntries: [
-                        for (int j = 0; j < workersName.length; j++)
-                          DropdownMenuEntry(
-                            value: workersName[j]['name'],
-                            label: workersName[j]['name'],
-                          )
-                      ],
-                      onSelected: (value) {
-                        print("Selected worker ID: $value");
-                      },
+              Column(
+                children: [
+                  for (int i = 0; i < ddLabels.length; i++) 
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: CustomDropdown(
+                        Width: 400,
+                        label: ddLabels[i]['label'],
+                        ddController: ddLabels[i]['controller'],
+                        ddEntries: [
+                          for (int j = 0; j < workersName.length; j++)
+                            DropdownMenuEntry(
+                              value: workersName[j]['name'],
+                              label: workersName[j]['name'],
+                            )
+                        ],
+                        onSelected: (value) {
+                          print("Selected worker ID: $value");
+                        },
+                      ),
                     ),
-                  ),
-            ],
+                ],
+              )
+                
+              ],
+            ),
           ),
         ),
       ),

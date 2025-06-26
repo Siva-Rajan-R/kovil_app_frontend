@@ -9,11 +9,11 @@ import 'package:sampleflutter/utils/global_variables.dart';
 
 class DetailedEventPage extends StatefulWidget {
   final Map eventDetails;
-  final List<Widget> eventStatusUpdateButtons;
+  final List<Widget>? eventStatusUpdateButtons;
   
   const DetailedEventPage({
     required this.eventDetails,
-    required this.eventStatusUpdateButtons,
+    this.eventStatusUpdateButtons,
     super.key,
   });
 
@@ -52,11 +52,11 @@ class _DetailedEventPageState extends State<DetailedEventPage> with SingleTicker
     }
     print(_tabController.index);
     return Scaffold(
-      bottomNavigationBar: curTabIndex == 0
+      bottomNavigationBar: curTabIndex == 0 && widget.eventStatusUpdateButtons!=null
           ? CustomBottomAppbar(
               bottomAppbarChild: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [...widget.eventStatusUpdateButtons],
+                children: [...widget.eventStatusUpdateButtons!],
               ),
             )
           : null,
@@ -88,7 +88,29 @@ class _DetailedEventPageState extends State<DetailedEventPage> with SingleTicker
               controller: _tabController,
               children: [
                 buildEventInfo(widget.eventDetails,context),
-                buildEventReport(widget.eventDetails, context),
+                DefaultTabController(
+                  length: 2, 
+                  child: Column(
+                    children: [
+                      TabBar(
+                        labelColor: Colors.black,
+                        indicatorColor: Colors.orange,
+                        tabs: [
+                          Tab(text: "Actual Report"),
+                          Tab(text: "Assigned Report")
+                        ],
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            buildEventReport(widget.eventDetails, context,isForAssign: false),
+                            buildEventReport(widget.eventDetails, context,isForAssign: true)
+                          ]
+                        ),
+                      )
+                    ],
+                  )
+                ),
                 if (currentUserRole == UserRoleEnum.ADMIN.name) ContactDescCard(eventDetails: widget.eventDetails,),
               ],
             ),

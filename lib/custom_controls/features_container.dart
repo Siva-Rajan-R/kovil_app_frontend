@@ -17,6 +17,9 @@ class FeaturesContainer extends StatefulWidget{
   final Color shadowColor;
   final Color containerColor;
   final Widget route;
+  final double width;
+  final double height;
+  final bool canTap;
 
   
 
@@ -27,7 +30,10 @@ class FeaturesContainer extends StatefulWidget{
       required this.label,
       required this.shadowColor,
       required this.containerColor,
-      required this.route
+      required this.route,
+      this.width=85,
+      this.height=100,
+      this.canTap=true
     }
   );
 
@@ -52,10 +58,11 @@ class _FeaturesContainerState extends State<FeaturesContainer> {
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
-              onTap: () async{
+              onTap: widget.canTap? () async{
                 if (widget.label=='Logout'){
                   print("logout ulla");
                   AwesomeDialog(
+                    width: MediaQuery.of(context).size.width>400? 500 : null,
                     context: context,
                     btnOkText: "Yes",
                     dismissOnTouchOutside: false,
@@ -97,10 +104,10 @@ class _FeaturesContainerState extends State<FeaturesContainer> {
                   Navigator.push(context,CupertinoPageRoute(builder: (context)=>widget.route));
                 }
                 print("clicked container ${widget.label}");
-              },
+              } : null,
               child: Container(
-                  width: 85,
-                  height: 100,
+                  width: widget.width,
+                  height: widget.height,
                   
                   padding: EdgeInsets.all(8.0),
                   margin: EdgeInsets.all(8.0),

@@ -129,21 +129,21 @@ class _TodayEventsPageState extends State<TodayEventsPage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
-                child: Column(
-                 
-                  children: [
-                    LottieBuilder.asset(getRandomLoadings()),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Please wait while fetching events...",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
-                        VerticalDivider(),
-                        SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
-                      ],
-                    )
-                  ],
-                )
-              );
+                      child: Column(
+                      
+                        children: [
+                          LottieBuilder.asset(getRandomLoadings(),width:200),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Please wait while fetching events...",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
+                              VerticalDivider(),
+                              SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
+                            ],
+                          )
+                        ],
+                      )
+                    );
                   }
 
                   final pending = snapshot.data?['pending'] ?? [];

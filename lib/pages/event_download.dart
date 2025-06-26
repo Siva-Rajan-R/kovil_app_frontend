@@ -81,6 +81,7 @@ class _EventDownloadPage extends State<EventDownloadPage>{
     AwesomeDialog(
         context: context,
         btnOkText: "Yes",
+        width: MediaQuery.of(context).size.width>400? 500 : null,
         dismissOnTouchOutside: false,
         dismissOnBackKeyPress: false,
         dialogType: DialogType.info,
@@ -112,7 +113,7 @@ class _EventDownloadPage extends State<EventDownloadPage>{
         }
       },
       child: Scaffold(
-        appBar: KovilAppBar(
+        appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(
           withIcon: true,
         ),
         bottomNavigationBar: CustomBottomAppbar(
@@ -144,89 +145,93 @@ class _EventDownloadPage extends State<EventDownloadPage>{
             ],
           ),
         ),
-        body: Container(
-          width: double.infinity,
-          margin: const EdgeInsets.all(10),
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              Colors.orange.shade400,
-              Colors.orange.shade600,
-              Colors.orange.shade800,
-            ]),
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.orange.shade800,
-                blurRadius: 5,
-                spreadRadius: 2,
-                blurStyle: BlurStyle.outer,
+        body: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 500),
+            child: Container(
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+                  Colors.orange.shade400,
+                  Colors.orange.shade600,
+                  Colors.orange.shade800,
+                ]),
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.orange.shade800,
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                    blurStyle: BlurStyle.outer,
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                      ),
-                      onPressed: () => pickFromDate(context),
-                      child: Text(
-                        fromDate == null
-                            ? "Pick Start Date"
-                            : "${fromDate!.toLocal()}".split(' ')[0],
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => pickFromDate(context),
+                          child: Text(
+                            fromDate == null
+                                ? "Pick Start Date"
+                                : "${fromDate!.toLocal()}".split(' ')[0],
+                          ),
+                        ),
+                        Text(
+                          "To",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => pickToDate(context),
+                          child: Text(
+                            toDate == null
+                                ? "Pick End Date"
+                                : "${toDate!.toLocal()}".split(' ')[0],
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      "To",
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600
-                      ),
+                    SizedBox(height: 30,),
+                  
+                    CustomDropdown(
+                      textColor: Colors.white,
+                      themeColor: Colors.white,
+                      label: "Event Report Format", 
+                      ddController: eventReportFormat, 
+                      ddEntries: [
+                        for(String i in ["pdf","excel"])
+                          DropdownMenuEntry(
+                            value: i, 
+                            label: i,
+                          )
+                      ], 
+                      onSelected: (value)=>print(value)
                     ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                      ),
-                      onPressed: () => pickToDate(context),
-                      child: Text(
-                        toDate == null
-                            ? "Pick End Date"
-                            : "${toDate!.toLocal()}".split(' ')[0],
-                      ),
-                    ),
+                    
+                    SizedBox(height: 10,),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: SizedBox(width: 300,child: CustomTextField(label: "Forward To (Optional)",controller: forwardTo,themeColor: Colors.white,fontColor: Colors.white,)),
+                    )
                   ],
                 ),
-                SizedBox(height: 30,),
-      
-                CustomDropdown(
-                  textColor: Colors.white,
-                  themeColor: Colors.white,
-                  label: "Event Report Format", 
-                  ddController: eventReportFormat, 
-                  ddEntries: [
-                    for(String i in ["pdf","excel"])
-                      DropdownMenuEntry(
-                        value: i, 
-                        label: i,
-                      )
-                  ], 
-                  onSelected: (value)=>print(value)
-                ),
-                
-                SizedBox(height: 10,),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: CustomTextField(label: "Forward To (Optional)",controller: forwardTo,themeColor: Colors.white,fontColor: Colors.white,),
-                )
-              ],
+              ),
             ),
           ),
         ),

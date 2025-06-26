@@ -49,7 +49,7 @@ class DashboardPage extends StatelessWidget{
           
           
         return Scaffold(
-          appBar: KovilAppBar(withIcon: true,),
+          appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,),
             body: Column(
               children: [
                 Column(

@@ -1,5 +1,4 @@
-import 'dart:ui';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/recive_notification_card.dart';
@@ -25,7 +24,7 @@ class _RecivedNotificationPageState extends State<RecivedNotificationPage> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      appBar: KovilAppBar(withIcon: true,),
+      appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,),
       body: ((widget.newNotificationsList==null || widget.newNotificationsList!.isEmpty)&&(widget.seenNotificationList==null || widget.seenNotificationList!.isEmpty))? Center(child: Text("No Notifications, Try to refresh on homepage",style: TextStyle(color: Colors.orange,fontWeight: FontWeight.w700),textAlign: TextAlign.center,))
       : ListView(
         physics: BouncingScrollPhysics(),

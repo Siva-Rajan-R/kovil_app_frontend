@@ -146,7 +146,7 @@ class _EventDashboardPageState extends State<EventDashboardPage> {
                 child: Column(
                   
                   children: [
-                    LottieBuilder.asset(getRandomLoadings()),
+                    LottieBuilder.asset(getRandomLoadings(),height: MediaQuery.of(context).size.height*0.5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

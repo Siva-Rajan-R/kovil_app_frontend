@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailOrNo = TextEditingController();
   final password = TextEditingController();
+  List<FocusNode> focusNodes = List.generate(2, (_) => FocusNode());
+
   bool _isLoading = false;
 
   Future<void> _login(BuildContext context) async {
@@ -38,25 +42,29 @@ class _LoginPageState extends State<LoginPage> {
     );
     if (!mounted) return;
 
-    await NetworkService.sendRequest(
-      path: "/app/notify/register-update", 
-      context: context,
-      method: "POST",
-      body: {
-        "fcm_token":fcmToken,
-        "device_id":deviceId,
-        "user_email_or_no":emailOrNo.text
-      },
-      isLoginPage: true
-    );
+    if (Platform.isAndroid || Platform.isIOS){
+      await NetworkService.sendRequest(
+        path: "/app/notify/register-update", 
+        context: context,
+        method: "POST",
+        body: {
+          "fcm_token":fcmToken,
+          "device_id":deviceId,
+          "user_email_or_no":emailOrNo.text
+        },
+        isLoginPage: true
+      );
+    }
 
     if (!mounted) return;
 
     
     if (res!=null) {
       print("1234567890`0`hruihrf ulla ${context.mounted}");
-      await FirebaseMessaging.instance.subscribeToTopic("all");
-      // await FirebaseMessaging.instance.subscribeToTopic("test");
+      if (Platform.isAndroid || Platform.isIOS){
+        await FirebaseMessaging.instance.subscribeToTopic("all");
+        await FirebaseMessaging.instance.subscribeToTopic("test");
+      }
       await secureStorage.write(key: "accessToken", value: res['access_token']);
       await secureStorage.write(key: "refreshToken", value: res['refresh_token']);
       print("999999999999999999999999999999999999999999999999${await secureStorage.read(key: "refreshToken")}");
@@ -65,7 +73,8 @@ class _LoginPageState extends State<LoginPage> {
       await secureStorage.write(key: 'isLoggedIn', value: 'true');
 
       currentUserRole=res['role'];
-      await Navigator.pushReplacementNamed(context, "/home");
+
+      await Navigator.pushReplacementNamed(context, MediaQuery.of(context).size.width>400? '/desktop-home' : '/home');
     }
 
     setState(() {
@@ -157,6 +166,10 @@ class _LoginPageState extends State<LoginPage> {
                                 label: "Enter email or number",
                                 keyboardtype: TextInputType.text,
                                 controller: emailOrNo,
+                                focusNode: focusNodes[0],
+                                onSubmitted: (_){
+                                  FocusScope.of(context).requestFocus(focusNodes[1]);
+                                },
                               ),
                             ),
                             SizedBox(height: 20),
@@ -166,6 +179,9 @@ class _LoginPageState extends State<LoginPage> {
                                 label: "Enter the password",
                                 keyboardtype: TextInputType.visiblePassword,
                                 controller: password,
+                                focusNode: focusNodes[1],
+                                onSubmitted: _isLoading ? null : (_) => _login(context)
+                                ,
                               ),
                             ),
                             Padding(
@@ -173,14 +189,17 @@ class _LoginPageState extends State<LoginPage> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  GestureDetector(
-                                    onTap: () => Navigator.popAndPushNamed(context, '/forgot'),
-                                    child: Text(
-                                      "Forgot Password ?",
-                                      style: TextStyle(
-                                        color: Colors.orange.shade900,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.popAndPushNamed(context, '/forgot'),
+                                      child: Text(
+                                        "Forgot Password ?",
+                                        style: TextStyle(
+                                          color: Colors.orange.shade900,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
                                   ),

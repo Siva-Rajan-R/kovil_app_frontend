@@ -7,57 +7,110 @@ import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
 
-Widget _buildUsers({required List users,required BuildContext context}){
-  if (users!=[]){
-    print("naan aagi");
-    return ListView.builder(
-      physics: BouncingScrollPhysics(),
-      itemCount: users.length,
-      itemBuilder: (context,index){
-        return RepaintBoundary(child: UserCard(user: users[index]));
-      }
-    );
-  }
 
-  else{
-    return Center(
-      child: Text("No Data Found"),
-    );
-  }
-}
 
 // ignore: must_be_immutable
-class UserPage extends StatelessWidget{
+class UserPage extends StatefulWidget{
   const UserPage({super.key});
 
+  @override
+  State<UserPage> createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
+  List<Map> users=[];
+  List<Map> admins=[];
+  bool isLoading=true;
+
+  void onUsersDelete(String userRole,String userId){
+    List userListToDelete=users;
+    if (userRole=='admin'){
+      userListToDelete=admins;
+    }
+
+    setState(() {
+      userListToDelete.removeWhere((user)=>user['id']==userId);
+    });
+  }
+
+  void onUsersRoleChanged(String prevUserRole,String userId){
+    List userListToUpdate=admins;
+    List swappedUserList=users;
+    String userRole='admin';
+
+    print("hyyyyyyyyyyyyyyyyyyyyyyyyyy $admins $users $userId $prevUserRole");
+    if (prevUserRole=='admin'){
+      userListToUpdate=users;
+      swappedUserList=admins;
+      userRole='user';
+    }
+    print("llllllllllllllllll $swappedUserList ");
+    Map userToAdd=swappedUserList.firstWhere((user)=>user['id']==userId) ?? {};
+     print(userToAdd);
+    userToAdd['role']=userRole;
+    setState(() {
+      userListToUpdate.add(userToAdd);
+      swappedUserList.removeWhere((user)=>user['id']==userId);
+    });
+  }
+
+  Widget _buildUsers({required List users,required BuildContext context}){
+    if (users.isNotEmpty){
+      print("naan aagi");
+      return ListView.builder(
+        physics: BouncingScrollPhysics(),
+        itemCount: users.length,
+        itemBuilder: (context,index){
+          return RepaintBoundary(
+            child: UserCard(
+              onDelete: (userRole,userId) => onUsersDelete(userRole, userId),
+              onRoleChangeed: (userRole, userId) => onUsersRoleChanged(userRole, userId),
+              user: users[index]
+            )
+          );
+        }
+      );
+    }
+
+    else{
+      return Center(
+        child: Text("No Data Found"),
+      );
+    }
+}
+
   Future getUsers(BuildContext context)async {
-    final List<Map> users;
-    final List<Map> admins;
     final res=await NetworkService.sendRequest(path: '/users',context: context);
     print("res $res");
     if (res==null){
-      return {
-        'admins':[],
-        'users':[]
-      };
+      setState(() {
+        users=[];
+        admins=[];
+        isLoading=false;
+      });
     }
     else{
       final usersList=List<Map>.from(res['users']);
-      users=usersList.where((u)=>u['role']=='user').toList();
-      admins=usersList.where((u)=>u['role']=="admin").toList();
-        return {
-        'users':users,
-        'admins':admins
-      };
-    }
 
+      setState(() {
+        users=usersList.where((u)=>u['role']=='user').toList();
+        admins=usersList.where((u)=>u['role']=="admin").toList();
+        isLoading=false;
+      });
+    }
+  }
+
+  @override
+  void initState(){
+    super.initState();
     
+    getUsers(context);
   }
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: KovilAppBar(withIcon: true,),
+      appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,),
       body: DefaultTabController(
         length: 2,
         child: Column(
@@ -74,44 +127,28 @@ class UserPage extends StatelessWidget{
             ),
 
             Expanded(
-              child: FutureBuilder(
-                future: getUsers(context),
-                builder: (context,snapshot){
-                  if (snapshot.connectionState==ConnectionState.waiting){
-                    return Center(
-                      child: Column(
-                        
-                        children: [
-                          LottieBuilder.asset(getRandomLoadings()),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Please wait while fetching users...",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
-                              VerticalDivider(),
-                              SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
-                            ],
-                          )
-                        ],
-                      )
-                    );
-                  }
-                  else{
-                    print("anap shhort $snapshot.data");
-                    List admins=[];
-                    List users=[];
-                    if (snapshot.data!=null){
-                      admins=snapshot.data!['admins'];
-                      users=snapshot.data!['users'];
-                    }
-                    return TabBarView(
-                          children: [
-                            admins.isNotEmpty? _buildUsers(users: admins,context: context) : Center(child: Text("No Data Found"),),
-                            users.isNotEmpty? _buildUsers(users: users,context: context) : Center(child: Text("No Data Found"),)
-                          ],
-                      );
-                  }
-                },
-              ),
+              child: isLoading? Center(
+                child: Column(
+                  children: [
+                    LottieBuilder.asset(getRandomLoadings(),height: MediaQuery.of(context).size.height*0.5,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Please wait while fetching users...",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.w600,color: Colors.orange),),
+                        VerticalDivider(),
+                        SizedBox(width: 30,height: 30, child: CircularProgressIndicator(color: Colors.orange,padding: EdgeInsets.all(5),))
+                      ],
+                    )
+                  ],
+                ),
+              )
+              : TabBarView(
+                  children: [
+                    admins.isNotEmpty? _buildUsers(users: admins,context: context) : Center(child: Text("No Data Found"),),
+                    users.isNotEmpty? _buildUsers(users: users,context: context) : Center(child: Text("No Data Found"),)
+                  ],
+              )
+
             )
           ],
         ),

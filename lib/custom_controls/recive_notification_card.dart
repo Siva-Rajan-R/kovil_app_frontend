@@ -2,14 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:sampleflutter/custom_controls/custom_ad.dart';
+import 'package:sampleflutter/utils/convert_utc_to_local.dart';
 
-String formatUtcToLocal(String utcString) {
-  DateTime utcTime = DateTime.parse(utcString).toUtc();
-  DateTime localTime = utcTime.toLocal();
-  return DateFormat('dd-MMM-yyyy / hh:mm a').format(localTime);
-}
+
 
 class ReciveNotificationCard extends StatefulWidget {
   final String notificationTitle;
@@ -100,11 +96,11 @@ class _ReciveNotificationCardState extends State<ReciveNotificationCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.notificationTitle,
+                            "${widget.notificationTitle},",
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
-                              fontSize: 16
+                              fontSize: 15
                             ),
                             softWrap: true,
                           ),
@@ -113,8 +109,8 @@ class _ReciveNotificationCardState extends State<ReciveNotificationCard> {
                             widget.notificationBody,
                             style: TextStyle(
                               fontWeight: FontWeight.w900,
-                              color: Colors.white70,
-                              fontSize: 14
+                              color: Colors.white,
+                              fontSize: 13
                             ),
                             softWrap: true,
                           )

@@ -6,6 +6,7 @@ import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
 import 'package:sampleflutter/utils/network_request.dart';
+import 'package:sampleflutter/utils/notification_scheduler.dart';
 
 class AddEventsNextPage extends StatefulWidget {
   final Map previousPageData;
@@ -32,6 +33,9 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
   late TextEditingController paymentStatus;
   late TextEditingController paymentMode;
   late TextEditingController neivethiyamAmount;
+  
+  List<FocusNode> focusNodes = List.generate(7, (_) => FocusNode());
+
   String buttonLabel = "Submit";
   String method = "POST";
 
@@ -91,7 +95,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
     }
   }
 
-  Future<void> _handleSubmit(BuildContext context) async {
+  Future _handleSubmit(BuildContext context) async {
     String eventName = widget.previousPageData['eventName'];
     bool? isSpecialEvent = widget.previousPageData["isSpecialEvent"];
     print(eventName.isEmpty);
@@ -155,7 +159,15 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
       setState(() => isLoading = false);
 
       if (res != null) {
+        
+        if (res is Map){
+          customSnackBar(content: res['response_msg'], contentType: AnimatedSnackBarType.success).show(context);
+          for (Map notification in res['schedule_notifications']){
+            await scheduleFlutterLocalNotification(title: notification['title'], body: notification['body'], dateTime: DateTime.parse(notification['datetime']).toUtc());
+          }
+        }
         Navigator.popUntil(context, (route) => route.isFirst);
+        
       }
     }
   }
@@ -172,170 +184,203 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
       child: Scaffold(
         appBar: KovilAppBar(height: 100),
         body: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Column(
             children: [
-              Container(
-                width: double.infinity,
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.orange.shade400,
-                      Colors.orange.shade600,
-                      Colors.orange.shade800,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.orange.shade800,
-                      blurRadius: 5,
-                      spreadRadius: 2,
-                      blurStyle: BlurStyle.outer,
-                    ),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Client Info",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              fontSize: 20,
-                            ),
-                          ),
+              Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 500),
+                  child: Container(
+                    width: double.infinity,
+                    margin: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.orange.shade400,
+                          Colors.orange.shade600,
+                          Colors.orange.shade800,
                         ],
                       ),
-                      SizedBox(height: 20),
-                      CustomTextField(
-                        label: "Client name",
-                        themeColor: Colors.white,
-                        fontColor: Colors.white,
-                        controller: clientName,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.shade800,
+                          blurRadius: 5,
+                          spreadRadius: 2,
+                          blurStyle: BlurStyle.outer,
+                        ),
+                      ],
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Client Info",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          CustomTextField(
+                            label: "Client name",
+                            themeColor: Colors.white,
+                            fontColor: Colors.white,
+                            controller: clientName,
+                            focusNode: focusNodes[0],
+                            onSubmitted: (_){
+                              FocusScope.of(context).requestFocus(focusNodes[1]);
+                            },
+                          ),
+                          SizedBox(height: 20),
+                          CustomTextField(
+                            label: "Client Number",
+                            themeColor: Colors.white,
+                            fontColor: Colors.white,
+                            keyboardtype: TextInputType.number,
+                            controller: clientNumber,
+                            focusNode: focusNodes[1],
+                            onSubmitted: (_){
+                              FocusScope.of(context).requestFocus(focusNodes[2]);
+                            },
+                          ),
+                          SizedBox(height: 20),
+                          CustomTextField(
+                            label: "Client place",
+                            themeColor: Colors.white,
+                            fontColor: Colors.white,
+                            keyboardtype: TextInputType.streetAddress,
+                            controller: clientCity,
+                            focusNode: focusNodes[2],
+                            onSubmitted: (_){
+                              FocusScope.of(context).requestFocus(focusNodes[3]);
+                            },
+                          ),
+                          SizedBox(height: 20),
+                        ],
                       ),
-                      SizedBox(height: 20),
-                      CustomTextField(
-                        label: "Client Number",
-                        themeColor: Colors.white,
-                        fontColor: Colors.white,
-                        keyboardtype: TextInputType.number,
-                        controller: clientNumber,
-                      ),
-                      SizedBox(height: 20),
-                      CustomTextField(
-                        label: "Client place",
-                        themeColor: Colors.white,
-                        fontColor: Colors.white,
-                        keyboardtype: TextInputType.streetAddress,
-                        controller: clientCity,
-                      ),
-                      SizedBox(height: 20),
-                    ],
+                    ),
                   ),
                 ),
               ),
               SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.orange.shade400,
-                      Colors.orange.shade600,
-                      Colors.orange.shade800,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.orange.shade800,
-                      blurRadius: 5,
-                      spreadRadius: 2,
-                      blurStyle: BlurStyle.outer,
+              Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 500),
+                  child: Container(
+                    width: double.infinity,
+                    margin: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.orange.shade400,
+                          Colors.orange.shade600,
+                          Colors.orange.shade800,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.shade800,
+                          blurRadius: 5,
+                          spreadRadius: 2,
+                          blurStyle: BlurStyle.outer,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    child: SingleChildScrollView(
+                      child: Column(
                         children: [
-                          Text(
-                            "Payment Info",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              fontSize: 20,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Payment Info",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          CustomTextField(
+                            label: "Total amount",
+                            themeColor: Colors.white,
+                            fontColor: Colors.white,
+                            keyboardtype: TextInputType.number,
+                            controller: totalAmount,
+                            focusNode: focusNodes[3],
+                            onSubmitted: (_){
+                              FocusScope.of(context).requestFocus(focusNodes[4]);
+                            },
+                          ),
+                          SizedBox(height: 20),
+                          CustomTextField(
+                            label: "Paid amount",
+                            themeColor: Colors.white,
+                            fontColor: Colors.white,
+                            keyboardtype: TextInputType.number,
+                            controller: paidAmount,
+                            focusNode: focusNodes[4],
+                            onSubmitted: (_){
+                              FocusScope.of(context).requestFocus(focusNodes[5]);
+                            },
+                          ),
+                          SizedBox(height: 20),
+                          SingleChildScrollView(
+                            physics: BouncingScrollPhysics(),
+                            padding: EdgeInsets.only(top: 10),
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                CustomDropdown(
+                                  themeColor: Colors.white,
+                                  textColor: Colors.white,
+                                  focusNode: focusNodes[5],
+                                  Width: 250,
+                                  label: "Payment mode",
+                                  ddController: paymentMode,
+                                  ddEntries: [
+                                    for (String i
+                                        in List.from(
+                                          widget.previousPageData['paymentModes'],
+                                        ).toList())
+                                      DropdownMenuEntry(value: i, label: i),
+                                  ],
+                                  onSelected: (value) => print(value),
+                                ),
+                        
+                                SizedBox(width: 10),
+                        
+                                CustomDropdown(
+                                  themeColor: Colors.white,
+                                  textColor: Colors.white,
+                                  Width: 250,
+                                  label: "Payment status",
+                                  ddController: paymentStatus,
+                                  ddEntries: [
+                                    for (String i
+                                        in widget.previousPageData['paymentStatus'])
+                                      DropdownMenuEntry(value: i, label: i),
+                                  ],
+                                  onSelected: (value) => print(value),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 10),
-                      CustomTextField(
-                        label: "Total amount",
-                        themeColor: Colors.white,
-                        fontColor: Colors.white,
-                        keyboardtype: TextInputType.number,
-                        controller: totalAmount,
-                      ),
-                      SizedBox(height: 20),
-                      CustomTextField(
-                        label: "Paid amount",
-                        themeColor: Colors.white,
-                        fontColor: Colors.white,
-                        keyboardtype: TextInputType.number,
-                        controller: paidAmount,
-                      ),
-                      SizedBox(height: 20),
-                      SingleChildScrollView(
-                        padding: EdgeInsets.only(top: 10),
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            CustomDropdown(
-                              themeColor: Colors.white,
-                              textColor: Colors.white,
-                              Width: 250,
-                              label: "Payment mode",
-                              ddController: paymentMode,
-                              ddEntries: [
-                                for (String i
-                                    in List.from(
-                                      widget.previousPageData['paymentModes'],
-                                    ).toList())
-                                  DropdownMenuEntry(value: i, label: i),
-                              ],
-                              onSelected: (value) => print(value),
-                            ),
-      
-                            SizedBox(width: 10),
-      
-                            CustomDropdown(
-                              themeColor: Colors.white,
-                              textColor: Colors.white,
-                              Width: 250,
-                              label: "Payment status",
-                              ddController: paymentStatus,
-                              ddEntries: [
-                                for (String i
-                                    in widget.previousPageData['paymentStatus'])
-                                  DropdownMenuEntry(value: i, label: i),
-                              ],
-                              onSelected: (value) => print(value),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),

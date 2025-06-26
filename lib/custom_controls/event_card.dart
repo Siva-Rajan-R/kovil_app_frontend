@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
+import 'package:sampleflutter/pages/add_events.dart';
 import 'package:sampleflutter/pages/detailed_event.dart';
 import 'package:sampleflutter/pages/status_update.dart';
 import 'package:sampleflutter/utils/enums.dart';
@@ -19,7 +20,7 @@ List<Widget> eventStatusUpdateButtonsBuilder(List<String> labels,String eventId,
   for(int i=0;i<labels.length;i++){
     buttons.add(
       ElevatedButton(
-        onPressed: ()=>Navigator.push(context, CupertinoPageRoute(builder: (context)=>StatusUpdatePage(eventStatus: labels[i],eventId: eventId,existingEventDetails: eventDetails,))),
+        onPressed: ()=>Navigator.push(context, CupertinoPageRoute(builder: (context)=>StatusUpdatePage(eventStatus: labels[i],eventId: eventId,existingEventDetails: eventDetails,isForAssign: false,))),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.orange,
         ),
@@ -129,319 +130,333 @@ class _EventCardState extends State<EventCard> {
         children: [
           GestureDetector(
             onTap: () => Navigator.push(context, CupertinoPageRoute(builder: (context)=>DetailedEventPage(eventDetails: eventDetails,eventStatusUpdateButtons: buttons,))),
-            child: Container(
-              
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(10),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  Colors.orange.shade400,
-                  Colors.orange.shade600,
-                  Colors.orange.shade800
-                ]),
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.orange.shade800,
-                    blurRadius: 5,
-                    spreadRadius: 2,
-                    blurStyle: BlurStyle.outer
-                  )
-                ]
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(top: 2.0,bottom: 2.0,left: 4,right: 4),
-                        
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(6))
-                        ),
-                        child: Text(
-                          eventDetails['is_special_event'] == null
-                          ? "Neivethiyam"
-                          : eventDetails['is_special_event'] == true
-                              ? "Special"
-                              : "Normal",
-      
-                          style: TextStyle(color: Colors.orange,fontWeight: FontWeight.w600),
-                        ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 500),
+                child: Container(
+                  
+                  margin: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      Colors.orange.shade400,
+                      Colors.orange.shade600,
+                      Colors.orange.shade800
+                    ]),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.shade800,
+                        blurRadius: 5,
+                        spreadRadius: 2,
+                        blurStyle: BlurStyle.outer
                       )
-                    ],
+                    ]
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      curUser==UserRoleEnum.ADMIN.name?
-                        PopupMenuButton(
-                          icon: Icon(Icons.more_horiz,color: Colors.white,),
-                          onSelected: (value)async{
-                            if(value=='edit'){
-                              Navigator.popUntil(context, (route) => route.isFirst);
-                            }
-                            else if(value=="delete"){
-                              AwesomeDialog(
-                                context: context,
-                                btnOkText: "Yes",
-                                dismissOnTouchOutside: false,
-                                dismissOnBackKeyPress: false,
-                                dialogType: DialogType.info,
-                                animType: AnimType.rightSlide,
-                                title: 'Delete Event',
-                                desc: 'Are you sure , Do you Want to Delete ${eventDetails['event_name']} ?',
-                                btnCancelOnPress: () {},
-                                btnOkOnPress: () async {
-                                  setState(() {
-                                    isEventloading=true;
-                                  });
-                                  final res=await NetworkService.sendRequest(path: "/event", context: context,method: "DELETE",body: {"event_id":eventDetails['event_id']});
-                                  setState(() {
-                                    isEventloading=false;
-                                  });
-                                  if(res!=null){
-                                    Navigator.popUntil(context, (route) => route.isFirst);
-                                  }
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(top: 2.0,bottom: 2.0,left: 4,right: 4),
+                            
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.all(Radius.circular(6))
+                            ),
+                            child: Text(
+                              eventDetails['is_special_event'] == null
+                              ? "Neivethiyam"
+                              : eventDetails['is_special_event'] == true
+                                  ? "Special"
+                                  : "Normal",
+                      
+                              style: TextStyle(color: Colors.orange,fontWeight: FontWeight.w600),
+                            ),
+                          )
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          curUser==UserRoleEnum.ADMIN.name?
+                            PopupMenuButton(
+                              icon: Icon(Icons.more_horiz,color: Colors.white,),
+                              onSelected: (value)async{
+                                if (value=='assign'){
+                                  await Navigator.push(context, CupertinoPageRoute(builder: (context)=> StatusUpdatePage(eventStatus: 'completed', eventId: eventDetails['event_id'],existingEventDetails: eventDetails,isForAssign: true,)));
                                 }
-                              ).show();
-                            }
-              
-                            else if (value == "contact") {
-                                await getContactDescription(eventDetails['event_id']);
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                  ),
-                                  builder: (context) => DraggableScrollableSheet(
-                                    initialChildSize: 0.7,
-                                    minChildSize: 0.0,
-                                    maxChildSize: 0.7,
-                                    expand: false,
-                                    builder: (context, scrollController) {
-                                      bool localLoading = false; // Local state for the button
-                                      return StatefulBuilder(
-                                        builder: (BuildContext context, StateSetter setModalState) {
-                                          return SingleChildScrollView(
-                                            controller: scrollController,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(16.0),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Container(
-                                                    height: 5,
-                                                    width: 40,
-                                                    margin: const EdgeInsets.only(bottom: 10),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.grey[300],
-                                                      borderRadius: BorderRadius.circular(10),
-                                                    ),
-                                                  ),
-                                                  const Text(
-                                                    "Contact Description",
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 20,
-                                                      color: Colors.orange,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  TextField(
-                                                    controller: contactDescription,
-                                                    style: const TextStyle(
-                                                        color: Colors.black, fontWeight: FontWeight.w600),
-                                                    cursorColor: Colors.orange,
-                                                    minLines: 4,
-                                                    decoration: InputDecoration(
-                                                      hintText: 'Write a contact description...',
-                                                      hintStyle: const TextStyle(
-                                                          color: Colors.grey, fontWeight: FontWeight.w500),
-                                                      enabledBorder: const OutlineInputBorder(
-                                                        borderSide: BorderSide(color: Colors.black38),
+                                if(value=='edit'){
+                                  await Navigator.push(context, CupertinoPageRoute(builder: (context)=> AddEventsPage(existingEventDetails: eventDetails,)));
+                                }
+                                else if(value=="delete"){
+                                  AwesomeDialog(
+                                    context: context,
+                                    width: MediaQuery.of(context).size.width>400? 500 : null,
+                                    btnOkText: "Yes",
+                                    dismissOnTouchOutside: false,
+                                    dismissOnBackKeyPress: false,
+                                    dialogType: DialogType.info,
+                                    animType: AnimType.rightSlide,
+                                    title: 'Delete Event',
+                                    desc: 'Are you sure , Do you Want to Delete ${eventDetails['event_name']} ?',
+                                    btnCancelOnPress: () {},
+                                    btnOkOnPress: () async {
+                                      setState(() {
+                                        isEventloading=true;
+                                      });
+                                      final res=await NetworkService.sendRequest(path: "/event", context: context,method: "DELETE",body: {"event_id":eventDetails['event_id']});
+                                      setState(() {
+                                        isEventloading=false;
+                                      });
+                                      if(res!=null){
+                                        Navigator.popUntil(context, (route) => route.isFirst);
+                                      }
+                                    }
+                                  ).show();
+                                }
+                  
+                                else if (value == "contact") {
+                                    await getContactDescription(eventDetails['event_id']);
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                      ),
+                                      builder: (context) => DraggableScrollableSheet(
+                                        initialChildSize: 0.7,
+                                        minChildSize: 0.0,
+                                        maxChildSize: 0.7,
+                                        expand: false,
+                                        builder: (context, scrollController) {
+                                          bool localLoading = false; // Local state for the button
+                                          return StatefulBuilder(
+                                            builder: (BuildContext context, StateSetter setModalState) {
+                                              return SingleChildScrollView(
+                                                controller: scrollController,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(16.0),
+                                                  child: Column(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Container(
+                                                        height: 5,
+                                                        width: 40,
+                                                        margin: const EdgeInsets.only(bottom: 10),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.grey[300],
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
                                                       ),
-                                                      focusedBorder: const OutlineInputBorder(
-                                                        borderSide: BorderSide(color: Colors.orange),
+                                                      const Text(
+                                                        "Contact Description",
+                                                        style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 20,
+                                                          color: Colors.orange,
+                                                        ),
                                                       ),
-                                                      alignLabelWithHint: true,
-                                                    ),
-                                                    keyboardType: TextInputType.multiline,
-                                                    maxLines: 5,
-                                                  ),
-                                                  const SizedBox(height: 20),
-                                                  ElevatedButton(
-                                                    onPressed: localLoading
-                                                        ? null
-                                                        : () async {
-                                                            setModalState(() => localLoading = true);
-                                                            await saveContactDescription(
-                                                                eventDetails['event_id']);
-                                                            setModalState(() => localLoading = false);
-                                                          },
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.orange,
-                                                    ),
-                                                    child: localLoading
-                                                        ? Row(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: const [
-                                                              SizedBox(
-                                                                width: 18,
-                                                                height: 18,
-                                                                child: CircularProgressIndicator(
-                                                                  color: Colors.white,
-                                                                  strokeWidth: 2,
-                                                                ),
-                                                              ),
-                                                              SizedBox(width: 8),
-                                                              Text(
-                                                                "Saving...",
+                                                      const SizedBox(height: 10),
+                                                      TextField(
+                                                        controller: contactDescription,
+                                                        style: const TextStyle(
+                                                            color: Colors.black, fontWeight: FontWeight.w600),
+                                                        cursorColor: Colors.orange,
+                                                        minLines: 4,
+                                                        decoration: InputDecoration(
+                                                          hintText: 'Write a contact description...',
+                                                          hintStyle: const TextStyle(
+                                                              color: Colors.grey, fontWeight: FontWeight.w500),
+                                                          enabledBorder: const OutlineInputBorder(
+                                                            borderSide: BorderSide(color: Colors.black38),
+                                                          ),
+                                                          focusedBorder: const OutlineInputBorder(
+                                                            borderSide: BorderSide(color: Colors.orange),
+                                                          ),
+                                                          alignLabelWithHint: true,
+                                                        ),
+                                                        keyboardType: TextInputType.multiline,
+                                                        maxLines: 5,
+                                                      ),
+                                                      const SizedBox(height: 20),
+                                                      ElevatedButton(
+                                                        onPressed: localLoading
+                                                            ? null
+                                                            : () async {
+                                                                setModalState(() => localLoading = true);
+                                                                await saveContactDescription(
+                                                                    eventDetails['event_id']);
+                                                                setModalState(() => localLoading = false);
+                                                              },
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Colors.orange,
+                                                        ),
+                                                        child: localLoading
+                                                            ? Row(
+                                                                mainAxisSize: MainAxisSize.min,
+                                                                children: const [
+                                                                  SizedBox(
+                                                                    width: 18,
+                                                                    height: 18,
+                                                                    child: CircularProgressIndicator(
+                                                                      color: Colors.white,
+                                                                      strokeWidth: 2,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(width: 8),
+                                                                  Text(
+                                                                    "Saving...",
+                                                                    style: TextStyle(color: Colors.white),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            : const Text(
+                                                                "Save",
                                                                 style: TextStyle(color: Colors.white),
                                                               ),
-                                                            ],
-                                                          )
-                                                        : const Text(
-                                                            "Save",
-                                                            style: TextStyle(color: Colors.white),
-                                                          ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
-                                            ),
+                                                ),
+                                              );
+                                            },
                                           );
                                         },
-                                      );
-                                    },
-                                  ),
-                                );
-                              }
-              
-                          },
-                          itemBuilder: (context){
-                            return [
-                              PopupMenuItem(value: "edit",child: Text("Edit",style: TextStyle(color: Colors.orange.shade800),)),
-                              PopupMenuItem(value: "delete",child: Text("Delete",style: TextStyle(color: Colors.orange.shade800))),
-                              PopupMenuItem(value: "contact",child: Text("Contact Description",style: TextStyle(color: Colors.orange.shade800)))
-                            ];
-                          }
-                        )
-                      : Text("")
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        "assets/svg/event svy.svg",
-                        width: 20,
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          eventDetails["event_name"],
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            fontSize: 18,                        
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10,),
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        "assets/svg/user-svgrepo-com.svg",
-                        width: 20,
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          eventDetails["client_name"],
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            fontSize: 18
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10,),
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        "assets/svg/mobile-phone-svgrepo-com.svg",
-                        width: 20,
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => makePhoneCall(eventDetails["client_mobile_number"],context),
-                          child: Text(
-                            eventDetails["client_mobile_number"],
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              fontSize: 18,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 15,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            "assets/svg/date-svgrepo-com.svg",
-                            width: 20,
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            eventDetails["event_date"],
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              fontSize: 14
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            "assets/svg/alarm-clock-svgrepo-com.svg",
-                            width: 20,
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            "${eventStartAt[0]}:${eventStartAt[1]}-${eventEndAt[0]}:${eventEndAt[1]}",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              fontSize: 14
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                                      ),
+                                    );
+                                  }
                   
-                ],
+                              },
+                              itemBuilder: (context){
+                                return [
+                                  if (eventDetails['event_status']=='pending' || eventDetails['event_status']=='canceled')
+                                    PopupMenuItem(value: "assign",child: Text("Assign Workers",style: TextStyle(color: Colors.orange.shade800),)),
+                                  PopupMenuItem(value: "edit",child: Text("Edit",style: TextStyle(color: Colors.orange.shade800),)),
+                                  PopupMenuItem(value: "delete",child: Text("Delete",style: TextStyle(color: Colors.orange.shade800))),
+                                  PopupMenuItem(value: "contact",child: Text("Contact Description",style: TextStyle(color: Colors.orange.shade800)))
+                                ];
+                              }
+                            )
+                          : Text("")
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            "assets/svg/event svy.svg",
+                            width: 20,
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              eventDetails["event_name"],
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                fontSize: 18,                        
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            "assets/svg/user-svgrepo-com.svg",
+                            width: 20,
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              eventDetails["client_name"],
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                fontSize: 18
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            "assets/svg/mobile-phone-svgrepo-com.svg",
+                            width: 20,
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: () => makePhoneCall(eventDetails["client_mobile_number"],context),
+                                child: Text(
+                                  eventDetails["client_mobile_number"],
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 15,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                "assets/svg/date-svgrepo-com.svg",
+                                width: 20,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                eventDetails["event_date"],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  fontSize: 14
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                "assets/svg/alarm-clock-svgrepo-com.svg",
+                                width: 20,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                "${eventStartAt[0]}:${eventStartAt[1]}-${eventEndAt[0]}:${eventEndAt[1]}",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  fontSize: 14
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

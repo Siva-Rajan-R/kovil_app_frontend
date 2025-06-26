@@ -14,7 +14,7 @@
 
 
     <application
-        android:label="Nanmai tharuvar kovil"
+        android:label="Guruvudhasan"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="false">

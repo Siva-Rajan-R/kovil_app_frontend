@@ -234,6 +234,7 @@ import 'package:dio/dio.dart';
 //   );
   
 // }
+// https://muddy-danette-sivarajan-1b1beec7.koyeb.app
 const String BASEURL = "https://muddy-danette-sivarajan-1b1beec7.koyeb.app";
 class NetworkService{
   // Replace with your actual base URL
@@ -455,12 +456,12 @@ class NetworkService{
         customSnackBar(content: "Session expired. Please log in again 3",contentType: AnimatedSnackBarType.info).show(context);
         await Navigator.of(context).pushReplacementNamed('/login');
         return null;
-      } else if (dioError.response != null && (dioError.response?.statusCode == 422 || dioError.response?.statusCode == 409)) {
+      } else if (dioError.response != null && (dioError.response?.statusCode == 422 || dioError.response?.statusCode == 409 || dioError.response?.statusCode == 404)) {
         // Other errors
         final responseData=dioError.response!.data;
         print("422 error${dioError.response!.data}");
         String? errorMsg = ((responseData['detail'] is !List)? responseData['detail'] : responseData['detail'][0]['msg']) ?? (responseData.toString().isNotEmpty ? responseData.toString() : "invalid inputs");
-        customSnackBar(content: "Error: $errorMsg",contentType: AnimatedSnackBarType.error).show(context);
+        customSnackBar(content: "$errorMsg",contentType: AnimatedSnackBarType.info).show(context);
         return null;
       }
       else{

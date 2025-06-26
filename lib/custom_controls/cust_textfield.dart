@@ -9,7 +9,9 @@ class CustomTextField extends StatelessWidget{
   final TextInputType? keyboardtype;
   final Color themeColor;
   final Color fontColor;
+  final FocusNode? focusNode;
   final Function(String)? onChanged;
+  final Function(String)? onSubmitted;
 
 
   const CustomTextField({
@@ -19,9 +21,11 @@ class CustomTextField extends StatelessWidget{
     this.value,
     this.controller,
     this.keyboardtype,
+    this.focusNode,
     this.themeColor=Colors.orange,
     this.fontColor=Colors.black,
     this.onChanged,
+    this.onSubmitted
 
   });
 
@@ -30,7 +34,10 @@ class CustomTextField extends StatelessWidget{
     return TextField(
           controller: controller,
           cursorColor: themeColor,
+          focusNode: focusNode,
           keyboardType: keyboardtype,
+          onSubmitted: onSubmitted,
+          onChanged: onChanged,
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: fontColor,

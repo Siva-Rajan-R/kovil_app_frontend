@@ -7,7 +7,13 @@ import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
 class AddEventNewName extends StatefulWidget {
-  const AddEventNewName({super.key});
+  final void Function(Map addedEventName,String addTo) onEventNameAdded;
+  const AddEventNewName(
+    {
+      required this.onEventNameAdded,
+      super.key
+    }
+  );
 
   @override
   _AddEventNewNameState createState() => _AddEventNewNameState();
@@ -16,6 +22,9 @@ class AddEventNewName extends StatefulWidget {
 class _AddEventNewNameState extends State<AddEventNewName> {
   final TextEditingController name = TextEditingController();
   final TextEditingController price = TextEditingController(text: "0");
+
+  
+  List<FocusNode> focusNodes = List.generate(3, (_) => FocusNode());
 
   final TextEditingController isForDD = TextEditingController();
 
@@ -30,23 +39,28 @@ class _AddEventNewNameState extends State<AddEventNewName> {
       isEventLoading = true; // Set loading to true to show loader and disable button
     });
     String path="/event/name";
-    Map body={
-          "event_name": name.text,
-          "event_amount": price.text.isNotEmpty ? int.parse(price.text) : 0,
-          "is_special":false
-    };
-    
-    if (selectedDdValues==1){
-      body["is_special"]=true;
-    }
-    else if (selectedDdValues==2){
-      path="/neivethiyam/name";
+    Map body={};
+    try{
       body={
-        "neivethiyam_name": name.text,
-        "neivethiyam_amount": price.text.isNotEmpty ? int.parse(price.text) : 0
+            "event_name": name.text,
+            "event_amount": price.text.isNotEmpty ? int.parse(price.text) : 0,
+            "is_special":false
       };
+      
+      if (selectedDdValues==1){
+        body["is_special"]=true;
+      }
+      else if (selectedDdValues==2){
+        path="/neivethiyam/name";
+        body={
+          "neivethiyam_name": name.text,
+          "neivethiyam_amount": price.text.isNotEmpty ? int.parse(price.text) : 0
+        };
+      }
     }
-
+    catch(e){
+      customSnackBar(content: "Enter a valid amount", contentType: AnimatedSnackBarType.error).show(context);
+    }
     
     try {
       final res = await NetworkService.sendRequest(
@@ -57,7 +71,9 @@ class _AddEventNewNameState extends State<AddEventNewName> {
       );
 
       if (res!=null) {
-        Navigator.pop(context);
+        final String addTo=(selectedDdValues==2) ?"neivethiyam" : (selectedDdValues==1) ? "special" : "normal";
+        widget.onEventNameAdded({'name':name.text,'amount': price.text.isNotEmpty ? int.parse(price.text) : 0,'id':1},addTo);
+        // Navigator.pop(context);
       } 
     } catch (e) {
       print("rfuyghliuhihiu  uguyguyguk $e");
@@ -90,62 +106,77 @@ class _AddEventNewNameState extends State<AddEventNewName> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            Container(
-              alignment: Alignment.center,
-              margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                    Colors.white10,
-                    Colors.white24,
-                    Colors.white54
-                  ]),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.orange.shade500,
-                      blurRadius: 5,
-                      spreadRadius: 2,
-                      blurStyle: BlurStyle.outer
-                    )
-                  ]
-                ),
-              child: Column(
-                children: [
-                  CustomTextField(label: "Name", controller: name),
-                  const SizedBox(height: 30),
-                  CustomTextField(
-                    label: "Price",
-                    controller: price,
-                    keyboardtype: TextInputType.number,
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 500),
+              child: Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      Colors.white10,
+                      Colors.white24,
+                      Colors.white54
+                    ]),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.shade500,
+                        blurRadius: 5,
+                        spreadRadius: 2,
+                        blurStyle: BlurStyle.outer
+                      )
+                    ]
                   ),
-                  const SizedBox(height: 30),
-                  CustomDropdown(
-                    label: "Is for", 
-                    ddController: isForDD, 
-                    ddEntries: ddValues.map((item){
-                      return DropdownMenuEntry(value: item['value'], label: item['label']);
-                    }).toList(), 
-                    onSelected: (value){
-                      setState(() {
-                        selectedDdValues=value;
-                      });
-                    }
-                  ),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: isEventLoading
-                        ? null // Disable the button when loading
-                        : () => addEventName(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                child: Column(
+                  children: [
+                    CustomTextField(
+                      label: "Name", 
+                      controller: name,
+                      focusNode: focusNodes[0],
+                      onSubmitted: (_){
+                        FocusScope.of(context).requestFocus(focusNodes[1]);
+                      },
                     ),
-                    child: isEventLoading
-                        ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
-                        : Text("Add", style: TextStyle(color: Colors.white)),
-                  ),
-                ],
+                    const SizedBox(height: 30),
+                    CustomTextField(
+                      label: "Price",
+                      controller: price,
+                      keyboardtype: TextInputType.number,
+                      focusNode: focusNodes[1],
+                      onSubmitted: (_){
+                        FocusScope.of(context).requestFocus(focusNodes[2]);
+                      },
+                    ),
+                    const SizedBox(height: 30),
+                    CustomDropdown(
+                      label: "Is for", 
+                      ddController: isForDD,
+                      focusNode: focusNodes[2],
+                      ddEntries: ddValues.map((item){
+                        return DropdownMenuEntry(value: item['value'], label: item['label']);
+                      }).toList(), 
+                      onSelected: (value){
+                        setState(() {
+                          selectedDdValues=value;
+                        });
+                      }
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: isEventLoading
+                          ? null // Disable the button when loading
+                          : () => addEventName(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                      ),
+                      child: isEventLoading
+                          ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
+                          : Text("Add", style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
               ),
             ),
             

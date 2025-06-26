@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +11,13 @@ import 'package:sampleflutter/pages/add_event_name.dart';
 import 'package:sampleflutter/pages/add_events.dart';
 import 'package:sampleflutter/pages/add_worker.dart';
 import 'package:sampleflutter/pages/all_events.dart';
+import 'package:sampleflutter/pages/assigned_events.dart';
 import 'package:sampleflutter/pages/dashboard.dart';
 import 'package:sampleflutter/pages/event_download.dart';
+import 'package:sampleflutter/pages/leave_management.dart';
 import 'package:sampleflutter/pages/login.dart';
 import 'package:sampleflutter/pages/recived_notification.dart';
+import 'package:sampleflutter/pages/request_leave.dart';
 import 'package:sampleflutter/pages/send_notification.dart';
 import 'package:sampleflutter/pages/tamil_calendar.dart';
 import 'package:sampleflutter/pages/today_events.dart';
@@ -26,6 +28,7 @@ import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/open_phone.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
+
 
 List<Widget> rowBuilder(List<Map<String,dynamic>> items){
   print("items ${items.length}");
@@ -69,8 +72,8 @@ class HomePage extends StatefulWidget{
 }
 
 class _HomePageState extends State<HomePage> {
-  List? newNotifications;
-  List? seenNotifications;
+  List? newNotifications=[];
+  List? seenNotifications=[];
   bool isNotificationClicked=false;
   String newNotificationsCounts='';
 
@@ -102,7 +105,7 @@ class _HomePageState extends State<HomePage> {
   Future getCurrentVersion() async {
     return await NetworkService.sendRequest(path: "/app/version", context: context);
     // return {
-    //   "current_version": "1.0.0",
+    //   "current_version": "1.1.0",
     //   "is_debug": false,
     //   "is_mandatory": false,
     //   "android_update_url": "https://drive.google.com/file/d/1jcStDM7QhCcxKHhQasmIiuhBx-phXdjb/view?usp=drive_link",
@@ -145,8 +148,11 @@ class _HomePageState extends State<HomePage> {
         {"label":"Tamil Calendar","svg":"assets/svg/calendar-svgrepo-com.svg","cc":Colors.yellow.shade50,"sc":Colors.yellow.shade300,"route":TamilCalendarPage()},
         {"label":"All Events","svg":"assets/svg/event svy.svg","cc":Colors.purple.shade50,"sc":Colors.purple.shade100,"route":AllEventsPage()},
         {"label":"Today Events","svg":"assets/svg/news-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade100,"route":TodayEventsPage()},
-        {"label":"Add Workers","svg":"assets/svg/service-workers-svgrepo-com.svg","cc":Colors.brown.shade50,"sc":Colors.brown.shade100,"route":AddWorkerPage()},
-        {"label":"Add Events Name","svg":"assets/svg/writing-svgrepo-com.svg","cc":Colors.teal.shade50,"sc":Colors.teal.shade100,"route":AddEventName()},
+        {"label":"Assigned\nEvents","svg":"assets/svg/write-document-svgrepo-com.svg","cc":Colors.lightBlue.shade50,"sc":Colors.lightBlue.shade300,"route":AssignedEventsPage()},
+        {"label":"Request\nLeave","svg":"assets/svg/suitcase-svgrepo-com.svg","cc":Colors.lightGreen.shade50,"sc":Colors.lightGreen.shade300,"route":RequestLeavePage()},
+        {"label":"Leave\nManager","svg":"assets/svg/notepad-note-svgrepo-com.svg","cc":Colors.indigo.shade50,"sc":Colors.indigo.shade300,"route":LeaveManagementPage()},
+        {"label":"Workers","svg":"assets/svg/service-workers-svgrepo-com.svg","cc":Colors.brown.shade50,"sc":Colors.brown.shade100,"route":AddWorkerPage()},
+        {"label":"Event Names","svg":"assets/svg/writing-svgrepo-com.svg","cc":Colors.teal.shade50,"sc":Colors.teal.shade100,"route":AddEventNamePage()},
         {"label":"Add Events","svg":"assets/svg/calendar-add-event-svgrepo-com.svg","cc":Colors.green.shade50,"sc":Colors.green.shade100,"route":AddEventsPage()},
         {"label":"Users","svg":"assets/svg/users-young-svgrepo-com.svg","cc":Colors.cyan.shade50,"sc":Colors.cyan.shade100,"route":UserPage()},
         {"label":"Download&Delete","svg":"assets/svg/download-svgrepo-com.svg","cc":Colors.grey.shade300,"sc":Colors.grey.shade300,"route":EventDownloadPage()},
@@ -160,7 +166,7 @@ class _HomePageState extends State<HomePage> {
       }
       else{
         visibleFeatures=[
-          ...featuresSvg.sublist(0,3),
+          ...featuresSvg.sublist(0,5),
           featuresSvg.last
           
         ];
@@ -183,26 +189,26 @@ class _HomePageState extends State<HomePage> {
         currentVersion=versionUpdateInfo!['current_version'];
 
         if(currentVersion!=oldVersion){
-          isMandatory=versionUpdateInfo!["is_mandatory"];
-          isTriggerLogin=versionUpdateInfo!['is_trigger_login'];
+          isMandatory=versionUpdateInfo!["is_mandatory"] ?? false;
+          isTriggerLogin=versionUpdateInfo!['is_trigger_login'] ?? false;
           triggerDialog=true;
 
           if(isClickedLater){
             triggerDialog=false;
           }
-
+          print("ehich is android");
           if(Platform.isAndroid){
             print("ehich is android");
-            updateUrl=versionUpdateInfo!["android_update_url"];
+            updateUrl=versionUpdateInfo!["android_update_url"] ?? "";
           }
           else if(Platform.isIOS){
-            updateUrl=versionUpdateInfo!["ios_update_url"];
+            updateUrl=versionUpdateInfo!["ios_update_url"] ?? "";
           }
           else if(Platform.isWindows){
-            updateUrl=versionUpdateInfo!["windows_update_url"];
+            updateUrl=versionUpdateInfo!["windows_update_url"] ?? "";
           }
           else{
-            updateUrl=versionUpdateInfo!["macos_update_url"];
+            updateUrl=versionUpdateInfo!["macos_update_url"] ?? "";
           }
 
         }
@@ -244,7 +250,7 @@ class _HomePageState extends State<HomePage> {
             dialogType: DialogType.info,
             animType: AnimType.topSlide,
             title: 'New Version',
-            desc: 'A new version is available ${currentVersion}. Please install.',
+            desc: 'A new version is available $currentVersion. Please install.',
             btnOkOnPress: () async {
               print("pressed install");
               if (isTriggerLogin){
@@ -276,73 +282,77 @@ class _HomePageState extends State<HomePage> {
         children: [
           Scaffold(
             appBar: KovilAppBar(withIcon: true,actions: actions,),
-              body:RefreshIndicator(
-                    onRefresh: () => getNotifications(),
-                    color: Colors.orange,
-                    child: SingleChildScrollView(
-                      physics: AlwaysScrollableScrollPhysics(),
-                      child: Column(
+              body:SizedBox.expand(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Features",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.orange.shade800
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        if (isNotificationClicked==false && newNotifications!.isNotEmpty){
-                                          unawaited(
-                                            NetworkService.sendRequest(
-                                              path: '/app/notifications/seen', 
-                                              context: context,
-                                              method: "PUT"
-                                            )
-                                          );
-
-                                        }
-                                        setState(() {
-                                          isNotificationClicked=true;
-                                        });
-                                        Navigator.of(context).push(CupertinoPageRoute(builder: (context)=> RecivedNotificationPage(newNotificationsList: newNotifications,seenNotificationList: seenNotifications)));
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(right: 8.0),
-                                        child: Badge(
-                                          isLabelVisible:isNotificationClicked? false : (newNotifications!=null && newNotifications!.isNotEmpty)? true : false,
-                                          backgroundColor: Colors.orange.shade700,
-                                          label: Text(newNotificationsCounts,overflow: TextOverflow.ellipsis,style: TextStyle(fontWeight: FontWeight.bold),),
-                                          child: Lottie.asset(
-                                            "assets/lotties/notification_bell.json",
-                                            width: 50,
-                                            height: 50,
-                                            animate: isNotificationClicked? false : (newNotifications!=null && newNotifications!.isNotEmpty)? true : false
-                    
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                          Text(
+                            "Features",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade800
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              if (isNotificationClicked==false && newNotifications!.isNotEmpty){
+                                unawaited(
+                                  NetworkService.sendRequest(
+                                    path: '/app/notifications/seen', 
+                                    context: context,
+                                    method: "PUT"
+                                  )
+                                );
+                          
+                              }
+                              setState(() {
+                                isNotificationClicked=true;
+                              });
+                              Navigator.of(context).push(CupertinoPageRoute(builder: (context)=> RecivedNotificationPage(newNotificationsList: newNotifications,seenNotificationList: seenNotifications)));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Badge(
+                                isLabelVisible:isNotificationClicked? false : (newNotifications!=null && newNotifications!.isNotEmpty)? true : false,
+                                backgroundColor: Colors.orange.shade700,
+                                label: Text(newNotificationsCounts,overflow: TextOverflow.ellipsis,style: TextStyle(fontWeight: FontWeight.bold),),
+                                child: Lottie.asset(
+                                  "assets/lotties/notification_bell.json",
+                                  width: 50,
+                                  height: 50,
+                                  animate: isNotificationClicked? false : (newNotifications!=null && newNotifications!.isNotEmpty)? true : false
+                          
                                 ),
                               ),
-                              SizedBox(height: 10,),
-                            ...rowBuilder(visibleFeatures)
-                              
-                            ],
+                            ),
                           )
                         ],
                       ),
                     ),
-                  )
+                    Expanded(
+                      child: RefreshIndicator(
+                        color: Colors.orange,
+                        onRefresh: ()=>getNotifications(),
+                        child: SingleChildScrollView(
+                          physics:visibleFeatures.length<=12? AlwaysScrollableScrollPhysics() : BouncingScrollPhysics(),
+                          child: Column(
+                            children: [
+                              ...rowBuilder(visibleFeatures)
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  
+                    
+                  ],
+                ),
+              )
             ),
 
             if (isLoading)
@@ -355,7 +365,7 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          LottieBuilder.asset(getRandomLoadings()),
+                          LottieBuilder.asset(getRandomLoadings(),height: MediaQuery.of(context).size.height*0.5,),
                         ],
                       )
                     )

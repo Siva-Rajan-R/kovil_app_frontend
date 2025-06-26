@@ -21,7 +21,7 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: KovilAppBar(withIcon: true,titleSize: 20,),
+      appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,titleSize: 20,),
       body: Column(
         children: [
           TableCalendar(

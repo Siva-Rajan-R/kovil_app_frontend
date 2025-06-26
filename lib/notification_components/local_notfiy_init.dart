@@ -40,17 +40,21 @@ Future<void> showForegroundImageNotification(String? title, String? body, String
     'high_importance_channel',
     'High Importance Notifications',
     channelDescription: 'Used for important notifications',
-    importance: Importance.high,
-    priority: Priority.high,
+    importance: Importance.max,
+    priority: Priority.max,
     styleInformation: style,
     largeIcon: largeIconBitmap
+  );
+
+  final windowsDetails=WindowsNotificationDetails(
+
   );
   int notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   await flutterLocalNotificationsPlugin.show(
     notificationId,
     title,
     body,
-    NotificationDetails(android: androidDetails),
+    NotificationDetails(android: androidDetails,windows: windowsDetails),
   );
 }
 
@@ -61,8 +65,16 @@ Future<void> setupFlutterNotifications() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@drawable/ic_cust');
 
+  const WindowsInitializationSettings initializationSettingsWindows=
+      WindowsInitializationSettings(
+        appName: "guruvuthasan",
+        appUserModelId: "com.example.sampleflutter",
+        guid: '65a347f6-9288-441d-9d68-f75c36f98b79',
+        iconPath: '@drawable/ic_cust'
+      );
+
   const InitializationSettings initializationSettings =
-      InitializationSettings(android: initializationSettingsAndroid);
+      InitializationSettings(android: initializationSettingsAndroid,windows: initializationSettingsWindows);
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 

@@ -8,6 +8,7 @@ import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
 import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
+import 'package:sampleflutter/notification_components/local_notfiy_init.dart';
 import 'package:sampleflutter/utils/compress_image.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
@@ -24,6 +25,7 @@ class SendNotificationPage extends StatefulWidget{
 class _SendNotificationPageState extends State<SendNotificationPage>{
   TextEditingController notifyTitle=TextEditingController();
   TextEditingController notifyBody=TextEditingController();
+  List<FocusNode> focusNodes = List.generate(2, (_) => FocusNode());
   
   double? uploadingCurrentStatus;
   bool _isSending=false;
@@ -96,13 +98,22 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
       if(_selectedImage!=null){
         await  _selectedImage!.delete();
       }
+
+      if (Platform.isWindows || Platform.isMacOS){
+        await showForegroundImageNotification(notifyTitle.text, notifyBody.text, null);
+      }
+      
+      setState(() {
+          _selectedImage=null;
+      });
       // Navigator.pushAndRemoveUntil(
       //   context,
       //   CupertinoPageRoute(builder: (_) => HomePage()),
       //   (_) => false,
       // );
-
-      Navigator.pop(context);
+      // if (MediaQuery.of(context).size.width<=400){
+      //   Navigator.pop(context);
+      // }
     }
   }
 
@@ -116,7 +127,7 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
         }
       },
       child: Scaffold(
-        appBar: KovilAppBar(withIcon: true,),
+        appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,),
         bottomNavigationBar: CustomBottomAppbar(
           bottomAppbarChild: Center(
             child: ElevatedButton(
@@ -141,91 +152,110 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
             ),
           ),
         ),
-        body: Container(
-          width: double.infinity,
-          margin: const EdgeInsets.all(10),
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              Colors.orange.shade400,
-              Colors.orange.shade600,
-              Colors.orange.shade800,
-            ]),
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.orange.shade800,
-                blurRadius: 5,
-                spreadRadius: 2,
-                blurStyle: BlurStyle.outer,
+        body: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 500),
+            child: Container(
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+                  Colors.orange.shade400,
+                  Colors.orange.shade600,
+                  Colors.orange.shade800,
+                ]),
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.orange.shade800,
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                    blurStyle: BlurStyle.outer,
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Text(
-                  "Send Notification To All",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 30,),
-      
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: GestureDetector(
-                    onTap: _pickImage,
-                    child: DottedBorder(
-                      color: Colors.white,
-                      child: Container(
-                        width: 200,
-                        height: 200,
-                        alignment: Alignment.center,
-                        child: _selectedImage == null
-                            ? const Text("Select Photo\n(Optional)",textAlign: TextAlign.center,style: TextStyle(color: Colors.white),)
-                            : _isCompressing? CircularProgressIndicator(color: Colors.white,) 
-                            : Image.file(
-                                _selectedImage!,
-                                fit: BoxFit.cover,
-                              ),
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    Text(
+                      "Send Notification To All",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 30,),
+                  
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: DottedBorder(
+                            color: Colors.white,
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              alignment: Alignment.center,
+                              child: _selectedImage == null
+                                  ? const Text("Select Photo\n(Optional)",textAlign: TextAlign.center,style: TextStyle(color: Colors.white),)
+                                  : _isCompressing? CircularProgressIndicator(color: Colors.white,) 
+                                  : Image.file(
+                                      _selectedImage!,
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: CustomTextField(label: "Notification title",controller: notifyTitle,themeColor: Colors.white,fontColor: Colors.white,),
-                ),
-                SizedBox(height: 10,),
-                
-                SizedBox(height: 10,),
-                TextField(
-                    controller: notifyBody,
-                    style: const TextStyle(
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: CustomTextField(
+                        label: "Notification title",
+                        controller: notifyTitle,
+                        themeColor: Colors.white,
+                        fontColor: Colors.white,
+                        focusNode: focusNodes[0],
+                        onSubmitted: (_){
+                          FocusScope.of(context).requestFocus(focusNodes[1]);
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 10,),
+                    
+                    SizedBox(height: 10,),
+                    TextField(
+                        controller: notifyBody,
+                        style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.w600),
-                    cursorColor: Colors.white,
-                    minLines: 3,
-                    decoration: InputDecoration(
-                      hintText: 'Notification body...',
-                      hintStyle: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w500),
-                      enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      alignLabelWithHint: true,
+                        cursorColor: Colors.white,
+                        focusNode: focusNodes[1],
+                        minLines: 3,
+                        decoration: InputDecoration(
+                          hintText: 'Notification body...',
+                          hintStyle: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w500),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          alignLabelWithHint: true,
+                        ),
+                        keyboardType: TextInputType.multiline,
+                        maxLines: 4,
+                        onSubmitted:  _isSending ? null : (_)=> handleSending,
                     ),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 4,
+                    
+                  ],
                 ),
-                
-              ],
+              ),
             ),
           ),
         ),

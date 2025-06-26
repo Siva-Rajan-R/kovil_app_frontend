@@ -3,29 +3,32 @@ import "package:flutter/material.dart";
 
 class CustomDropdown extends StatelessWidget {
   final String label;
-  final TextEditingController ddController;
+  final TextEditingController? ddController;
   final List<DropdownMenuEntry> ddEntries;
   final Color? themeColor;
   final Color? textColor;
   final double? Width;
+  final FocusNode? focusNode;
   final Function(dynamic)? onSelected;
 
 
   const CustomDropdown({
     super.key,
     required this.label,
-    required this.ddController,
+    this.ddController,
     required this.ddEntries,
     required this.onSelected,
     this.themeColor=Colors.orange,
     this.textColor=Colors.black,
     this.Width=300,
+    this.focusNode
   });
 
   @override
   Widget build(BuildContext context) {
     return DropdownMenu(
       width: Width,
+      focusNode: focusNode,
       label: Text(
         label,
         style: TextStyle(

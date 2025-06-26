@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/notification_components/local_notfiy_init.dart';
 import 'package:sampleflutter/utils/global_variables.dart';
@@ -72,41 +73,16 @@ Future<void> initFCM(BuildContext context) async {
   });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  print('Foreground notification: ${message.notification}');
-  RemoteNotification? notification = message.notification;
-  AndroidNotification? android = message.notification?.android;
-  final notificationImageUrl = message.notification?.android?.imageUrl;
+      print('Foreground notification: ${message.notification}');
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      final notificationImageUrl = message.notification?.android?.imageUrl;
 
-  if (notification != null && android != null) {
-    // flutterLocalNotificationsPlugin.show(
-    //   notification.hashCode,
-    //   notification.title,
-    //   notification.body,
-    //   NotificationDetails(
-    //     android: AndroidNotificationDetails(
-    //       'high_importance_channel', // same ID
-    //       'High Importance Notifications',
-    //       importance: Importance.high,
-    //       priority: Priority.high,
-    //       icon: '@drawable/ic_cust',
-    //       color: Colors.orange,
-    //     ),
-    //   ),
-    // );
+      if (notification != null && android != null) {
 
-    showForegroundImageNotification(notification.title, notification.body, notificationImageUrl);
-  }
-});
-
-FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-  print('Notification clicked: ${message.notification?.title}');
-  String screen=message.data["screen"];
-  print("this is the go to screen $screen");
-
-  if (screen=="event_page"){
-    Navigator.pushNamed(context, "/tamil-calendar");
-  }
-});
-
-
+        showForegroundImageNotification(notification.title, notification.body, notificationImageUrl);
+      }
+    }
+  );
 }
+

@@ -106,6 +106,7 @@ class _DashboardState extends State<WorkerDashboardPage>{
     AwesomeDialog(
         context: context,
         btnOkText: "Download",
+        width: MediaQuery.of(context).size.width>400? 500 : null,
         dismissOnTouchOutside: false,
         dismissOnBackKeyPress: false,
         dialogType: DialogType.noHeader,
@@ -163,6 +164,7 @@ class _DashboardState extends State<WorkerDashboardPage>{
 
   void handleDelete() async {
     AwesomeDialog(
+        width:MediaQuery.of(context).size.width>400? 500 : null,
         context: context,
         btnOkText: "Yes",
         dismissOnTouchOutside: false,
@@ -240,7 +242,7 @@ class _DashboardState extends State<WorkerDashboardPage>{
           child: Column(
             
             children: [
-              LottieBuilder.asset(getRandomLoadings()),
+              LottieBuilder.asset(getRandomLoadings(),height: MediaQuery.of(context).size.height*0.5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -253,165 +255,170 @@ class _DashboardState extends State<WorkerDashboardPage>{
           )
         )
         : SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 20,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 500),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () => pickFromDate(context),
-                  child: Text(
-                    fromDate == null
-                        ? "Pick Start Date"
-                        : "${fromDate!.toLocal()}".split(' ')[0],
-                  ),
-                ),
-                Text(
-                  "To",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.orange,
-                    fontWeight: FontWeight.w600
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () => pickToDate(context),
-                  child: Text(
-                    toDate == null
-                        ? "Pick End Date"
-                        : "${toDate!.toLocal()}".split(' ')[0],
-                  ),
-                ),
-                ],
-              ),
-              
-              SizedBox(height: 10,),
-              Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.99,
-                  height: 440,
-                  child: Card(
-                    color: Colors.grey.shade100,
-                    elevation: 4,
-                    margin: const EdgeInsets.all(12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+                  SizedBox(height: 20,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () => pickFromDate(context),
+                      child: Text(
+                        fromDate == null
+                            ? "Pick Start Date"
+                            : "${fromDate!.toLocal()}".split(' ')[0],
+                      ),
                     ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            'Total No Of Events : $totNofEvents',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const Divider(),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: DataTable(
-                                headingRowColor: WidgetStateColor.resolveWith((states) => Colors.blueGrey.shade300),
-                                dataRowColor: WidgetStateColor.resolveWith((states) => Colors.grey.shade100),
-                                columnSpacing: 24,
-                                columns: const [
-                                  DataColumn(
-                                    label: Center(
-                                      child: Text(
-                                        'Name',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Center(
-                                      child: Text(
-                                        'Events Participated',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Center(
-                                      child: Text(
-                                        'Total Amount (₹)',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                                rows: workersData.map((item) {
-                                  print(item);
-                                  int totAmount = item['no_of_participated_events'] * amount;
-                                  return DataRow(
-                                    cells: [
-                                      DataCell(Text(item['name'], style: const TextStyle(fontSize: 14))),
-                                      DataCell(Center(child: Text(item['no_of_participated_events'].toString(), style: const TextStyle(fontSize: 14)))),
-                                      DataCell(Center(child: Text(totAmount.toString(), style: const TextStyle(fontSize: 14)))),
-                                    ],
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      "To",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.orange,
+                        fontWeight: FontWeight.w600
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(child: CustomTextField(label: "Enter a amount",controller: amountToCalculate,)),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         foregroundColor: Colors.white,
                       ),
-                      onPressed: (){
-                        print(amount);
-                        if (amountToCalculate.text.isNotEmpty && int.tryParse(amountToCalculate.text)!=null){
-                          setState(() {
-                            _isCalculating=true;
-                          });
-                          
-                          setState(() {
-                            // amountToCalculate.text=amount.toString();
-                            amount =int.parse(amountToCalculate.text);
-                            _isCalculating=false;
-                          });       
-                        }
-                        else{
-                
-                          customSnackBar(content: "Enter a valid number", contentType: AnimatedSnackBarType.info).show(context);
-                        }
-                      },
+                      onPressed: () => pickToDate(context),
                       child: Text(
-                        _isCalculating
-                            ? "Calculating..."
-                            : "Calculate",
+                        toDate == null
+                            ? "Pick End Date"
+                            : "${toDate!.toLocal()}".split(' ')[0],
                       ),
                     ),
-                  ],
-                ),
+                    ],
+                  ),
+                  
+                  SizedBox(height: 10,),
+                  Center(
+                    child: SizedBox(
+                      width: 500,
+                      height: 440,
+                      child: Card(
+                        color: Colors.grey.shade100,
+                        elevation: 4,
+                        margin: const EdgeInsets.all(12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Total No Of Events : $totNofEvents',
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const Divider(),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: DataTable(
+                                    headingRowColor: WidgetStateColor.resolveWith((states) => Colors.blueGrey.shade300),
+                                    dataRowColor: WidgetStateColor.resolveWith((states) => Colors.grey.shade100),
+                                    columnSpacing: 24,
+                                    columns: const [
+                                      DataColumn(
+                                        label: Center(
+                                          child: Text(
+                                            'Name',
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                          ),
+                                        ),
+                                      ),
+                                      DataColumn(
+                                        label: Center(
+                                          child: Text(
+                                            'Events Participated',
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                          ),
+                                        ),
+                                      ),
+                                      DataColumn(
+                                        label: Center(
+                                          child: Text(
+                                            'Total Amount (₹)',
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    rows: workersData.map((item) {
+                                      print(item);
+                                      int totAmount = item['no_of_participated_events'] * amount;
+                                      return DataRow(
+                                        cells: [
+                                          DataCell(Text(item['name'], style: const TextStyle(fontSize: 14))),
+                                          DataCell(Center(child: Text(item['no_of_participated_events'].toString(), style: const TextStyle(fontSize: 14)))),
+                                          DataCell(Center(child: Text(totAmount.toString(), style: const TextStyle(fontSize: 14)))),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(child: CustomTextField(label: "Enter a amount",controller: amountToCalculate,)),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: (){
+                            print(amount);
+                            if (amountToCalculate.text.isNotEmpty && int.tryParse(amountToCalculate.text)!=null){
+                              setState(() {
+                                _isCalculating=true;
+                              });
+                              
+                              setState(() {
+                                // amountToCalculate.text=amount.toString();
+                                amount =int.parse(amountToCalculate.text);
+                                _isCalculating=false;
+                              });       
+                            }
+                            else{
+                    
+                              customSnackBar(content: "Enter a valid number", contentType: AnimatedSnackBarType.info).show(context);
+                            }
+                          },
+                          child: Text(
+                            _isCalculating
+                                ? "Calculating..."
+                                : "Calculate",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                ],
               ),
-              
-            ],
+            ),
           ),
         )
       ),

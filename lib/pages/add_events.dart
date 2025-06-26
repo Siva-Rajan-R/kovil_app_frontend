@@ -46,6 +46,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
   late TextEditingController neivethiyam;
   late TextEditingController eventDes;
   late TextEditingController padiKg;
+
   List<Map> eventNamesAmount = [];
   List<Map> neivethiyamNamesAmount = [];
   List paymentModes = [];
@@ -240,7 +241,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
                 child: Column(
                   
                   children: [
-                    LottieBuilder.asset(getRandomLoadings()),
+                    LottieBuilder.asset(getRandomLoadings(),height: MediaQuery.of(context).size.height*0.5,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -253,208 +254,211 @@ class _AddEventsPageState extends State<AddEventsPage> {
                 )
               )
               : SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Column(
                   children: [
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.all(10),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.orange.shade400,
-                            Colors.orange.shade600,
-                            Colors.orange.shade800,
-                          ],
-                        ),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(20),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.orange.shade800,
-                            blurRadius: 5,
-                            spreadRadius: 2,
-                            blurStyle: BlurStyle.outer,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Event Info",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                ),
+                    Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 500),
+                        child: Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.orange.shade400,
+                                Colors.orange.shade600,
+                                Colors.orange.shade800,
+                              ],
+                            ),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(20),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.orange.shade800,
+                                blurRadius: 5,
+                                spreadRadius: 2,
+                                blurStyle: BlurStyle.outer,
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
-                          CustomDropdown(
-                            textColor: Colors.white,
-                            themeColor: Colors.white,
-                            label: "Event Name",
-                            ddController: eventName,
-                            ddEntries: [
-                              for (int i = 0; i < eventNamesAmount.length; i++)
-                                DropdownMenuEntry(
-                                  value: i,
-                                  label:
-                                      "${eventNamesAmount[i]['name']} - ₹ ${eventNamesAmount[i]['amount']}",
-                                ),
-                            ],
-                            onSelected:
-                                (value) => {
-                                  print("selected value $value"),
-                                  setState(() {
-                                    eventNameValue =
-                                        eventNamesAmount[value!]['name'];
-                                    eventAmount =
-                                        eventNamesAmount[value]['amount']
-                                            .toDouble();
-                                    isSpecial =
-                                        eventNamesAmount[value]['is_special'];
-                                  }),
-                                },
-                          ),
-                          const SizedBox(height: 20),
-
-                          Row(
+                          child: Column(
                             children: [
+                              const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Event Info",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
                               CustomDropdown(
-                                Width: 270,
                                 textColor: Colors.white,
                                 themeColor: Colors.white,
-                                label: "Neivethiyam Name",
-                                ddController: neivethiyam,
+                                label: "Event Name",
+                                ddController: eventName,
                                 ddEntries: [
-                                  for (
-                                    int i = 0;
-                                    i < neivethiyamNamesAmount.length;
-                                    i++
-                                  )
+                                  for (int i = 0; i < eventNamesAmount.length; i++)
                                     DropdownMenuEntry(
                                       value: i,
                                       label:
-                                          "${neivethiyamNamesAmount[i]["name"]} - ₹ ${neivethiyamNamesAmount[i]['amount']}",
+                                          "${eventNamesAmount[i]['name']} - ₹ ${eventNamesAmount[i]['amount']}",
                                     ),
                                 ],
                                 onSelected:
                                     (value) => {
-                                      print(
-                                        "selected value $value ${neivethiyamNamesAmount[value!]["amount"].runtimeType}",
-                                      ),
+                                      print("selected value $value"),
                                       setState(() {
-                                        neivethiyamName =
-                                            neivethiyamNamesAmount[value]["name"];
-                                        neivethiyamAmount =
-                                            neivethiyamNamesAmount[value!]["amount"]
+                                        eventNameValue =
+                                            eventNamesAmount[value!]['name'];
+                                        eventAmount =
+                                            eventNamesAmount[value]['amount']
                                                 .toDouble();
-                                        neivethiyamId =
-                                            neivethiyamNamesAmount[value]["id"];
-                                        print(neivethiyamId);
+                                        isSpecial =
+                                            eventNamesAmount[value]['is_special'];
                                       }),
                                     },
                               ),
-                              VerticalDivider(width: 2.5),
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(top: 5),
-                                  child: CustomTextField(
-                                    label: "Padi/Kg",
+                              const SizedBox(height: 20),
+                        
+                              Row(
+                                children: [
+                                  CustomDropdown(
+                                    Width: 270,
+                                    textColor: Colors.white,
                                     themeColor: Colors.white,
-                                    fontColor: Colors.white,
-                                    controller: padiKg,
-                                    keyboardtype: TextInputType.number,
+                                    label: "Neivethiyam Name",
+                                    ddController: neivethiyam,
+                                    ddEntries: [
+                                      for (
+                                        int i = 0;
+                                        i < neivethiyamNamesAmount.length;
+                                        i++
+                                      )
+                                        DropdownMenuEntry(
+                                          value: i,
+                                          label:
+                                              "${neivethiyamNamesAmount[i]["name"]} - ₹ ${neivethiyamNamesAmount[i]['amount']}",
+                                        ),
+                                    ],
+                                    onSelected:
+                                        (value) => {
+                                          print(
+                                            "selected value $value ${neivethiyamNamesAmount[value!]["amount"].runtimeType}",
+                                          ),
+                                          setState(() {
+                                            neivethiyamName =
+                                                neivethiyamNamesAmount[value]["name"];
+                                            neivethiyamAmount =
+                                                neivethiyamNamesAmount[value!]["amount"]
+                                                    .toDouble();
+                                            neivethiyamId =
+                                                neivethiyamNamesAmount[value]["id"];
+                                            print(neivethiyamId);
+                                          }),
+                                        },
                                   ),
+                                  VerticalDivider(width: 3),
+                                  Expanded(
+                                    child: CustomTextField(
+                                      label: "Padi/Kg",
+                                      themeColor: Colors.white,
+                                      fontColor: Colors.white,
+                                      controller: padiKg,
+                                      keyboardtype: TextInputType.number,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                        
+                              const SizedBox(height: 20),
+                        
+                              TextField(
+                                controller: eventDes,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                cursorColor: Colors.white,
+                                minLines: 2, // text color
+                                decoration: InputDecoration(
+                                  labelText: 'Event Description',
+                                  labelStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ), // label color
+                        
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white),
+                                  ),
+                                  alignLabelWithHint: true,
+                                ),
+                                keyboardType: TextInputType.multiline,
+                                maxLines: 5,
+                              ),
+                        
+                              const SizedBox(height: 20),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                      ),
+                                      onPressed: () => pickDate(context),
+                                      child: Text(
+                                        selectedDate == null
+                                            ? "Pick Date"
+                                            : "${selectedDate!.toLocal()}".split(
+                                              ' ',
+                                            )[0],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                      ),
+                                      onPressed: () => pickStartTime(context),
+                                      child: Text(
+                                        startTime == null
+                                            ? "Start Time"
+                                            : startTime!,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                      ),
+                                      onPressed: () => pickEndTime(context),
+                                      child: Text(
+                                        endTime == null ? "End Time" : endTime!,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                              const SizedBox(height: 20),
                             ],
                           ),
-
-                          const SizedBox(height: 20),
-
-                          TextField(
-                            controller: eventDes,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            cursorColor: Colors.white,
-                            minLines: 2, // text color
-                            decoration: InputDecoration(
-                              labelText: 'Event Description',
-                              labelStyle: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ), // label color
-
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                              ),
-                              alignLabelWithHint: true,
-                            ),
-                            keyboardType: TextInputType.multiline,
-                            maxLines: 5,
-                          ),
-
-                          const SizedBox(height: 20),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.black,
-                                  ),
-                                  onPressed: () => pickDate(context),
-                                  child: Text(
-                                    selectedDate == null
-                                        ? "Pick Date"
-                                        : "${selectedDate!.toLocal()}".split(
-                                          ' ',
-                                        )[0],
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.black,
-                                  ),
-                                  onPressed: () => pickStartTime(context),
-                                  child: Text(
-                                    startTime == null
-                                        ? "Start Time"
-                                        : startTime!,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.black,
-                                  ),
-                                  onPressed: () => pickEndTime(context),
-                                  child: Text(
-                                    endTime == null ? "End Time" : endTime!,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
+                        ),
                       ),
                     ),
                   ],
