@@ -206,7 +206,7 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
                               width: 200,
                               height: 200,
                               alignment: Alignment.center,
-                              child: _selectedImage == null
+                              child: (_selectedImage == null && !_isCompressing)
                                   ? const Text("Select Photo\n(Optional)",textAlign: TextAlign.center,style: TextStyle(color: Colors.white),)
                                   : _isCompressing? CircularProgressIndicator(color: Colors.white,) 
                                   : Image.file(

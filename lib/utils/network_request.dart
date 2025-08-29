@@ -13,7 +13,7 @@ import 'package:dio/dio.dart';
 
 
 
-const String BASEURL = "https://guruvudhasan.onrender.com";
+const String BASEURL = "http://10.41.33.92:8000";
 class NetworkService{
   // Replace with your actual base URL
   static const String _baseUrl = BASEURL; 
