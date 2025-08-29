@@ -1,4 +1,6 @@
 
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
@@ -31,7 +33,7 @@ Future<void> showForegroundImageNotification(String? title, String? body, String
       }
     } catch (e) {
       // Any network or decoding error, skip image
-      print('Error loading image: $e');
+      printToConsole('Error loading image: $e');
       style = null;
     }
   }

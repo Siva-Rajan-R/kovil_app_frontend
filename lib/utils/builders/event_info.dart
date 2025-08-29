@@ -1,16 +1,18 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sampleflutter/utils/enums.dart';
 import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/open_phone.dart';
 
-Widget buildEventInfo(Map eventDetails, BuildContext context) {
-  print("event $eventDetails['paid_amount']");
-  final List<String> eventStartAt = eventDetails["event_start_at"].split(":");
-  final List<String> eventEndAt = eventDetails["event_end_at"].split(":");
-  final int paid = eventDetails['paid_amount'] ?? 0;
-  final int total = eventDetails['total_amount'] ?? 0;
-  final int profitOrLoss = paid - total;
+Widget buildEventInfo(Map eventDetails, BuildContext context,{bool isForBookedEvents=false}) {
+  printToConsole("event $eventDetails['paid_amount']");
+  final String eventStartAt = eventDetails["event_start_at"];
+  final String eventEndAt = eventDetails["event_end_at"];
+  final double paid = eventDetails['paid_amount'] ?? 0.0;
+  final double total = eventDetails['total_amount'] ?? 0.0;
+  final double profitOrLoss = paid - total;
   final String eventDescription =
       eventDetails['neivethiyam_name'] != null
           ? "${eventDetails['neivethiyam_name']}-${eventDetails['padi_kg']} Padi/Kg\n${eventDetails['event_description']}"
@@ -20,6 +22,48 @@ Widget buildEventInfo(Map eventDetails, BuildContext context) {
     physics: BouncingScrollPhysics(),
     child: Column(
       children: [
+        if(isForBookedEvents)
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 500),
+            child: Container(
+              width: double.infinity,
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.orange.shade400,
+                    Colors.orange.shade600,
+                    Colors.orange.shade800,
+                  ],
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.orange.shade800,
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                    blurStyle: BlurStyle.outer,
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "Link shared by : ${eventDetails['event_added_by']}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                      softWrap: true,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
         ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 500),
           child: Container(
@@ -90,7 +134,7 @@ Widget buildEventInfo(Map eventDetails, BuildContext context) {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "${eventStartAt[0]}:${eventStartAt[1]}-${eventEndAt[0]}:${eventEndAt[1]}",
+                          "$eventStartAt-$eventEndAt",
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -234,6 +278,27 @@ Widget buildEventInfo(Map eventDetails, BuildContext context) {
                             softWrap: true,
                           ),
                         ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/svg/mailbox-svgrepo-com.svg",
+                      width: 20,
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        eventDetails["client_email"],
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                        softWrap: true,
                       ),
                     ),
                   ],

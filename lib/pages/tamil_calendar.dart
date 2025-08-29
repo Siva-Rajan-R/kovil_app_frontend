@@ -1,6 +1,9 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
@@ -21,7 +24,7 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,titleSize: 20,),
+      appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(withIcon: true,titleSize: 20,),
       body: Column(
         children: [
           TableCalendar(
@@ -43,7 +46,7 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
               ),
             ),
             onDaySelected: (selectedDay, focusedDay) {
-              print(DateFormat("yyyy-MM-dd").format(selectedDay));
+              printToConsole(DateFormat("yyyy-MM-dd").format(selectedDay));
               setState(() {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
@@ -56,7 +59,7 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
               });
             },
             onPageChanged: (focusedDay) {
-              print("$focusedDay,$_focusedDay");
+              printToConsole("$focusedDay,$_focusedDay");
               _focusedDay = focusedDay;
             },
           ),
@@ -83,7 +86,7 @@ class _TamilCalendarPageState extends State<TamilCalendarPage> {
                                 );
                             },
                             errorWidget: (context, error, stackTrace) {
-                              print("Image load error: $error"); // 👈 debug print
+                              printToConsole("Image load error: $error"); // 👈 debug printToConsole
                               return const Center(
                                 child: SizedBox(
                                   height: 100,

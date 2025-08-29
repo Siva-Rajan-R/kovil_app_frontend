@@ -3,6 +3,7 @@ import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/utils/builders/event_name.dart';
 import 'package:sampleflutter/custom_controls/event_name_card.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
@@ -103,7 +104,7 @@ class _AddEventNamePageState extends State<AddEventNamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true),
+      appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(withIcon: true),
       body: DefaultTabController(
         length: 3,
         child: Column(

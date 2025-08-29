@@ -1,8 +1,11 @@
 
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/user_card.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
@@ -38,15 +41,15 @@ class _UserPageState extends State<UserPage> {
     List swappedUserList=users;
     String userRole='admin';
 
-    print("hyyyyyyyyyyyyyyyyyyyyyyyyyy $admins $users $userId $prevUserRole");
+    printToConsole("hyyyyyyyyyyyyyyyyyyyyyyyyyy $admins $users $userId $prevUserRole");
     if (prevUserRole=='admin'){
       userListToUpdate=users;
       swappedUserList=admins;
       userRole='user';
     }
-    print("llllllllllllllllll $swappedUserList ");
+    printToConsole("llllllllllllllllll $swappedUserList ");
     Map userToAdd=swappedUserList.firstWhere((user)=>user['id']==userId) ?? {};
-     print(userToAdd);
+     printToConsole("$userToAdd");
     userToAdd['role']=userRole;
     setState(() {
       userListToUpdate.add(userToAdd);
@@ -56,7 +59,7 @@ class _UserPageState extends State<UserPage> {
 
   Widget _buildUsers({required List users,required BuildContext context}){
     if (users.isNotEmpty){
-      print("naan aagi");
+      printToConsole("naan aagi");
       return ListView.builder(
         physics: BouncingScrollPhysics(),
         itemCount: users.length,
@@ -81,7 +84,7 @@ class _UserPageState extends State<UserPage> {
 
   Future getUsers(BuildContext context)async {
     final res=await NetworkService.sendRequest(path: '/users',context: context);
-    print("res $res");
+    printToConsole("res $res");
     if (res==null){
       setState(() {
         users=[];
@@ -110,7 +113,7 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,),
+      appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(withIcon: true,),
       body: DefaultTabController(
         length: 2,
         child: Column(

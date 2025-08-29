@@ -1,3 +1,4 @@
+import 'package:sampleflutter/utils/custom_print.dart';
 
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -7,6 +8,7 @@ import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
 import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
 class EventDownloadPage extends StatefulWidget{
@@ -62,18 +64,18 @@ class _EventDownloadPage extends State<EventDownloadPage>{
       _isSubmitting=true;
     });
 
-    print("$fromDate $toDate $eventReportFormat");
+    printToConsole("$fromDate $toDate $eventReportFormat");
     Map body={"from_date":fromDate.toString(),"to_date":toDate.toString(),"file_type":eventReportFormat.text};
     if(forwardTo.text.isNotEmpty){
       body['send_to']=forwardTo.text;
     }
 
-    print(body);
+    printToConsole("$body");
     final res=await NetworkService.sendRequest(path: '/event/report/email',method: "POST", context: context,body:body);
     setState(() {
       _isSubmitting=false;
     });
-    print(res);
+    printToConsole(res);
     
   }
 
@@ -94,7 +96,7 @@ class _EventDownloadPage extends State<EventDownloadPage>{
             _isDeleting=true;
           });
           final res=await NetworkService.sendRequest(path: '/event/all',method: "DELETE", context: context,body: {"from_date":fromDate.toString(),"to_date":toDate.toString()});
-          print(res);
+          printToConsole(res);
           setState(() {
             _isDeleting=false;
           });
@@ -113,36 +115,45 @@ class _EventDownloadPage extends State<EventDownloadPage>{
         }
       },
       child: Scaffold(
-        appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(
+        appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(
           withIcon: true,
         ),
         bottomNavigationBar: CustomBottomAppbar(
-          bottomAppbarChild: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: _isDeleting ? null : handleDelete,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  
-                ),
-                child: Text(
-                  _isDeleting ? "Deleting..." : "Delete All",
-                  style: const TextStyle(color: Colors.white),
-                ),
+          bottomAppbarChild: Center(
+            child: SizedBox(
+              width: 500,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _isDeleting ? null : handleDelete,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        
+                      ),
+                      child: Text(
+                        _isDeleting ? "Deleting..." : "Delete All",
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20,),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting ? null :handleDownload,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        
+                      ),
+                      child: Text(
+                        _isSubmitting ? "Downloading..." : "Download",
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              ElevatedButton(
-                onPressed: _isSubmitting ? null :handleDownload,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  
-                ),
-                child: Text(
-                  _isSubmitting ? "Downloading..." : "Download",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
         body: Center(
@@ -173,36 +184,43 @@ class _EventDownloadPage extends State<EventDownloadPage>{
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black,
-                          ),
-                          onPressed: () => pickFromDate(context),
-                          child: Text(
-                            fromDate == null
-                                ? "Pick Start Date"
-                                : "${fromDate!.toLocal()}".split(' ')[0],
-                          ),
-                        ),
-                        Text(
-                          "To",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                            ),
+                            onPressed: () => pickFromDate(context),
+                            child: Text(
+                              fromDate == null
+                                  ? "Pick Start Date"
+                                  : "${fromDate!.toLocal()}".split(' ')[0],
+                            ),
                           ),
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black,
-                          ),
-                          onPressed: () => pickToDate(context),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20,right: 20),
                           child: Text(
-                            toDate == null
-                                ? "Pick End Date"
-                                : "${toDate!.toLocal()}".split(' ')[0],
+                            "To",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                            ),
+                            onPressed: () => pickToDate(context),
+                            child: Text(
+                              toDate == null
+                                  ? "Pick End Date"
+                                  : "${toDate!.toLocal()}".split(' ')[0],
+                            ),
                           ),
                         ),
                       ],
@@ -221,7 +239,7 @@ class _EventDownloadPage extends State<EventDownloadPage>{
                             label: i,
                           )
                       ], 
-                      onSelected: (value)=>print(value)
+                      onSelected: (value)=>printToConsole(value)
                     ),
                     
                     SizedBox(height: 10,),

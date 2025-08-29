@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -87,12 +89,12 @@ class _EventNameAmountCard extends State<EventNameAmountCard>{
                                 Map body={"event_name":eventName};
                                 
                                 if(widget.isForNeivethiyam){
-                                  print("jiiiiiiii");
+                                  printToConsole("jiiiiiiii");
                                   path="/neivethiyam/name";
                                   body={"neivethiyam_name":eventName};
                                 }
                                 final res=await NetworkService.sendRequest(path: path, context: context,method: "DELETE",body: body);
-                                  print("hello $res");
+                                  printToConsole("hello $res");
             
                                   setState(() {
                                   isLoading=false;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/assigned_events_card.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
@@ -42,7 +43,7 @@ class _AssignedEventsPageState extends State<AssignedEventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: (MediaQuery.of(context).size.width>400) && widget.canShowAppBar==false? null : KovilAppBar(withIcon: true,),
+      appBar: (MediaQuery.of(context).size.width>phoneSize) && widget.canShowAppBar==false? null : KovilAppBar(withIcon: true,),
       body: isLoading? Center(
       child: Column(
         children: [

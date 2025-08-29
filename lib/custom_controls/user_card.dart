@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +32,7 @@ class _UserCardState extends State<UserCard> {
   
   @override
   Widget build(BuildContext context) {
-    print(widget.user);
+    printToConsole("${widget.user}");
     return PopScope(
       canPop: isloading? false : true,
       onPopInvokedWithResult: (didPop, result) {
@@ -90,7 +92,7 @@ class _UserCardState extends State<UserCard> {
                                       isloading = true;
                                     });
                                     final res=await NetworkService.sendRequest(path: "/user", context: context,method: "DELETE",body: {"del_user_id":widget.user['id']});
-                                    print(res);
+                                    printToConsole(res);
                                     setState(() {
                                         isloading=false;
                                       });
@@ -118,7 +120,7 @@ class _UserCardState extends State<UserCard> {
                                       isloading = true;
                                     });
                                     final res=await NetworkService.sendRequest(path: "/user/role", context: context,method: "PUT",body: {"user_id":widget.user['id'],"role":value});
-                                    print(res);
+                                    printToConsole(res);
                                     setState(() {
                                         isloading=false;
                                       });
@@ -157,7 +159,7 @@ class _UserCardState extends State<UserCard> {
                                 color: Colors.white,
                                 fontSize: 18
                               ),
-                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
                             ),
                           ),
                         ],
@@ -197,12 +199,15 @@ class _UserCardState extends State<UserCard> {
                             width: 20,
                           ),
                           SizedBox(width: 10),
-                          Text(
-                            widget.user["email"] ?? '',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              fontSize: 18
+                          Expanded(
+                            child: Text(
+                              widget.user["email"] ?? '',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                fontSize: 18
+                              ),
+                              softWrap: true,
                             ),
                           ),
                         ],

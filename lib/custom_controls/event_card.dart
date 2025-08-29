@@ -1,3 +1,4 @@
+import 'package:sampleflutter/utils/custom_print.dart';
 
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -19,14 +20,21 @@ List<Widget> eventStatusUpdateButtonsBuilder(List<String> labels,String eventId,
   final List<Widget> buttons=[];
   for(int i=0;i<labels.length;i++){
     buttons.add(
-      ElevatedButton(
-        onPressed: ()=>Navigator.push(context, CupertinoPageRoute(builder: (context)=>StatusUpdatePage(eventStatus: labels[i],eventId: eventId,existingEventDetails: eventDetails,isForAssign: false,))),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange,
+      Expanded(
+        child: ElevatedButton(
+          onPressed: ()=>Navigator.push(context, CupertinoPageRoute(builder: (context)=>StatusUpdatePage(eventStatus: labels[i],eventId: eventId,existingEventDetails: eventDetails,isForAssign: false,))),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange,
+          ),
+          child: Text(labels[i],style: TextStyle(color: Colors.white),)
         ),
-        child: Text(labels[i],style: TextStyle(color: Colors.white),)
       ),
     );
+    if(i!=labels.length-1){
+      buttons.add(
+        SizedBox(width: 20,)
+      );
+    }
   }
   return buttons;
 }
@@ -70,9 +78,9 @@ class _EventCardState extends State<EventCard> {
     setState(() {
       isContactAddLoading=true;
     });
-     print("biiii $isContactAddLoading");
+     printToConsole("biiii $isContactAddLoading");
     final res=await NetworkService.sendRequest(path: "/event/contact-description", context: context,method: 'POST',body: {"event_id":eventId,"contact_description":contactDescription.text.trim()});
-    print(res);
+    printToConsole(res);
 
     setState(() {
       isContactAddLoading=false;
@@ -95,7 +103,7 @@ class _EventCardState extends State<EventCard> {
     final int currentTabIndex=widget.currentTabIndex;
     final String curUser=currentUserRole!;
 
-    print("ederdrdfffyf $eventDetails");
+    printToConsole("ederdrdfffyf $eventDetails");
     List<String> labels=[
       "pending",
       "canceled",
@@ -105,10 +113,7 @@ class _EventCardState extends State<EventCard> {
     final eventStartAtStr = eventDetails["event_start_at"] ?? "";
     final eventEndAtStr = eventDetails["event_end_at"] ?? "";
 
-    final List<String> eventStartAt = eventStartAtStr.contains(":") ? eventStartAtStr.split(":") : ["00", "00"];
-    final List<String> eventEndAt = eventEndAtStr.contains(":") ? eventEndAtStr.split(":") : ["00", "00"];
-
-    print(currentTabIndex);
+    printToConsole("${currentTabIndex}");
     if (currentTabIndex==0){
       buttons.addAll(eventStatusUpdateButtonsBuilder([labels[1],labels[2]],eventDetails['event_id'],context,eventDetails));
     }
@@ -284,41 +289,48 @@ class _EventCardState extends State<EventCard> {
                                                         maxLines: 5,
                                                       ),
                                                       const SizedBox(height: 20),
-                                                      ElevatedButton(
-                                                        onPressed: localLoading
-                                                            ? null
-                                                            : () async {
-                                                                setModalState(() => localLoading = true);
-                                                                await saveContactDescription(
-                                                                    eventDetails['event_id']);
-                                                                setModalState(() => localLoading = false);
-                                                              },
-                                                        style: ElevatedButton.styleFrom(
-                                                          backgroundColor: Colors.orange,
-                                                        ),
-                                                        child: localLoading
-                                                            ? Row(
-                                                                mainAxisSize: MainAxisSize.min,
-                                                                children: const [
-                                                                  SizedBox(
-                                                                    width: 18,
-                                                                    height: 18,
-                                                                    child: CircularProgressIndicator(
-                                                                      color: Colors.white,
-                                                                      strokeWidth: 2,
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(width: 8),
-                                                                  Text(
-                                                                    "Saving...",
-                                                                    style: TextStyle(color: Colors.white),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            : const Text(
-                                                                "Save",
-                                                                style: TextStyle(color: Colors.white),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Expanded(
+                                                            child: ElevatedButton(
+                                                              onPressed: localLoading
+                                                                  ? null
+                                                                  : () async {
+                                                                      setModalState(() => localLoading = true);
+                                                                      await saveContactDescription(
+                                                                          eventDetails['event_id']);
+                                                                      setModalState(() => localLoading = false);
+                                                                    },
+                                                              style: ElevatedButton.styleFrom(
+                                                                backgroundColor: Colors.orange,
                                                               ),
+                                                              child: localLoading
+                                                                  ? Row(
+                                                                      mainAxisSize: MainAxisSize.min,
+                                                                      children: const [
+                                                                        SizedBox(
+                                                                          width: 18,
+                                                                          height: 18,
+                                                                          child: CircularProgressIndicator(
+                                                                            color: Colors.white,
+                                                                            strokeWidth: 2,
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(width: 8),
+                                                                        Text(
+                                                                          "Saving...",
+                                                                          style: TextStyle(color: Colors.white),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  : const Text(
+                                                                      "Save",
+                                                                      style: TextStyle(color: Colors.white),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),
@@ -442,7 +454,7 @@ class _EventCardState extends State<EventCard> {
                               ),
                               SizedBox(width: 10),
                               Text(
-                                "${eventStartAt[0]}:${eventStartAt[1]}-${eventEndAt[0]}:${eventEndAt[1]}",
+                                "$eventStartAtStr-$eventEndAtStr",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,

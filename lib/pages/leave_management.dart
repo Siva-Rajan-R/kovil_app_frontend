@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/leave_card.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
@@ -87,7 +88,7 @@ class _LeaveManagementPageState extends State<LeaveManagementPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,titleSize: 20,),
+      appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(withIcon: true,titleSize: 20,),
       body: isLoading? Center(
         child: Column(
           children: [

@@ -19,18 +19,17 @@ class AllEventsPage extends StatefulWidget {
 }
 
 class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateMixin {
-  CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
+  CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
-  List<String> eventDates = [];
+  Map eventDates = {};
   late Future<Map<String, List>> _eventsFuture;
 
   int noOfPendings = 0;
   int noOfCanceled = 0;
   int noOfCompleted = 0;
 
-  List<DateTime> get eventDateObjects => eventDates.map((e) => DateTime.parse(e)).toList();
 
   @override
   void initState() {
@@ -40,13 +39,16 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
   }
 
   Future<void> fetchEventDates(int month, int year) async {
+
     final res = await NetworkService.sendRequest(
       path: "/event/calendar?month=$month&year=$year",
       context: context,
     );
     if (res!=null) {
       setState(() {
-        eventDates = List<String>.from(res['events']);
+        eventDates = {
+          for(Map i in res['events_date']) i['date']:i['total_events']
+        };
       });
     }
   }
@@ -135,19 +137,22 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
               calendarFormat: _calendarFormat,
               selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
               calendarStyle: CalendarStyle(
+                isTodayHighlighted: false,
                 selectedDecoration: BoxDecoration(
-                  color: Colors.orange.shade800,
                   shape: BoxShape.circle,
+                  gradient: LinearGradient(colors: [Colors.orange.shade300,Colors.orange.shade500,Colors.orange.shade600])
                 ),
                 todayDecoration: BoxDecoration(
-                  color: Colors.orange.shade400,
                   shape: BoxShape.circle,
+                  gradient: LinearGradient(colors: [Colors.orange.shade300,Colors.orange.shade500,Colors.orange.shade600])
                 ),
               ),
               calendarBuilders: CalendarBuilders(
                 defaultBuilder: (context, day, focusedDay) {
-                  bool isEventDay = eventDateObjects.any((d) => isSameDay(d, day));
-                  if (isEventDay) {
+                  final dateStr = DateFormat('yyyy-MM-dd').format(day);
+                  final count = eventDates[dateStr];
+
+                  if (count!=null) {
                     return Container(
                       margin: const EdgeInsets.all(6.0),
                       alignment: Alignment.center,
@@ -155,9 +160,15 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
                         border: Border.all(color: Colors.orange.shade600, width: 2),
                         shape: BoxShape.circle,
                       ),
-                      child: Text(
-                        '${day.day}',
-                        style: const TextStyle(color: Colors.black),
+                      child: Badge(
+                        offset: Offset(9, -15),
+                        backgroundColor: Colors.orange,
+                        textColor: Colors.white,
+                        label: Text(count>99? "99+" : "$count",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 10),textAlign: TextAlign.center,),
+                        child: Text(
+                          '${day.day}',
+                          style: const TextStyle(color: Colors.black),
+                        ),
                       ),
                     );
                   }
@@ -207,7 +218,7 @@ class _AllEventsPageState extends State<AllEventsPage> with TickerProviderStateM
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          LottieBuilder.asset(getRandomLoadings(),height: 200,),
+                          LottieBuilder.asset(getRandomLoadings(),height: 200),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

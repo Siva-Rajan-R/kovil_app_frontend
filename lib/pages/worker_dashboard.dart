@@ -1,4 +1,6 @@
 
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +59,7 @@ class _DashboardState extends State<WorkerDashboardPage>{
     setState(() {
       _isFullLoading=false;
     });
-    print("//////////////// res $res");
+    printToConsole("//////////////// res $res");
     
     if (res!=null){
       setState(() {
@@ -131,13 +133,13 @@ class _DashboardState extends State<WorkerDashboardPage>{
           if(sendTo.text.trim()!=""){
             body['send_to']=sendTo.text.trim();
           }
-          print(body);
+          printToConsole("$body");
           final res=await NetworkService.sendRequest(path: '/worker/report/email',method: "POST", context: context,body: body);
 
           setState(() {
             _isSubmitting=false;
           });
-          print(res);
+          printToConsole(res);
        }
       ).show();
     
@@ -193,7 +195,7 @@ class _DashboardState extends State<WorkerDashboardPage>{
           }
 
           final res=await NetworkService.sendRequest(path: '/worker/reset/all',method: "PUT", context: context,body: body);
-          print(res);
+          printToConsole(res);
           setState(() {
             _isDeleting=false;
           });
@@ -210,32 +212,42 @@ class _DashboardState extends State<WorkerDashboardPage>{
         appBar: KovilAppBar(height: 100,),
         bottomNavigationBar: _isFullLoading? null 
         : CustomBottomAppbar(
-          bottomAppbarChild: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: _isDeleting ? null : handleDelete,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  
-                ),
-                child: Text(
-                  _isDeleting ? "Reseting..." : "Reset",
-                  style: const TextStyle(color: Colors.white),
-                ),
+          bottomAppbarChild: Center(
+            child: SizedBox(
+              width: 500,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _isDeleting ? null : handleDelete,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        
+                      ),
+                      child: Text(
+                        _isDeleting ? "Reseting..." : "Reset",
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20,),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting ? null :handleDownload,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        
+                      ),
+                      child: Text(
+                        _isSubmitting ? "Downloading..." : "Download",
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              ElevatedButton(
-                onPressed: _isSubmitting ? null :handleDownload,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  
-                ),
-                child: Text(
-                  _isSubmitting ? "Downloading..." : "Download",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
         body: _isFullLoading? Center(
@@ -262,42 +274,52 @@ class _DashboardState extends State<WorkerDashboardPage>{
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12,right: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () => pickFromDate(context),
+                          child: Text(
+                            fromDate == null
+                                ? "Pick Start Date"
+                                : "${fromDate!.toLocal()}".split(' ')[0],
+                          ),
+                                                ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20,right: 20),
+                        child: Text(
+                          "To",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.orange,
+                            fontWeight: FontWeight.w600
+                          ),
+                        ),
                       ),
-                      onPressed: () => pickFromDate(context),
-                      child: Text(
-                        fromDate == null
-                            ? "Pick Start Date"
-                            : "${fromDate!.toLocal()}".split(' ')[0],
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () => pickToDate(context),
+                          child: Text(
+                            toDate == null
+                                ? "Pick End Date"
+                                : "${toDate!.toLocal()}".split(' ')[0],
+                          ),
+                        ),
                       ),
+                      ],
                     ),
-                    Text(
-                      "To",
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.orange,
-                        fontWeight: FontWeight.w600
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: () => pickToDate(context),
-                      child: Text(
-                        toDate == null
-                            ? "Pick End Date"
-                            : "${toDate!.toLocal()}".split(' ')[0],
-                      ),
-                    ),
-                    ],
                   ),
                   
                   SizedBox(height: 10,),
@@ -306,7 +328,7 @@ class _DashboardState extends State<WorkerDashboardPage>{
                       width: 500,
                       height: 440,
                       child: Card(
-                        color: Colors.grey.shade100,
+                        color: Colors.orange.shade50,
                         elevation: 4,
                         margin: const EdgeInsets.all(12),
                         shape: RoundedRectangleBorder(
@@ -328,43 +350,28 @@ class _DashboardState extends State<WorkerDashboardPage>{
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: DataTable(
-                                    headingRowColor: WidgetStateColor.resolveWith((states) => Colors.blueGrey.shade300),
-                                    dataRowColor: WidgetStateColor.resolveWith((states) => Colors.grey.shade100),
+                                    headingRowColor: WidgetStateColor.resolveWith((states) => Colors.orange.shade400),
+                                    dataRowColor: WidgetStateColor.resolveWith((states) => Colors.orange.shade50),
                                     columnSpacing: 24,
-                                    columns: const [
-                                      DataColumn(
-                                        label: Center(
-                                          child: Text(
-                                            'Name',
-                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    columns: [
+                                      for(String i in ['Name','Events Participated','Total Amount (₹)'])
+                                        DataColumn(
+                                          label: Center(
+                                            child: Text(
+                                              i,
+                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,color: Colors.white),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      DataColumn(
-                                        label: Center(
-                                          child: Text(
-                                            'Events Participated',
-                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                          ),
-                                        ),
-                                      ),
-                                      DataColumn(
-                                        label: Center(
-                                          child: Text(
-                                            'Total Amount (₹)',
-                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                          ),
-                                        ),
-                                      ),
                                     ],
                                     rows: workersData.map((item) {
-                                      print(item);
+                                      printToConsole("$item");
                                       int totAmount = item['no_of_participated_events'] * amount;
                                       return DataRow(
                                         cells: [
-                                          DataCell(Text(item['name'], style: const TextStyle(fontSize: 14))),
-                                          DataCell(Center(child: Text(item['no_of_participated_events'].toString(), style: const TextStyle(fontSize: 14)))),
-                                          DataCell(Center(child: Text(totAmount.toString(), style: const TextStyle(fontSize: 14)))),
+                                          DataCell(Text(item['name'], style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w700,))),
+                                          DataCell(Center(child: Text(item['no_of_participated_events'].toString(), style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w600)))),
+                                          DataCell(Center(child: Text(totAmount.toString(), style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w600)))),
                                         ],
                                       );
                                     }).toList(),
@@ -389,7 +396,7 @@ class _DashboardState extends State<WorkerDashboardPage>{
                             foregroundColor: Colors.white,
                           ),
                           onPressed: (){
-                            print(amount);
+                            printToConsole("$amount");
                             if (amountToCalculate.text.isNotEmpty && int.tryParse(amountToCalculate.text)!=null){
                               setState(() {
                                 _isCalculating=true;
@@ -402,7 +409,7 @@ class _DashboardState extends State<WorkerDashboardPage>{
                               });       
                             }
                             else{
-                    
+                                            
                               customSnackBar(content: "Enter a valid number", contentType: AnimatedSnackBarType.info).show(context);
                             }
                           },

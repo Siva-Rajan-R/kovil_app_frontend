@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -107,7 +109,7 @@ class _LeaveCardState extends State<LeaveCard> {
                                       isLoading = true;
                                     });
                                     final res=await NetworkService.sendRequest(path: "/user/leave", context: context,method: "DELETE",body: {"leave_id":leaveDetails['id']});
-                                    print(res);
+                                    printToConsole(res);
                                     setState(() {
                                         isLoading=false;
                                       });

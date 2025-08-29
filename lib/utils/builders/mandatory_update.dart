@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
@@ -71,7 +73,7 @@ class _ShowMandatoryUpdateState extends State<ShowMandatoryUpdate> {
                       ),
                     ),
                     onPressed: () async {
-                      print("pressed install");
+                      printToConsole("pressed install");
                       if (widget.triggerVersionDialogInfo!['isTriggerLogin']){
                         await deleteStoredLocalStorageValues();
                       }

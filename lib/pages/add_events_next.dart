@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
@@ -28,13 +30,14 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
   late TextEditingController clientName;
   late TextEditingController clientCity;
   late TextEditingController clientNumber;
+  late TextEditingController clientEmail;
   late TextEditingController totalAmount;
   late TextEditingController paidAmount;
   late TextEditingController paymentStatus;
   late TextEditingController paymentMode;
   late TextEditingController neivethiyamAmount;
   
-  List<FocusNode> focusNodes = List.generate(7, (_) => FocusNode());
+  List<FocusNode> focusNodes = List.generate(8, (_) => FocusNode());
 
   String buttonLabel = "Submit";
   String method = "POST";
@@ -44,16 +47,17 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
     super.initState();
 
     final data = widget.existingEventDetails;
-    print(widget.previousPageData["isSpecialEvent"]);
+    printToConsole(widget.previousPageData["isSpecialEvent"]);
     clientName = TextEditingController(text: data?['client_name'] ?? "");
     clientCity = TextEditingController(text: data?['client_city'] ?? "");
     clientNumber = TextEditingController(
       text: data?['client_mobile_number'] ?? "",
     );
+    clientEmail=TextEditingController(text: data?['client_email'] ?? "");
 
     double totAmnt = widget.previousPageData['eventAmount'];
-    print("huuunjmmmijij ${widget.previousPageData['eventAmount']}");
-    print(
+    printToConsole("huuunjmmmijij ${widget.previousPageData['eventAmount']}");
+    printToConsole(
       "ghjkjkll ${widget.previousPageData['padiKg']} ${widget.previousPageData['neivethiyamName']}",
     );
     if (widget.previousPageData['neivethiyamName']!=null) {
@@ -62,19 +66,19 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
         widget.previousPageData['padiKg'] = double.parse(
           widget.previousPageData['padiKg'],
         );
-        print(
+        printToConsole(
           "ghjkjkll ${widget.previousPageData['padiKg']} ${widget.previousPageData['neivethiyamAmount']}",
         );
         double neivethiyamTotAmount =
             widget.previousPageData["neivethiyamAmount"] *
             widget.previousPageData['padiKg'];
-        print(widget.previousPageData["isSpecialEvent"]);
+        printToConsole(widget.previousPageData["isSpecialEvent"]);
 
         totAmnt =
             widget.previousPageData["isSpecialEvent"] != null
                 ? totAmnt + neivethiyamTotAmount
                 : neivethiyamTotAmount;
-        print(totAmnt);
+        printToConsole("$totAmnt");
       } else {
         customSnackBar(
           content: "Enter a valid number on padi/kg",
@@ -98,8 +102,8 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
   Future _handleSubmit(BuildContext context) async {
     String eventName = widget.previousPageData['eventName'];
     bool? isSpecialEvent = widget.previousPageData["isSpecialEvent"];
-    print(eventName.isEmpty);
-    print(
+    printToConsole("${eventName.isEmpty}");
+    printToConsole(
       "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg",
     );
     if (eventName.isEmpty &&
@@ -110,7 +114,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
       ).show(context);
     } else {
       if (eventName.isEmpty) {
-        print(
+        printToConsole(
           "${widget.previousPageData['neivethiyamName']}-${widget.previousPageData['padiKg']} Padi/Kg",
         );
 
@@ -119,7 +123,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
       }
 
       setState(() => isLoading = true);
-      print("hello pooo ${widget.previousPageData['neivethiyamName']}");
+      printToConsole("hello pooo ${widget.previousPageData['neivethiyamName']}");
       Map reqBody = {
         "event_name": eventName,
         "event_description": widget.previousPageData['eventDes'],
@@ -129,6 +133,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
         "client_name": clientName.text,
         "client_mobile_number": clientNumber.text,
         "client_city": clientCity.text,
+        "client_email": clientEmail.text,
         "total_amount":
             totalAmount.text.isNotEmpty ? double.parse(totalAmount.text) : 0,
         "paid_amount":
@@ -139,10 +144,10 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
         "neivethiyam_kg": widget.previousPageData['padiKg'],
       };
 
-      print(widget.previousPageData["neivethiyamName"]);
+      printToConsole(widget.previousPageData["neivethiyamName"]);
       if (widget.previousPageData["neivethiyamName"]!=null){
         reqBody["neivethiyam_id"]=widget.previousPageData["neivethiyamId"];
-        print("vaangana vanakam na my song enna kelunga na");
+        printToConsole("vaangana vanakam na my song enna kelunga na");
       }
 
       if (method == "PUT") {
@@ -253,14 +258,26 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                           ),
                           SizedBox(height: 20),
                           CustomTextField(
+                            label: "Client Email",
+                            themeColor: Colors.white,
+                            fontColor: Colors.white,
+                            keyboardtype: TextInputType.emailAddress,
+                            controller: clientEmail,
+                            focusNode: focusNodes[2],
+                            onSubmitted: (_){
+                              FocusScope.of(context).requestFocus(focusNodes[3]);
+                            },
+                          ),
+                          SizedBox(height: 20),
+                          CustomTextField(
                             label: "Client place",
                             themeColor: Colors.white,
                             fontColor: Colors.white,
                             keyboardtype: TextInputType.streetAddress,
                             controller: clientCity,
-                            focusNode: focusNodes[2],
+                            focusNode: focusNodes[3],
                             onSubmitted: (_){
-                              FocusScope.of(context).requestFocus(focusNodes[3]);
+                              FocusScope.of(context).requestFocus(focusNodes[4]);
                             },
                           ),
                           SizedBox(height: 20),
@@ -319,9 +336,9 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                             fontColor: Colors.white,
                             keyboardtype: TextInputType.number,
                             controller: totalAmount,
-                            focusNode: focusNodes[3],
+                            focusNode: focusNodes[4],
                             onSubmitted: (_){
-                              FocusScope.of(context).requestFocus(focusNodes[4]);
+                              FocusScope.of(context).requestFocus(focusNodes[5]);
                             },
                           ),
                           SizedBox(height: 20),
@@ -331,9 +348,9 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                             fontColor: Colors.white,
                             keyboardtype: TextInputType.number,
                             controller: paidAmount,
-                            focusNode: focusNodes[4],
+                            focusNode: focusNodes[5],
                             onSubmitted: (_){
-                              FocusScope.of(context).requestFocus(focusNodes[5]);
+                              FocusScope.of(context).requestFocus(focusNodes[6]);
                             },
                           ),
                           SizedBox(height: 20),
@@ -346,8 +363,8 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                                 CustomDropdown(
                                   themeColor: Colors.white,
                                   textColor: Colors.white,
-                                  focusNode: focusNodes[5],
-                                  Width: 250,
+                                  focusNode: focusNodes[6],
+                                  width: 250,
                                   label: "Payment mode",
                                   ddController: paymentMode,
                                   ddEntries: [
@@ -357,7 +374,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                                         ).toList())
                                       DropdownMenuEntry(value: i, label: i),
                                   ],
-                                  onSelected: (value) => print(value),
+                                  onSelected: (value) => printToConsole(value),
                                 ),
                         
                                 SizedBox(width: 10),
@@ -365,7 +382,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                                 CustomDropdown(
                                   themeColor: Colors.white,
                                   textColor: Colors.white,
-                                  Width: 250,
+                                  width: 250,
                                   label: "Payment status",
                                   ddController: paymentStatus,
                                   ddEntries: [
@@ -373,7 +390,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                                         in widget.previousPageData['paymentStatus'])
                                       DropdownMenuEntry(value: i, label: i),
                                   ],
-                                  onSelected: (value) => print(value),
+                                  onSelected: (value) => printToConsole(value),
                                 ),
                               ],
                             ),
@@ -388,10 +405,10 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
           ),
         ),
         bottomNavigationBar: CustomBottomAppbar(
-          bottomAppbarChild: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
+          bottomAppbarChild: Center(
+            child: SizedBox(
+              width: 500,
+              child: ElevatedButton(
                 onPressed: isLoading ? null : () => _handleSubmit(context),
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
                 child:
@@ -409,7 +426,7 @@ class _AddEventsNextPageState extends State<AddEventsNextPage> {
                           style: TextStyle(color: Colors.white),
                         ),
               ),
-            ],
+            ),
           ),
         ),
       ),

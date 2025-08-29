@@ -1,5 +1,6 @@
 
 import 'dart:io';
+import 'package:sampleflutter/utils/custom_print.dart';
 
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -60,21 +61,21 @@ class _LoginPageState extends State<LoginPage> {
 
     
     if (res!=null) {
-      print("1234567890`0`hruihrf ulla ${context.mounted}");
+      printToConsole("1234567890`0`hruihrf ulla ${context.mounted}");
       if (Platform.isAndroid || Platform.isIOS){
         await FirebaseMessaging.instance.subscribeToTopic("all");
         await FirebaseMessaging.instance.subscribeToTopic("test");
       }
       await secureStorage.write(key: "accessToken", value: res['access_token']);
       await secureStorage.write(key: "refreshToken", value: res['refresh_token']);
-      print("999999999999999999999999999999999999999999999999${await secureStorage.read(key: "refreshToken")}");
+      printToConsole("999999999999999999999999999999999999999999999999${await secureStorage.read(key: "refreshToken")}");
       await secureStorage.write(key: 'role', value: res['role']);
       await secureStorage.write(key: 'refreshTokenExpDate', value: res['refresh_token_exp_date']);
       await secureStorage.write(key: 'isLoggedIn', value: 'true');
 
       currentUserRole=res['role'];
 
-      await Navigator.pushReplacementNamed(context, MediaQuery.of(context).size.width>400? '/desktop-home' : '/home');
+      await Navigator.pushReplacementNamed(context, MediaQuery.of(context).size.width>600? '/desktop-home' : '/home');
     }
 
     setState(() {

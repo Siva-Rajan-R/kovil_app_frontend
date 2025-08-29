@@ -1,18 +1,21 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/features_container.dart';
 import 'package:sampleflutter/pages/event_dashboard.dart';
 import 'package:sampleflutter/pages/worker_dashboard.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 
 List<Widget> rowBuilder(List<Map<String,dynamic>> items){
-  print("items ${items.length}");
+  printToConsole("items ${items.length}");
   List<Widget> rows=[];
   List<Widget> temp=[];
 
   int count=0;
   // FeaturesContainer(svgLink: items[i]["svg"], label: items[i]["label"], shadowColor: items[i]["sc"], containerColor: items[i]["cc"])
   for(int i=0 ; i<items.length ; i++){
-      print(i);
+      printToConsole("$i");
       temp.add(FeaturesContainer(svgLink: items[i]["svg"], label: items[i]["label"], shadowColor: items[i]["sc"], containerColor: items[i]["cc"],route: items[i]["route"],));
       count++;
       if(count==3){
@@ -26,7 +29,7 @@ List<Widget> rowBuilder(List<Map<String,dynamic>> items){
     rows.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: List.from(temp),));
     temp.clear();
   }
-  print("rows length $rows");
+  printToConsole("rows length $rows");
   return rows;
     
   }
@@ -49,7 +52,7 @@ class DashboardPage extends StatelessWidget{
           
           
         return Scaffold(
-          appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,),
+          appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(withIcon: true,),
             body: Column(
               children: [
                 Column(

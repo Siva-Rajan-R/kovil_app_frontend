@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:sampleflutter/utils/custom_print.dart';
 import 'dart:ui';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ import 'package:sampleflutter/utils/random_loading.dart';
 
 
 List<Widget> rowBuilder(List<Map<String,dynamic>> items){
-  print("items ${items.length}");
+  printToConsole("items ${items.length}");
   List<Widget> rows=[];
   List<Widget> temp=[];
 
@@ -38,7 +39,7 @@ List<Widget> rowBuilder(List<Map<String,dynamic>> items){
   int count=0;
   // FeaturesContainer(svgLink: items[i]["svg"], label: items[i]["label"], shadowColor: items[i]["sc"], containerColor: items[i]["cc"])
   for(int i=0 ; i<items.length ; i++){
-      print(i);
+      printToConsole("$i");
       temp.add(FeaturesContainer(svgLink: items[i]["svg"], label: items[i]["label"], shadowColor: items[i]["sc"], containerColor: items[i]["cc"],route: items[i]["route"],));
       count++;
       if(count==3){
@@ -52,11 +53,21 @@ List<Widget> rowBuilder(List<Map<String,dynamic>> items){
     rows.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: List.from(temp),));
     temp.clear();
   }
-  print("rows length $rows");
+  printToConsole("rows length $rows");
   return rows;
     
-  }
+}
   
+bool isVersionLess(String v1, String v2) {
+  List<int> p1 = v1.split('.').map(int.parse).toList();
+  List<int> p2 = v2.split('.').map(int.parse).toList();
+
+  for (int i = 0; i < p1.length; i++) {
+    if (p1[i] < p2[i]) return true;
+    if (p1[i] > p2[i]) return false;
+  }
+  return false; // equal versions
+}
 
 
 class DesktopHomePage extends StatefulWidget{
@@ -139,23 +150,24 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
   void initState(){
     super.initState();
     getAllFuctions();
-    print("$newNotifications \n $seenNotifications ");
+    printToConsole("$newNotifications \n $seenNotifications ");
   }
 
   @override
   Widget build(BuildContext context) {
   List<Map<String,dynamic>> visibleFeatures=[];
-      print("cur role $currentUserRole ${UserRoleEnum.ADMIN.name}");
+      printToConsole("cur role $currentUserRole ${UserRoleEnum.ADMIN.name}");
       final List<Map<String,dynamic>> featuresSvg=[
         {"label":"Tamil Calendar","svg":"assets/svg/calendar-svgrepo-com.svg","cc":Colors.yellow.shade50,"sc":Colors.yellow.shade300,"route":TamilCalendarPage(),'canTap':false},
         {"label":"All Events","svg":"assets/svg/event svy.svg","cc":Colors.purple.shade50,"sc":Colors.purple.shade100,"route":AllEventsPage(),'canTap':true},
-        {"label":"Today Events","svg":"assets/svg/news-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade100,"route":TodayEventsPage(),'canTap':true},
+        {"label":"Today Events","svg":"assets/svg/news-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade100,"route":TodayEventsPage(),'canTap':false},
         {"label":"Assigned\nEvents","svg":"assets/svg/write-document-svgrepo-com.svg","cc":Colors.lightBlue.shade50,"sc":Colors.lightBlue.shade300,"route":AssignedEventsPage(),'canTap':false},
         {"label":"Request\nLeave","svg":"assets/svg/suitcase-svgrepo-com.svg","cc":Colors.lightGreen.shade50,"sc":Colors.lightGreen.shade300,"route":RequestLeavePage(),'canTap':false},
         {"label":"Leave\nManager","svg":"assets/svg/notepad-note-svgrepo-com.svg","cc":Colors.indigo.shade50,"sc":Colors.indigo.shade300,"route":LeaveManagementPage(),'canTap':false},
         {"label":"Workers","svg":"assets/svg/service-workers-svgrepo-com.svg","cc":Colors.brown.shade50,"sc":Colors.brown.shade100,"route":AddWorkerPage(),'canTap':false},
         {"label":"Event Names","svg":"assets/svg/writing-svgrepo-com.svg","cc":Colors.teal.shade50,"sc":Colors.teal.shade100,"route":AddEventNamePage(),'canTap':false},
-        {"label":"Add Events","svg":"assets/svg/calendar-add-event-svgrepo-com.svg","cc":Colors.green.shade50,"sc":Colors.green.shade100,"route":AddEventsPage(),'canTap':true},
+        {"label":"Add Events","svg":"assets/svg/calendar-add-event-svgrepo-com.svg","cc":Colors.green.shade50,"sc":Colors.green.shade100,"route":AddEventsPage(),"canTap":false},
+        // {"label":"Booked Events","svg":"assets/svg/booked_calendar-svgrepo-com.svg","cc":Colors.lime.shade50,"sc":Colors.lime.shade100,"route":BookedEventsPage(),'canTap':false},
         {"label":"Users","svg":"assets/svg/users-young-svgrepo-com.svg","cc":Colors.cyan.shade50,"sc":Colors.cyan.shade100,"route":UserPage(),'canTap':false},
         {"label":"Download&Delete","svg":"assets/svg/download-svgrepo-com.svg","cc":Colors.grey.shade300,"sc":Colors.grey.shade300,"route":EventDownloadPage(),'canTap':false},
         {"label":"Dashboard","svg":"assets/svg/analytics-clipboard-svgrepo-com.svg","cc":Colors.pink.shade50,"sc":Colors.pink.shade300,"route":DashboardPage(),'canTap':false},
@@ -172,12 +184,12 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
           featuresSvg.last
           
         ];
-        print(visibleFeatures);
+        printToConsole("$visibleFeatures");
       }
 
-      print("visible feature==================  ");
+      printToConsole("visible feature==================  ");
       
-      print(packageInfo!.version);
+      printToConsole(packageInfo!.version);
       String updateUrl="";
       bool triggerDialog=false;
       String currentVersion=packageInfo!.version;
@@ -187,10 +199,10 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
 
 
       if (versionUpdateInfo!=null){
-        print("hii welocome to gere $versionUpdateInfo $currentVersion");
+        printToConsole("hii welocome to gere $versionUpdateInfo $currentVersion");
         currentVersion=versionUpdateInfo!['current_version'];
 
-        if(currentVersion!=oldVersion){
+        if(isVersionLess(oldVersion, currentVersion)){
           isMandatory=versionUpdateInfo!["is_mandatory"]?? false;
           isTriggerLogin=versionUpdateInfo!['is_trigger_login'] ?? false;
           triggerDialog=true;
@@ -200,7 +212,7 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
           }
 
           if(Platform.isAndroid){
-            print("ehich is android");
+            printToConsole("ehich is android");
             updateUrl=versionUpdateInfo!["android_update_url"] ?? "";
           }
           else if(Platform.isIOS){
@@ -231,7 +243,7 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
                   openUrl(updateUrl, context);
                 }
                 catch(e){
-                  print(e);
+                  printToConsole("$e");
                 }
                 
               },
@@ -255,16 +267,16 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
             title: 'New Version',
             desc: 'A new version is available $currentVersion. Please install.',
             btnOkOnPress: () async {
-              print("pressed install");
+              printToConsole("pressed install");
               if (isTriggerLogin){
                 await deleteStoredLocalStorageValues();
               }
               openUrl(updateUrl, context);
             },
-            btnCancelOnPress: isMandatory? null : ()=>print("later clicked"),
+            btnCancelOnPress: isMandatory? null : ()=>printToConsole("later clicked"),
             autoDismiss: false,
             onDismissCallback: (type) {
-              print(type);
+              printToConsole("$type");
               if (isMandatory){
                 if (oldVersion == currentVersion) {
                 
@@ -329,10 +341,36 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
                               ),
                             ),
                         ),
+                        SizedBox(height: 10,),
+                        // if(currentUserRole==UserRoleEnum.ADMIN.name)
+                        //   MouseRegion(
+                        //     cursor: SystemMouseCursors.click,
+                        //     child: GestureDetector(
+                        //       onTap: () async {
+                        //         final generatedLink=await NetworkService.sendRequest(
+                        //           path: '/user/generate/client-link', 
+                        //           context: context,
+                        //           method: "get"
+                        //         );
+                        //         if(generatedLink!=null){
+                        //           clipboardDialog(context, generatedLink);
+                        //         }
+
+                        //       },
+                        //       child: Padding(
+                        //         padding: const EdgeInsets.only(right: 8.0),
+                        //         child: SvgPicture.asset(
+                        //           "assets/svg/paper-rocket-svgrepo-com.svg",
+                        //           width: 30,
+                        //           height: 30,
+                        //         )
+                        //         ),
+                        //       ),
+                        //     ),
                       ],
                     ),
                     SingleChildScrollView(
-                      physics: BouncingScrollPhysics(),
+                      physics: AlwaysScrollableScrollPhysics(),
                       child: Column(
                         children: [
                           Column(

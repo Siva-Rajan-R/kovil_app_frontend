@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:sampleflutter/utils/custom_print.dart';
 import 'dart:typed_data';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,7 +19,7 @@ Future compressImageToTargetSize(File file,int compressTo,{bool returnAsFile=fal
     );
 
     if (compressed != null && compressed.lengthInBytes <= targetSize) {
-      print("Final Size: ${compressed.lengthInBytes} bytes");
+      printToConsole("Final Size: ${compressed.lengthInBytes} bytes");
       break;
     }
 

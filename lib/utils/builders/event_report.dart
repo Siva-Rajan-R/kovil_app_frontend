@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,7 +31,7 @@ Widget buildRows(String title){
 }
 
 Widget buildEventReport(Map eventDetails,BuildContext context,{bool isForAssign=false}){
-  print(eventDetails["updated_at"]);
+  printToConsole(eventDetails["updated_at"]);
   
   String updatedAt=eventDetails["completed_updated_at"] ?? "Not Updated";
   String updatedDate=eventDetails["completed_updated_date"] ?? "Not Updated";
@@ -60,7 +62,7 @@ Widget buildEventReport(Map eventDetails,BuildContext context,{bool isForAssign=
     updatedDate=datetime[0];
     updatedAt=datetime[1];
 
-    print("/////////////////////////riiruf $updatedDate");
+    printToConsole("/////////////////////////riiruf $updatedDate");
 
   }
 
@@ -69,7 +71,7 @@ Widget buildEventReport(Map eventDetails,BuildContext context,{bool isForAssign=
   if ((eventDetails["event_status"].toLowerCase() == "pending" || eventDetails["event_status"].toLowerCase() == "canceled") && isForAssign==false){
     updatedAt=eventDetails["pending_canceled_updated_at"] ?? "Not Updated";
     updatedDate=eventDetails["pending_canceled_updated_date"] ?? "Not Updated";
-    print("hello world please $updatedAt $isForAssign");
+    printToConsole("hello world please $updatedAt $isForAssign");
     
   }
 
@@ -129,7 +131,7 @@ Widget buildEventReport(Map eventDetails,BuildContext context,{bool isForAssign=
   }
 
   if ((eventDetails["event_status"].toLowerCase() == "pending" || eventDetails["event_status"].toLowerCase() == "canceled") && isForAssign==false){
-    print("..................................vvan ");
+    printToConsole("..................................vvan ");
     status=[
       ...status.sublist(0,5),
       SizedBox(height: 10,),
@@ -149,7 +151,7 @@ Widget buildEventReport(Map eventDetails,BuildContext context,{bool isForAssign=
         ],
       )
     ];
-     print("..................................vvan .........................");
+     printToConsole("..................................vvan .........................");
   }
 
   return SizedBox(
@@ -180,7 +182,7 @@ Widget buildEventReport(Map eventDetails,BuildContext context,{bool isForAssign=
                     );
                   },
                   errorWidget: (context, error, stackTrace) {
-                    print("Image load error: $error"); // 👈 debug print
+                    printToConsole("Image load error: $error"); // 👈 debug printToConsole
                     return const Center(
                       child: SizedBox(
                         height: 100,
@@ -243,7 +245,7 @@ Widget buildEventReport(Map eventDetails,BuildContext context,{bool isForAssign=
                                   btnCancelOnPress: () {},
                                   btnOkOnPress: () async {
                                     final res=await NetworkService.sendRequest(path: "/event/assign", context: context,method: "DELETE",body: {"event_id":eventDetails['event_id']});
-                                    print(res);
+                                    printToConsole(res);
                                     
                                     if(res!=null){
                                       Navigator.pop(context);

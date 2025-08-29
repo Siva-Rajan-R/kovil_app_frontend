@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/utils/network_request.dart';
@@ -6,14 +8,14 @@ import 'package:sampleflutter/custom_controls/event_dashboard_container.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
 List<Widget> rowBuilder(List items,eventTotCount) {
-  print("items ${items.length}");
+  printToConsole("items ${items.length}");
   List<Widget> rows = [];
   List<Widget> temp = [];
   if (items.isNotEmpty) {
     int count = 0;
     // FeaturesContainer(svgLink: items[i]["svg"], label: items[i]["label"], shadowColor: items[i]["sc"], containerColor: items[i]["cc"])
     for (int i = 0; i < items.length; i++) {
-      print(i);
+      printToConsole("$i");
       temp.add(
         EventDashboardContainer(
           eventCount: items[i]['count'],
@@ -50,7 +52,7 @@ List<Widget> rowBuilder(List items,eventTotCount) {
       );
       temp.clear();
     }
-    print("rows length $rows");
+    printToConsole("rows length $rows");
     return rows;
   }
   return [Center(child: Text("No data found, select a different date",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 15),))];
@@ -69,10 +71,10 @@ class _EventDashboardPageState extends State<EventDashboardPage> {
   List eventsDashboard = [];
   bool isLoading = false;
   int eventTotCount=0;
-  int eventTotAmnt=0;
+  double eventTotAmnt=0.0;
 
   Future getEventDashboard(BuildContext context) async {
-    print(fromDate);
+    printToConsole("$fromDate");
     setState(() {
       isLoading = true;
     });
@@ -80,24 +82,25 @@ class _EventDashboardPageState extends State<EventDashboardPage> {
       path: '/event/dashboard?from_date=$fromDate&to_date=$toDate',
       context: context,
     );
-    print("res $res");
+    printToConsole("res $res");
     setState(() {
       isLoading = false;
     });
 
     if (res != null) {
 
-      eventTotAmnt=0;
+      eventTotAmnt=0.0;
       eventTotCount=0;
 
       eventsDashboard = List<Map>.from(res['events_dashboard']);
       for(int index=0;index<eventsDashboard.length;index++){
-        eventTotAmnt+=(eventsDashboard[index]['total_amount'] as num).toInt();
+        eventTotAmnt+=(eventsDashboard[index]['total_amount'] as num).toDouble();
         eventTotCount+=(eventsDashboard[index]['count'] as num).toInt();
+        printToConsole("vanakam pangaki $eventTotAmnt");
       }
     }
   }
-
+  
   @override
   void initState() {
     super.initState();
@@ -139,7 +142,7 @@ class _EventDashboardPageState extends State<EventDashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: KovilAppBar(),
+      appBar: KovilAppBar(withIcon: true,),
       body:
           isLoading
               ? Center(
@@ -198,6 +201,7 @@ class _EventDashboardPageState extends State<EventDashboardPage> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 20,),
                   ...rowBuilder(eventsDashboard,eventTotCount),
                 ],
               ),

@@ -1,4 +1,6 @@
 
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -60,7 +62,7 @@ class _FeaturesContainerState extends State<FeaturesContainer> {
             child: GestureDetector(
               onTap: widget.canTap? () async{
                 if (widget.label=='Logout'){
-                  print("logout ulla");
+                  printToConsole("logout ulla");
                   AwesomeDialog(
                     width: MediaQuery.of(context).size.width>400? 500 : null,
                     context: context,
@@ -103,7 +105,7 @@ class _FeaturesContainerState extends State<FeaturesContainer> {
                 else{
                   Navigator.push(context,CupertinoPageRoute(builder: (context)=>widget.route));
                 }
-                print("clicked container ${widget.label}");
+                printToConsole("clicked container ${widget.label}");
               } : null,
               child: Container(
                   width: widget.width,

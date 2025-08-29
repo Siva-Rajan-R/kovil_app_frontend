@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/notification_components/local_notfiy_init.dart';
@@ -35,7 +37,7 @@ Future<void> initFCM(BuildContext context) async {
   // Get FCM token
   String? token = await messaging.getToken();
   fcmToken=token;
-  print("FCM Token: $fcmToken");
+  printToConsole("FCM Token: $fcmToken");
   
   final storedFcmToken=await secureStorage.read(key: 'fcmToken');
   if (storedFcmToken==null){
@@ -43,7 +45,7 @@ Future<void> initFCM(BuildContext context) async {
   }
 
   if (storedFcmToken!=fcmToken){
-    print("triggers new token =======================================");
+    printToConsole("triggers new token =======================================");
     await NetworkService.sendRequest(
       path: "/app/notify/register-update", 
       context: context,
@@ -59,7 +61,7 @@ Future<void> initFCM(BuildContext context) async {
   //sending token to backend
   messaging.onTokenRefresh.listen((newFcmToken) async{
     fcmToken=newFcmToken;
-    print("triggred --------------------------------------------------- new token");
+    printToConsole("triggred --------------------------------------------------- new token");
     await NetworkService.sendRequest(
       path: "/app/notify/register-update", 
       context: context,
@@ -73,7 +75,7 @@ Future<void> initFCM(BuildContext context) async {
   });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Foreground notification: ${message.notification}');
+      printToConsole('Foreground notification: ${message.notification}');
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       final notificationImageUrl = message.notification?.android?.imageUrl;

@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -24,7 +26,7 @@ class _AssignedEventsCardState extends State<AssignedEventsCard> {
     setState(() {
       isLoading=false;
     });
-    print(res);
+    printToConsole(res);
     if (res!=null){
       return res['events'][0];
 
@@ -48,7 +50,7 @@ class _AssignedEventsCardState extends State<AssignedEventsCard> {
               child: GestureDetector(
                 onTap: () async {
                   final eventDetails=await getEventsDetails();
-                  print(eventDetails);
+                  printToConsole(eventDetails);
                   await Navigator.of(context).push(CupertinoPageRoute(builder: (context)=>DetailedEventPage(eventDetails: eventDetails)));
                 },
                 child: Container(

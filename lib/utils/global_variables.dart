@@ -9,4 +9,6 @@ String? currentUserRole="";
 
 PackageInfo? packageInfo;
 
+double phoneSize=600;
+
 

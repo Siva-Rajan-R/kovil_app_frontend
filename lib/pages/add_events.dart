@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -7,6 +9,7 @@ import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/custom_dropdown.dart';
 import 'package:sampleflutter/pages/add_events_next.dart';
 import 'package:intl/intl.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
@@ -24,7 +27,7 @@ Map<String, dynamic>? extractNameAndNumberFromNeivethiyam(String input) {
   if (match != null) {
     String name = match.group(1)!;
     double number = double.parse(match.group(2)!);
-    print(" esrwaerauiokmnzbd $name $number");
+    printToConsole(" esrwaerauiokmnzbd $name $number");
     return {'name': name, 'number': number};
   }
 
@@ -84,7 +87,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
     double nvKg = 1.0;
 
     if (widget.existingEventDetails != null) {
-      print(
+      printToConsole(
         "exists 1 ------------------------ ${widget.existingEventDetails!['neivethiyam_amount']} ${widget.existingEventDetails}",
       );
       en =
@@ -94,7 +97,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
       ed = widget.existingEventDetails!["event_description"] ?? "";
       nv = widget.existingEventDetails!["neivethiyam_name"] ?? "";
       nvKg = (widget.existingEventDetails!['padi_kg'] ?? 0).toDouble();
-      print("qwetyuiipdtftfyyc $nvKg");
+      printToConsole("qwetyuiipdtftfyyc $nvKg");
       selectedDate = DateTime.parse(widget.existingEventDetails!['event_date']);
       startTime =
           widget.existingEventDetails!['event_start_at'] ?? "start time";
@@ -115,7 +118,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
 
       neivethiyamId = widget.existingEventDetails!['neivethiyam_id'];
       isSpecial = widget.existingEventDetails!['is_special_event'];
-      print("qwetyuiipdtftfyyc $isSpecial");
+      printToConsole("qwetyuiipdtftfyyc $isSpecial");
     }
 
     eventName = TextEditingController(text: en);
@@ -164,7 +167,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("hii bye $isSpecial hoooo $eventNamesAmount $neivethiyamAmount");
+    printToConsole("hii bye $isSpecial hoooo $eventNamesAmount $neivethiyamAmount");
     return Scaffold(
       bottomNavigationBar:
           isloading
@@ -234,7 +237,7 @@ class _AddEventsPageState extends State<AddEventsPage> {
                   ],
                 ),
               ),
-      appBar: KovilAppBar(withIcon: true),
+      appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(withIcon: true),
       body:
           isloading
               ? Center(
@@ -300,71 +303,80 @@ class _AddEventsPageState extends State<AddEventsPage> {
                                 ],
                               ),
                               const SizedBox(height: 20),
-                              CustomDropdown(
-                                textColor: Colors.white,
-                                themeColor: Colors.white,
-                                label: "Event Name",
-                                ddController: eventName,
-                                ddEntries: [
-                                  for (int i = 0; i < eventNamesAmount.length; i++)
-                                    DropdownMenuEntry(
-                                      value: i,
-                                      label:
-                                          "${eventNamesAmount[i]['name']} - ₹ ${eventNamesAmount[i]['amount']}",
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: CustomDropdown(
+                                      width: 500,
+                                      textColor: Colors.white,
+                                      themeColor: Colors.white,
+                                      label: "Event Name",
+                                      ddController: eventName,
+                                      ddEntries: [
+                                        for (int i = 0; i < eventNamesAmount.length; i++)
+                                          DropdownMenuEntry(
+                                            value: i,
+                                            label:
+                                                "${eventNamesAmount[i]['name']} - ₹ ${eventNamesAmount[i]['amount']}",
+                                          ),
+                                      ],
+                                      onSelected:
+                                          (value) => {
+                                            printToConsole("selected value $value"),
+                                            setState(() {
+                                              eventNameValue =
+                                                  eventNamesAmount[value!]['name'];
+                                              eventAmount =
+                                                  eventNamesAmount[value]['amount']
+                                                      .toDouble();
+                                              isSpecial =
+                                                  eventNamesAmount[value]['is_special'];
+                                            }),
+                                          },
                                     ),
+                                  ),
                                 ],
-                                onSelected:
-                                    (value) => {
-                                      print("selected value $value"),
-                                      setState(() {
-                                        eventNameValue =
-                                            eventNamesAmount[value!]['name'];
-                                        eventAmount =
-                                            eventNamesAmount[value]['amount']
-                                                .toDouble();
-                                        isSpecial =
-                                            eventNamesAmount[value]['is_special'];
-                                      }),
-                                    },
                               ),
                               const SizedBox(height: 20),
                         
                               Row(
                                 children: [
-                                  CustomDropdown(
-                                    Width: 270,
-                                    textColor: Colors.white,
-                                    themeColor: Colors.white,
-                                    label: "Neivethiyam Name",
-                                    ddController: neivethiyam,
-                                    ddEntries: [
-                                      for (
-                                        int i = 0;
-                                        i < neivethiyamNamesAmount.length;
-                                        i++
-                                      )
-                                        DropdownMenuEntry(
-                                          value: i,
-                                          label:
-                                              "${neivethiyamNamesAmount[i]["name"]} - ₹ ${neivethiyamNamesAmount[i]['amount']}",
-                                        ),
-                                    ],
-                                    onSelected:
-                                        (value) => {
-                                          print(
-                                            "selected value $value ${neivethiyamNamesAmount[value!]["amount"].runtimeType}",
+                                  Expanded(
+                                    child: CustomDropdown(
+                                      width: null,
+                                      textColor: Colors.white,
+                                      themeColor: Colors.white,
+                                      label: "Neivethiyam Name",
+                                      ddController: neivethiyam,
+                                      ddEntries: [
+                                        for (
+                                          int i = 0;
+                                          i < neivethiyamNamesAmount.length;
+                                          i++
+                                        )
+                                          DropdownMenuEntry(
+                                            value: i,
+                                            label:
+                                                "${neivethiyamNamesAmount[i]["name"]} - ₹ ${neivethiyamNamesAmount[i]['amount']}",
                                           ),
-                                          setState(() {
-                                            neivethiyamName =
-                                                neivethiyamNamesAmount[value]["name"];
-                                            neivethiyamAmount =
-                                                neivethiyamNamesAmount[value!]["amount"]
-                                                    .toDouble();
-                                            neivethiyamId =
-                                                neivethiyamNamesAmount[value]["id"];
-                                            print(neivethiyamId);
-                                          }),
-                                        },
+                                      ],
+                                      onSelected:
+                                          (value) => {
+                                            printToConsole(
+                                              "selected value $value ${neivethiyamNamesAmount[value!]["amount"].runtimeType}",
+                                            ),
+                                            setState(() {
+                                              neivethiyamName =
+                                                  neivethiyamNamesAmount[value]["name"];
+                                              neivethiyamAmount =
+                                                  neivethiyamNamesAmount[value!]["amount"]
+                                                      .toDouble();
+                                              neivethiyamId =
+                                                  neivethiyamNamesAmount[value]["id"];
+                                              printToConsole("$neivethiyamId");
+                                            }),
+                                          },
+                                    ),
                                   ),
                                   VerticalDivider(width: 3),
                                   Expanded(

@@ -3,6 +3,7 @@ import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/leave_card.dart';
 import 'package:sampleflutter/utils/builders/request_leave.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
@@ -88,7 +89,7 @@ class _RequestLeavePageState extends State<RequestLeavePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,titleSize: 20,),
+      appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(withIcon: true,titleSize: 20,),
       body: DefaultTabController(
         length: 2, 
         child: Column(

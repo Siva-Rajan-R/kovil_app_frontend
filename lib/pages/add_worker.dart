@@ -4,6 +4,7 @@ import 'package:lottie/lottie.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/workers_card.dart';
 import 'package:sampleflutter/utils/builders/workers.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
@@ -77,7 +78,7 @@ class _AddWorkerPageState extends State<AddWorkerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(
+      appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(
         withIcon: true,
       ),
       body: DefaultTabController(

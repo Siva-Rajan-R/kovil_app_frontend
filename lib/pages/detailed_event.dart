@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/contact_desc_card.dart';
 import 'package:sampleflutter/custom_controls/cust_bottom_appbar.dart';
@@ -10,10 +12,12 @@ import 'package:sampleflutter/utils/global_variables.dart';
 class DetailedEventPage extends StatefulWidget {
   final Map eventDetails;
   final List<Widget>? eventStatusUpdateButtons;
+  final bool isForBookedEvents;
   
   const DetailedEventPage({
     required this.eventDetails,
     this.eventStatusUpdateButtons,
+    this.isForBookedEvents=false,
     super.key,
   });
 
@@ -50,72 +54,91 @@ class _DetailedEventPageState extends State<DetailedEventPage> with SingleTicker
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    print(_tabController.index);
+    printToConsole("buttons from detailed event page ${widget.eventStatusUpdateButtons} $curTabIndex");
     return Scaffold(
       bottomNavigationBar: curTabIndex == 0 && widget.eventStatusUpdateButtons!=null
           ? CustomBottomAppbar(
-              bottomAppbarChild: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [...widget.eventStatusUpdateButtons!],
+              bottomAppbarChild: Center(
+                child: SizedBox(
+                  width: 500,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [...widget.eventStatusUpdateButtons!],
+                  ),
+                ),
               ),
             )
           : null,
       appBar: KovilAppBar(withIcon: true),
-      body: Column(
-        children: [
-          SizedBox(height: 10),
-          TabBar(
-            isScrollable: currentUserRole == UserRoleEnum.ADMIN.name? true : false,
-            tabAlignment: currentUserRole == UserRoleEnum.ADMIN.name? TabAlignment.center : TabAlignment.fill,
-            labelPadding: EdgeInsets.only(left: 25,right: 25),
-            controller: _tabController,
-            labelColor: Colors.black,
-            indicatorColor: Colors.orange,
-            tabs:  [
-              Tab(text: 'Event Info'),
-              Tab(text: 'Event Report'),
-              if (currentUserRole == UserRoleEnum.ADMIN.name) Tab(text: 'Contact Description')
-            ],
-            onTap: (index){
-              print("jiiiij $index");
-              setState(() {
-                curTabIndex=index;
-              });
-            },
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                buildEventInfo(widget.eventDetails,context),
-                DefaultTabController(
-                  length: 2, 
-                  child: Column(
-                    children: [
-                      TabBar(
-                        labelColor: Colors.black,
-                        indicatorColor: Colors.orange,
-                        tabs: [
-                          Tab(text: "Actual Report"),
-                          Tab(text: "Assigned Report")
-                        ],
-                      ),
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            buildEventReport(widget.eventDetails, context,isForAssign: false),
-                            buildEventReport(widget.eventDetails, context,isForAssign: true)
-                          ]
-                        ),
-                      )
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          children: [
+            SizedBox(height: 10),
+            (widget.isForBookedEvents)? Expanded(
+              child: buildEventInfo(widget.eventDetails,context,isForBookedEvents: true),
+            )
+            : Expanded(
+              child: Column(
+                children: [
+                  TabBar(
+                    isScrollable: currentUserRole == UserRoleEnum.ADMIN.name? true : false,
+                    tabAlignment: currentUserRole == UserRoleEnum.ADMIN.name? TabAlignment.center : TabAlignment.fill,
+                    labelPadding: EdgeInsets.only(left: 25,right: 25),
+                    controller: _tabController,
+                    labelColor: Colors.black,
+                    indicatorColor: Colors.orange,
+                    tabs:  [
+                      Tab(text: 'Event Info'),
+                      Tab(text: 'Event Report'),
+                      if (currentUserRole == UserRoleEnum.ADMIN.name) Tab(text: 'Contact Description')
                     ],
-                  )
-                ),
-                if (currentUserRole == UserRoleEnum.ADMIN.name) ContactDescCard(eventDetails: widget.eventDetails,),
-              ],
+                    onTap: (index){
+                      printToConsole("jiiiij $index");
+                      setState(() {
+                        curTabIndex=index;
+                      });
+                    },
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        buildEventInfo(widget.eventDetails,context),
+                        DefaultTabController(
+                          length: 2, 
+                          child: Column(
+                            children: [
+                              TabBar(
+                                labelColor: Colors.black,
+                                indicatorColor: Colors.orange,
+                                tabs: [
+                                  Tab(text: "Actual Report"),
+                                  Tab(text: "Assigned Report")
+                                ],
+                              ),
+                              Expanded(
+                                child: TabBarView(
+                                  children: [
+                                    buildEventReport(widget.eventDetails, context,isForAssign: false),
+                                    buildEventReport(widget.eventDetails, context,isForAssign: true)
+                                  ]
+                                ),
+                              )
+                            ],
+                          )
+                        ),
+                        if (currentUserRole == UserRoleEnum.ADMIN.name) ContactDescCard(eventDetails: widget.eventDetails,),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            
+            
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
 
@@ -6,14 +8,14 @@ Future<String?> getDeviceId() async {
 
   if (Platform.isAndroid) {
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    print(androidInfo.id);
+    printToConsole("${androidInfo.id}");
     String androidDeviceId=androidInfo.id;
 
     return androidDeviceId.replaceAll(".", "");
 
   } else if (Platform.isIOS) {
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    print(iosInfo.identifierForVendor);
+    printToConsole("${iosInfo.identifierForVendor}");
     String? iosDeviceid=iosInfo.identifierForVendor;
     if (iosDeviceid==null){
       return iosDeviceid;

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:sampleflutter/utils/custom_print.dart';
 
 String getRandomLoadings() {
   final names = [
@@ -7,6 +8,6 @@ String getRandomLoadings() {
   ];
   final random = Random();
   final randomName = names[random.nextInt(names.length)];
-  print(randomName);
+  printToConsole(randomName);
   return randomName;
 }

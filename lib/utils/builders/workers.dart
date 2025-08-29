@@ -11,7 +11,7 @@ class AddWorkers extends StatefulWidget {
   const AddWorkers({required this.onAdd,required this.availableusersList,super.key});
 
   @override
-  _AddWorkersState createState() => _AddWorkersState();
+  State<AddWorkers> createState() => _AddWorkersState();
 }
 
 class _AddWorkersState extends State<AddWorkers> {
@@ -166,16 +166,23 @@ class _AddWorkersState extends State<AddWorkers> {
 
                           ),
                           const SizedBox(height: 30),
-                          ElevatedButton(
-                            onPressed: isLoading
-                                ? null // Disable the button when loading
-                                : () => addWorkerName(context),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                            ),
-                            child: isLoading
-                                ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
-                                : Text("Add", style: TextStyle(color: Colors.white)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: isLoading
+                                      ? null // Disable the button when loading
+                                      : () => addWorkerName(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                  ),
+                                  child: isLoading
+                                      ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
+                                      : Text("Add", style: TextStyle(color: Colors.white)),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

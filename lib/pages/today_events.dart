@@ -6,6 +6,7 @@ import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/custom_controls/custom_ad.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 import 'package:sampleflutter/utils/random_loading.dart';
 
@@ -83,7 +84,7 @@ class _TodayEventsPageState extends State<TodayEventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: KovilAppBar(
+      appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(
         withIcon: true,
         titleSize: 20,
         actions: [

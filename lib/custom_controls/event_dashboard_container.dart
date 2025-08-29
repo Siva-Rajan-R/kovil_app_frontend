@@ -8,7 +8,7 @@ class EventDashboardContainer extends StatelessWidget {
   final int eventCount;
   final int totCount;
   final String eventStatus;
-  final int eventAmnt;
+  final double eventAmnt;
   final Color themeColor;
 
   const EventDashboardContainer({

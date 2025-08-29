@@ -1,4 +1,6 @@
 
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,7 +29,7 @@ class _ForgotPageState extends State<ForgotPage> {
       isLoading = true;
     });
 
-    print("emailOrNo:${emailOrNo.text},password:${password.text}");
+    printToConsole("emailOrNo:${emailOrNo.text},password:${password.text}");
     final res = await NetworkService.sendRequest(
         path: '/forgot',
         context: context,

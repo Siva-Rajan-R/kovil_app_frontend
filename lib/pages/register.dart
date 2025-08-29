@@ -1,3 +1,4 @@
+import 'package:sampleflutter/utils/custom_print.dart';
 
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -190,7 +191,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                               },
                                               isLoginPage: true
                                           );
-                                      print(res);
+                                      printToConsole(res);
                                       
                                       setState(() {
                                         isLoading = false;

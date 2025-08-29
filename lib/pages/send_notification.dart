@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:sampleflutter/utils/custom_print.dart';
 
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -10,6 +11,7 @@ import 'package:sampleflutter/custom_controls/cust_textfield.dart';
 import 'package:sampleflutter/custom_controls/custom_appbar.dart';
 import 'package:sampleflutter/notification_components/local_notfiy_init.dart';
 import 'package:sampleflutter/utils/compress_image.dart';
+import 'package:sampleflutter/utils/global_variables.dart';
 import 'package:sampleflutter/utils/network_request.dart';
 
 
@@ -57,7 +59,7 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
         _selectedImage = compressedFile;
         _selectedImagePath = compressedFile.path; // saving path
       });
-      print('Selected image path: $_selectedImagePath');
+      printToConsole('Selected image path: $_selectedImagePath');
     }
   }
 
@@ -78,12 +80,12 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
       imageFile: _selectedImage,
       nameOfImageField: "notification_image",
       onUploadProgress: (value){
-        print("value : $value");
+        printToConsole("value : $value");
         setState(() {
           double? custValue=value;
           if (uploadingCurrentStatus!=null && custValue==1){
             custValue=null;
-            print("hrllo");
+            printToConsole("hrllo");
           }
           uploadingCurrentStatus=custValue;
         });
@@ -127,28 +129,31 @@ class _SendNotificationPageState extends State<SendNotificationPage>{
         }
       },
       child: Scaffold(
-        appBar: MediaQuery.of(context).size.width>400? null : KovilAppBar(withIcon: true,),
+        appBar: MediaQuery.of(context).size.width>phoneSize? null : KovilAppBar(withIcon: true,),
         bottomNavigationBar: CustomBottomAppbar(
           bottomAppbarChild: Center(
-            child: ElevatedButton(
-              onPressed: _isSending ? null : handleSending,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                
-              ),
-              child: (_isSending==true && _selectedImage!=null) ? LinearProgressIndicator(
-                  value: uploadingCurrentStatus,
-                  minHeight: 8,
-                  
-                  backgroundColor: Colors.white,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                )
-              : Text(
-                _isSending ? "Sending..." : "Send",
-                style: const TextStyle(color: Colors.white),
-              ),
+            child: SizedBox(
+              width: 500,
+              child: ElevatedButton(
+                  onPressed: _isSending ? null : handleSending,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    
+                  ),
+                  child: (_isSending==true && _selectedImage!=null) ? LinearProgressIndicator(
+                      value: uploadingCurrentStatus,
+                      minHeight: 8,
+                      
+                      backgroundColor: Colors.white,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    )
+                  : Text(
+                    _isSending ? "Sending..." : "Send",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
             ),
           ),
         ),

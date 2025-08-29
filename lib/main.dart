@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:sampleflutter/utils/custom_print.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +21,6 @@ import 'package:sampleflutter/utils/secure_storage_init.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-
-
-
 
 
 
@@ -91,12 +89,13 @@ class _MyKovilAppState extends State<MyKovilApp> {
 
   @override
   Widget build(BuildContext context) {
-    
+    printToConsole((MediaQuery.of(context).size.width).toString(),color: ConsoleColors.red);
     return FutureBuilder(
       future: futureCheckLogin,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
+
             home: Scaffold(
               backgroundColor: Colors.orange.shade50,
               body: Center(
@@ -155,7 +154,8 @@ class _MyKovilAppState extends State<MyKovilApp> {
                 bodyMedium: TextStyle(fontFamily: 'BalooThambi2'),
               ),
             ),
-            home: isLoggedIn ? (MediaQuery.of(context).size.width>400) ? DesktopHomePage() : HomePage() :  LoginPage(),
+          
+            home: isLoggedIn ? (MediaQuery.of(context).size.width>600) ? DesktopHomePage() : HomePage() :  LoginPage(),
             routes: {
               "/login": (context) =>  LoginPage(),
               "/register": (context) =>  RegisterPage(),

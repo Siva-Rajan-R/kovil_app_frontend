@@ -1,4 +1,6 @@
 
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:sampleflutter/custom_controls/cust_snacbar.dart';
@@ -16,12 +18,12 @@ class AddEventNewName extends StatefulWidget {
   );
 
   @override
-  _AddEventNewNameState createState() => _AddEventNewNameState();
+  State<AddEventNewName> createState() => _AddEventNewNameState();
 }
 
 class _AddEventNewNameState extends State<AddEventNewName> {
   final TextEditingController name = TextEditingController();
-  final TextEditingController price = TextEditingController(text: "0");
+  final TextEditingController price = TextEditingController(text: "0.0");
 
   
   List<FocusNode> focusNodes = List.generate(3, (_) => FocusNode());
@@ -34,7 +36,7 @@ class _AddEventNewNameState extends State<AddEventNewName> {
 
   // Function to handle API request
   Future<void> addEventName(BuildContext context) async {
-    print("///////////////////////////////////hii $selectedDdValues");
+    printToConsole("///////////////////////////////////hii $selectedDdValues");
     setState(() {
       isEventLoading = true; // Set loading to true to show loader and disable button
     });
@@ -43,7 +45,7 @@ class _AddEventNewNameState extends State<AddEventNewName> {
     try{
       body={
             "event_name": name.text,
-            "event_amount": price.text.isNotEmpty ? int.parse(price.text) : 0,
+            "event_amount": price.text.isNotEmpty ? double.parse(price.text) : 0.0,
             "is_special":false
       };
       
@@ -54,7 +56,7 @@ class _AddEventNewNameState extends State<AddEventNewName> {
         path="/neivethiyam/name";
         body={
           "neivethiyam_name": name.text,
-          "neivethiyam_amount": price.text.isNotEmpty ? int.parse(price.text) : 0
+          "neivethiyam_amount": price.text.isNotEmpty ? double.parse(price.text) : 0.0
         };
       }
     }
@@ -72,11 +74,11 @@ class _AddEventNewNameState extends State<AddEventNewName> {
 
       if (res!=null) {
         final String addTo=(selectedDdValues==2) ?"neivethiyam" : (selectedDdValues==1) ? "special" : "normal";
-        widget.onEventNameAdded({'name':name.text,'amount': price.text.isNotEmpty ? int.parse(price.text) : 0,'id':1},addTo);
+        widget.onEventNameAdded({'name':name.text,'amount': price.text.isNotEmpty ? double.parse(price.text) : 0,'id':1},addTo);
         // Navigator.pop(context);
       } 
     } catch (e) {
-      print("rfuyghliuhihiu  uguyguyguk $e");
+      printToConsole("rfuyghliuhihiu  uguyguyguk $e");
       customSnackBar(content: "something went wrong", contentType: AnimatedSnackBarType.error).show(context);
     } finally {
       setState(() {
@@ -164,16 +166,23 @@ class _AddEventNewNameState extends State<AddEventNewName> {
                       }
                     ),
                     const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: isEventLoading
-                          ? null // Disable the button when loading
-                          : () => addEventName(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                      ),
-                      child: isEventLoading
-                          ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
-                          : Text("Add", style: TextStyle(color: Colors.white)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: isEventLoading
+                                ? null // Disable the button when loading
+                                : () => addEventName(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                            ),
+                            child: isEventLoading
+                                ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
+                                : Text("Add", style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

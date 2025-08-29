@@ -1,3 +1,5 @@
+import 'package:sampleflutter/utils/custom_print.dart';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,7 +45,7 @@ class _WorkersNameCard extends State<WorkersNameCard>{
     final String workerName=widget.workerName;
     final String workerNo=widget.workerNo;
     final int workerParticipatedEvents=widget.workerParticipatedEvents;
-    print(workerName);
+    printToConsole(workerName);
     return PopScope(
       canPop: isLoading? false : true,
       onPopInvokedWithResult: (didPop, result) {
@@ -110,7 +112,7 @@ class _WorkersNameCard extends State<WorkersNameCard>{
                                       });
                                       
                                       final res=await NetworkService.sendRequest(path: "/worker", context: context,method: "DELETE",body: {"worker_name":workerName});
-                                        print("hello $res");
+                                        printToConsole("hello $res");
                                         
                                         setState(() {
                                         isLoading=false;
@@ -163,11 +165,11 @@ class _WorkersNameCard extends State<WorkersNameCard>{
                                         isLoading=false;
                                       });
                                       if (res!=null){
-                                        final Map UpdatedWorkerInfo={
+                                        final Map updatedWorkerInfo={
                                           'name':selectedUserName,
                                           'mobile_number':selectedUserNo,
                                         };
-                                        widget.onUpdate(UpdatedWorkerInfo,workerName,selectedUserId);
+                                        widget.onUpdate(updatedWorkerInfo,workerName,selectedUserId);
                                       }
                                     }
                                   ).show();

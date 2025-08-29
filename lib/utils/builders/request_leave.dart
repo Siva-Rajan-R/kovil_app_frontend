@@ -14,7 +14,7 @@ class RequestLeaveAdd extends StatefulWidget {
   );
 
   @override
-  _RequestLeaveAddState createState() => _RequestLeaveAddState();
+  State<RequestLeaveAdd> createState() => _RequestLeaveAddState();
 }
 
 class _RequestLeaveAddState extends State<RequestLeaveAdd> {
@@ -122,38 +122,47 @@ class _RequestLeaveAddState extends State<RequestLeaveAdd> {
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: () => pickFromDate(context),
-                          child: Text(
-                            fromDate == null
-                                ? "Pick From Date"
-                                : "${fromDate!.toLocal()}".split(' ')[0],
-                          ),
-                        ),
-                        Text(
-                          "To",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w600
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                            ),
+                            onPressed: () => pickFromDate(context),
+                            child: Text(
+                              fromDate == null
+                                  ? "Pick From Date"
+                                  : "${fromDate!.toLocal()}".split(' ')[0],
+                            ),
                           ),
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: () => pickToDate(context),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20,right: 20),
                           child: Text(
-                            toDate == null
-                                ? "Pick To Date"
-                                : "${toDate!.toLocal()}".split(' ')[0],
+                            "To",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.w600
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: ElevatedButton(
+                          
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                              
+                            ),
+                            onPressed: () => pickToDate(context),
+                            child: Text(
+                              toDate == null
+                                  ? "Pick To Date"
+                                  : "${toDate!.toLocal()}".split(' ')[0],
+                            ),
                           ),
                         ),
                       ],
@@ -181,16 +190,22 @@ class _RequestLeaveAddState extends State<RequestLeaveAdd> {
                       maxLines: 5,
                     ),
                     const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: isLoading
-                          ? null // Disable the button when loading
-                          : () => addLeave(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                      ),
-                      child: isLoading
-                          ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
-                          : Text("Request Leave", style: TextStyle(color: Colors.white)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: isLoading
+                                ? null // Disable the button when loading
+                                : () => addLeave(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                            ),
+                            child: isLoading
+                                ? SizedBox(width: 18,height: 18,child: CircularProgressIndicator(color: Colors.orange)) // Show loader inside the button
+                                : Text("Request Leave", style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

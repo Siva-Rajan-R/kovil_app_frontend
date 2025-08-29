@@ -7,7 +7,7 @@ class CustomDropdown extends StatelessWidget {
   final List<DropdownMenuEntry> ddEntries;
   final Color? themeColor;
   final Color? textColor;
-  final double? Width;
+  final double? width;
   final FocusNode? focusNode;
   final Function(dynamic)? onSelected;
 
@@ -20,14 +20,14 @@ class CustomDropdown extends StatelessWidget {
     required this.onSelected,
     this.themeColor=Colors.orange,
     this.textColor=Colors.black,
-    this.Width=300,
+    this.width=300,
     this.focusNode
   });
 
   @override
   Widget build(BuildContext context) {
     return DropdownMenu(
-      width: Width,
+      width: width,
       focusNode: focusNode,
       label: Text(
         label,

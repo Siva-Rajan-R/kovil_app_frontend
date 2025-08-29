@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:sampleflutter/utils/custom_print.dart';
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,8 @@ class StatusUpdatePage extends StatefulWidget {
   final bool isForAssign;
   final String eventId;
   final Map? existingEventDetails;
-  const StatusUpdatePage({required this.eventStatus,required this.eventId, this.existingEventDetails, this.isForAssign=true,super.key});
+  final bool isForBookedEvents;
+  const StatusUpdatePage({required this.eventStatus,required this.eventId, this.existingEventDetails, this.isForAssign=true,super.key,this.isForBookedEvents=false});
 
   @override
   State<StatusUpdatePage> createState() => _StatusUpdatePageState();
@@ -43,6 +45,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
   late TextEditingController prepare;
   late TextEditingController statusDesc;
 
+  bool canSendLink=true;
 
   List<Map> workersName=[];
 
@@ -74,7 +77,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
         
         _selectedImagePath = compressedFile.path; // saving path
       });
-      print('Selected image path: $_selectedImagePath');
+      printToConsole('Selected image path: $_selectedImagePath');
     }
   }
 
@@ -100,11 +103,14 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     String nameOfImageField="image";
     String method='PUT';
 
+    printToConsole("lllllllllllllllllllllllllllllllllllllllllllllll${widget.eventStatus.toLowerCase()}");
     if (widget.eventStatus.toLowerCase() == "pending" || widget.eventStatus.toLowerCase() == "canceled"){
+      printToConsole("................................... $canSendLink");
       body={
         "event_id":widget.eventId,
         "event_status": widget.eventStatus,
-        "status_description": statusDesc.text.trim()
+        "status_description": statusDesc.text.trim(),
+        "can_attach_link": canSendLink
       };
       isJson=true;
       path="/event/status/pending-canceled";
@@ -121,7 +127,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       method='POST';
       
     }
-    print(body);
+    printToConsole("$body");
     final res = await NetworkService.sendRequest(
       path: path,
       context: context,
@@ -142,7 +148,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       }
     );
     setState(() => _isSubmitting = false);
-    print(res);
+    printToConsole(res);
     
     if (res!=null) {
       if(_selectedImage!=null){
@@ -164,7 +170,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
     setState(() {
       isLoading=false;
     });
-    print("qwertyuiopasdfghjk $res");
+    printToConsole("qwertyuiopasdfghjk $res");
     if (res!=null){
       workersName=List.from(res['workers']);
     }
@@ -203,7 +209,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
 
     if (existsDetails!=null){
       final bool isForAssign=widget.isForAssign; 
-      print("existsss $existsDetails");
+      printToConsole("existsss $existsDetails");
       efeedback=existsDetails['feedback'] ?? "";
       earchagar=isForAssign? existsDetails['assigned_archagar'] ?? "" : existsDetails['archagar'] ?? "";
       eabisegam=isForAssign? existsDetails['assigned_abisegam'] ?? "":existsDetails['abisegam'] ?? "";
@@ -225,9 +231,9 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    print('Event status: ${widget.eventStatus}');
+    printToConsole('Event status: ${widget.eventStatus}');
     bool canPickImage = !(widget.eventStatus.toLowerCase() == "pending" || widget.eventStatus.toLowerCase() == "canceled");
-    print("workers name is the worls------------$workersName");
+    printToConsole("workers name is the worls------------$workersName");
 
     final List<Map> ddLabels=[
       {"label":"ஸ்தல அர்ச்சகர்","controller":archagar},
@@ -251,22 +257,25 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
       child: Scaffold(
         bottomNavigationBar: CustomBottomAppbar(
           bottomAppbarChild: Center(
-            child: ElevatedButton(
-              onPressed: _isSubmitting ? null : handleSubmit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                
-              ),
-              child:(_isSubmitting==true && widget.eventStatus.toLowerCase() == "completed")? LinearProgressIndicator(
-                  value: uploadingCurrentStatus,
-                  minHeight: 6,
-                  backgroundColor: Colors.white,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
-                  color: Colors.white,
-                )
-              : Text(
-                 _isSubmitting? "Submitting..." : "Submit",
-                style: const TextStyle(color: Colors.white),
+            child: SizedBox(
+              width: 500,
+              child: ElevatedButton(
+                onPressed: _isSubmitting ? null : handleSubmit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  
+                ),
+                child:(_isSubmitting==true && widget.eventStatus.toLowerCase() == "completed")? LinearProgressIndicator(
+                    value: uploadingCurrentStatus,
+                    minHeight: 6,
+                    backgroundColor: Colors.white,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                    color: Colors.white,
+                  )
+                : Text(
+                   _isSubmitting? "Submitting..." : "Submit",
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ),
@@ -275,36 +284,59 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
         appBar: const KovilAppBar(withIcon: true),
         body: (widget.eventStatus.toLowerCase() == "pending" || widget.eventStatus.toLowerCase() == "canceled")? 
         Center(
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width>400? 500 : null,
-              child: TextField(
-                controller: statusDesc,
-                style: const TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.w600),
-                cursorColor: Colors.orange,
-                minLines: 5,
-                decoration: InputDecoration(
-                  hintText: 'Write a reason for ${widget.eventStatus}...',
-                  hintStyle: const TextStyle(
-                      color: Colors.grey, fontWeight: FontWeight.w500),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black38),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width>400? 500 : null,
+                  child: TextField(
+                    controller: statusDesc,
+                    style: const TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.w600),
+                    cursorColor: Colors.orange,
+                    minLines: 5,
+                    decoration: InputDecoration(
+                      hintText: 'Write a reason for ${widget.eventStatus}...',
+                      hintStyle: const TextStyle(
+                          color: Colors.grey, fontWeight: FontWeight.w500),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black38),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.orange),
+                      ),
+                      alignLabelWithHint: true,
+                    ),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 6,
                   ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.orange),
-                  ),
-                  alignLabelWithHint: true,
                 ),
-                keyboardType: TextInputType.multiline,
-                maxLines: 6,
               ),
-            ),
+              SizedBox(height: 10,),
+              if(widget.isForBookedEvents)
+                Row(
+                  children: [
+                    Checkbox(
+                      value: canSendLink,
+                      overlayColor: WidgetStatePropertyAll(Colors.orange.shade50),
+                      activeColor: Colors.orange,
+                      checkColor: Colors.white,
+                      onChanged: (value)=>setState(() {
+                        printToConsole("$value");
+                        canSendLink=value!;
+                      })
+                    ),
+                    Text("Can attach a new event booking link",style: TextStyle(color: Colors.orange,fontWeight: FontWeight.w600),)
+                  ],
+                )
+            ],
           ),
         )
         : SingleChildScrollView(
           scrollDirection: Axis.vertical,
+          physics: BouncingScrollPhysics(),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -356,7 +388,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
                     Padding(
                       padding: const EdgeInsets.all(10),
                       child: CustomDropdown(
-                        Width: 400,
+                        width: 400,
                         label: ddLabels[i]['label'],
                         ddController: ddLabels[i]['controller'],
                         ddEntries: [
@@ -367,7 +399,7 @@ class _StatusUpdatePageState extends State<StatusUpdatePage> {
                             )
                         ],
                         onSelected: (value) {
-                          print("Selected worker ID: $value");
+                          printToConsole("Selected worker ID: $value");
                         },
                       ),
                     ),
